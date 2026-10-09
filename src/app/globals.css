@@ -363,3 +363,12 @@ a {
 .ui-social-media a:hover i {
   color: var(--primary-color) !important;
 }
+
+/* keep the home hero floating boxes inside the viewport */
+.hero-home2 .home2-hero-content .iconbox-small1,
+.hero-home2 .home2-hero-content .iconbox-small2 {
+  white-space: nowrap;
+}
+.hero-home2 .home2-hero-content .iconbox-small2 {
+  right: 0;
+}

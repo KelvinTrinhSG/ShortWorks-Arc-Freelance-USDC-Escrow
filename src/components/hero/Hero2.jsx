@@ -196,27 +196,28 @@ export default function Hero2() {
               />
               <div className="home2-hero-content position-relative">
                 <div className="iconbox-small1 d-none d-xl-flex wow fadeInRight default-box-shadow4 bounce-x animate-up-1">
-                  <span className="icon flaticon-review" />
+                  <span className="icon flaticon-video-file" />
                   <div className="details pl20">
-                    <h6 className="mb-1">Proof of quality</h6>
-                    <p className="text fz13 mb-0">Lorem Ipsum Dolar Amet</p>
+                    <h6 className="mb-1">Vetted video talent</h6>
+                    <p className="text fz13 mb-0">Real portfolios & reviews</p>
                   </div>
                 </div>
                 <div className="iconbox-small2 d-none d-xl-flex wow fadeInLeft default-box-shadow4 bounce-y animate-up-2">
-                  <span className="icon flaticon-review" />
+                  <span className="icon flaticon-rocket" />
                   <div className="details pl20">
-                    <h6 className="mb-1">Safe and secure</h6>
-                    <p className="text fz13 mb-0">Lorem Ipsum Dolar Amet</p>
+                    <h6 className="mb-1">Fast turnaround</h6>
+                    <p className="text fz13 mb-0">Reels, TikToks & Shorts</p>
                   </div>
                 </div>
-                <Image
-                  height={68}
-                  width={362}
-                  style={{ height: "fit-content" }}
-                  src="/images/about/happy-client.png"
-                  alt="happy-client"
-                  className="bounce-x bdrs16 img-1 default-box-shadow4"
-                />
+                <div className="bounce-x bdrs16 img-1 default-box-shadow4 bgc-white d-flex align-items-center px25 py10 text-nowrap">
+                  <h6 className="mb-0 me-3">10K+ Happy Creators</h6>
+                  <Image
+                    height={54}
+                    width={163}
+                    src="/images/about/avatars_163x43 New.png"
+                    alt="happy creators"
+                  />
+                </div>
               </div>
             </div>
           </div>
