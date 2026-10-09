@@ -7,9 +7,9 @@ export default function CtaBannerCard1() {
         <div className="testimonial-style4 position-relative ps-0">
           <h2 className="sub-title text-thm mb25">Envato</h2>
           <h4 className="title mb35 text-white mb60 mb30-md">
-            “ I have used Freeio numerous times for several different companies.
+            “ I have used ShortWorks numerous times for several different companies.
             I have always had great experiences. I once tried using someone else
-            and I ended up having to cancel the order and move back to Freeio. ”
+            and I ended up having to cancel the order and move back to ShortWorks. ”
           </h4>
           <div className="d-flex align-items-center mb30 mb0-sm">
             <Image

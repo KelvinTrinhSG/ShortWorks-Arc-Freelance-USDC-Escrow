@@ -89,7 +89,7 @@ export default function TermsCondition1() {
                       </p>
                     </div>
                     <div className="grids mb90 mb40-md">
-                      <h4 className="title">2. Your Use of the Freeio Sites</h4>
+                      <h4 className="title">2. Your Use of the ShortWorks Sites</h4>
                       <p className="mb25 text fz15">
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                         Risus nascetur morbi nisl, mi, in semper metus porttitor
@@ -185,7 +185,7 @@ export default function TermsCondition1() {
                       </p>
                     </div>
                     <div className="grids mb90 mb40-md">
-                      <h4 className="title">2. Your Use of the Freeio Sites</h4>
+                      <h4 className="title">2. Your Use of the ShortWorks Sites</h4>
                       <p className="mb25 text fz15">
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                         Risus nascetur morbi nisl, mi, in semper metus porttitor
@@ -281,7 +281,7 @@ export default function TermsCondition1() {
                       </p>
                     </div>
                     <div className="grids mb90 mb40-md">
-                      <h4 className="title">2. Your Use of the Freeio Sites</h4>
+                      <h4 className="title">2. Your Use of the ShortWorks Sites</h4>
                       <p className="mb25 text fz15">
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                         Risus nascetur morbi nisl, mi, in semper metus porttitor
@@ -377,7 +377,7 @@ export default function TermsCondition1() {
                       </p>
                     </div>
                     <div className="grids mb90 mb40-md">
-                      <h4 className="title">2. Your Use of the Freeio Sites</h4>
+                      <h4 className="title">2. Your Use of the ShortWorks Sites</h4>
                       <p className="mb25 text fz15">
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                         Risus nascetur morbi nisl, mi, in semper metus porttitor
@@ -473,7 +473,7 @@ export default function TermsCondition1() {
                       </p>
                     </div>
                     <div className="grids mb90 mb40-md">
-                      <h4 className="title">2. Your Use of the Freeio Sites</h4>
+                      <h4 className="title">2. Your Use of the ShortWorks Sites</h4>
                       <p className="mb25 text fz15">
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                         Risus nascetur morbi nisl, mi, in semper metus porttitor

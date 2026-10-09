@@ -43,7 +43,7 @@ export default function Header10() {
                                             href="/"
                                         >
                                             <Image
-                                                width={133}
+                                                width={180}
                                                 height={40}
                                                 src="/images/header-logo3.svg"
                                                 alt="Header Logo"

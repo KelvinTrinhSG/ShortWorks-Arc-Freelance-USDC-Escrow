@@ -6,7 +6,7 @@ import HeaderInfo1 from "@/components/section/HeaderInfo1";
 import ShopArea1 from "@/components/section/ShopArea1";
 
 export const metadata = {
-    title: "Freeio - Freelance Marketplace React/Next Js Template | Job List",
+    title: "ShortWorks - Freelance Marketplace | Job List",
 };
 
 export default function page() {

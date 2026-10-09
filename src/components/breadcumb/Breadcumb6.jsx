@@ -26,7 +26,7 @@ export default function Breadcumb6() {
                     >
                       <i className="fal fa-play" />
                     </a>
-                    <h6 className="mb-0 text-white">How Freeio Works</h6>
+                    <h6 className="mb-0 text-white">How ShortWorks Works</h6>
                   </div>
                 </div>
               </div>

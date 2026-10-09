@@ -23,7 +23,7 @@ export default function NavSidebar() {
           <Link href="/">
             <Image
               alt="Header Logo"
-              width="133"
+              width="180"
               height="40"
               src="/images/header-logo2.svg"
             />

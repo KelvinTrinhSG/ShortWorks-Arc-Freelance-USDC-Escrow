@@ -9,7 +9,7 @@ import Header20 from "@/components/header/Header20";
 import Footer from "@/components/footer/Footer";
 
 export const metadata = {
-    title: "Freeio - Freelance Marketplace React/Next Js Template | Become seller",
+    title: "ShortWorks - Freelance Marketplace | Become seller",
 };
 
 export default function page() {

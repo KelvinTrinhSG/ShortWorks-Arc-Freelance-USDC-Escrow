@@ -5,7 +5,7 @@ import BlogArea4 from "@/components/section/BlogArea4";
 import RecentPostArea1 from "@/components/section/RecentPostArea1";
 
 export const metadata = {
-    title: "Freeio - Freelance Marketplace React/Next Js Template | Blog Single",
+    title: "ShortWorks - Freelance Marketplace | Blog Single",
 };
 
 export default function page() {

@@ -14,7 +14,7 @@ import TrendingService14 from "@/components/section/TrendingService14";
 import React from "react";
 
 export const metadata = {
-    title: "Freeio - Freelance Marketplace React/Next Js Template | Home 14",
+    title: "ShortWorks - Freelance Marketplace | Home 14",
 };
 
 export default function page() {

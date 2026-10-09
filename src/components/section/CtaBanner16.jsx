@@ -21,7 +21,7 @@ export default function CtaBanner16() {
             <div className="cta-style3 wow fadeInLeft">
               <h2 className="cta-title">
                 We Provide Stable Service <br className="d-none d-xl-block" />
-                With Freeio.
+                With ShortWorks.
               </h2>
               <p className="cta-text">
                 Work with the largest network of independent professionals and{" "}

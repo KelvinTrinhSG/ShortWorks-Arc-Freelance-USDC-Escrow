@@ -19,7 +19,7 @@ export default function Header13() {
                                             href="/"
                                         >
                                             <Image
-                                                width={133}
+                                                width={180}
                                                 height={40}
                                                 src="/images/header-logo-dark.svg"
                                                 alt="Header Logo"

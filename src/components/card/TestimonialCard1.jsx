@@ -19,10 +19,10 @@ export default function TestimonialCard1() {
           <div className="testimonial-style4 position-relative">
             <h2 className="sub-title text-thm mb25">Envato</h2>
             <h4 className="title mb35">
-              “ I have used Freeio numerous times for several different
+              “ I have used ShortWorks numerous times for several different
               companies. I have always had great experiences. I once tried using
               someone else and I ended up having to cancel the order and move
-              back to Freeio. ”
+              back to ShortWorks. ”
             </h4>
             <h6 className="author fz14">Courtney Henry</h6>
             <p className="desig mb-0">Product Manager | Envato</p>

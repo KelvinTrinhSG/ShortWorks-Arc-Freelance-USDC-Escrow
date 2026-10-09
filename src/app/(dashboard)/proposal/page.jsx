@@ -4,7 +4,7 @@ import ProposalInfo from "@/components/dashboard/section/ProposalInfo";
 import MobileNavigation2 from "@/components/header/MobileNavigation2";
 
 export const metadata = {
-  title: "Freeio - Freelance Marketplace React/Next Js Template | Proposal",
+  title: "ShortWorks - Freelance Marketplace | Proposal",
 };
 
 export default function page() {

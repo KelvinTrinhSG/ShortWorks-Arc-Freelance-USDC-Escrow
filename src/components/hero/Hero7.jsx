@@ -57,7 +57,7 @@ export default function Hero7() {
                   any job, online.
                 </h1>
                 <p className="animate-up-2 ff-heading mb30">
-                  Millions of people use freeio.com to turn their ideas into
+                  Millions of people use shortworks.com to turn their ideas into
                   reality.
                 </p>
                 <div className="advance-search-tab at-home7 bgc-white bdrs4 p10 position-relative zi2 animate-up-3">

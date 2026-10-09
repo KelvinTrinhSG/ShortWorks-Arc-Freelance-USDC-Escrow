@@ -42,7 +42,7 @@ export default function Hero8() {
                 Your Business
               </h1>
               <p className="animate-up-2 text-white ff-heading mb30">
-                Millions of people use freeio.com to turn their ideas into
+                Millions of people use shortworks.com to turn their ideas into
                 reality.
               </p>
               <div className="advance-search-tab bgc-white bdrs4 p10 position-relative zi1 animate-up-3">

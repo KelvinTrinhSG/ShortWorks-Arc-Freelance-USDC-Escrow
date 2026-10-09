@@ -40,7 +40,7 @@ export default function ContactInfo1() {
                   </div>
                   <div className="details">
                     <h5 className="title">Email</h5>
-                    <p className="mb-0 text">hello@freeio.com</p>
+                    <p className="mb-0 text">hello@shortworks.com</p>
                   </div>
                 </div>
               </div>

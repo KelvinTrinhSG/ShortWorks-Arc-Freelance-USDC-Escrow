@@ -20,7 +20,7 @@ export default function Header10() {
                                         >
                                             <Image
                                                 height={40}
-                                                width={133}
+                                                width={180}
                                                 src="/images/header-logo3.svg"
                                                 alt="Header Logo"
                                             />

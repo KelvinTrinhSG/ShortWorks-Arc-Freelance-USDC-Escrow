@@ -17,7 +17,7 @@ export default function Testimonials19() {
             <div className="col-lg-9 mx-auto">
               <div className="main-title text-center">
                 <h2 className="title text-white">
-                  People Love To Learn With Freeio
+                  People Love To Learn With ShortWorks
                 </h2>
                 <p className="paragraph text-white">
                   Lorem ipsum dolor sit amet, consectetur.

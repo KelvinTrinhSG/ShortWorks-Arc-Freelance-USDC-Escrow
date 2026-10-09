@@ -14,7 +14,7 @@ export default function LearnFreeio17() {
         <div className="row align-items-center wow fadeInUp">
           <div className="col-lg-9 mx-auto">
             <div className="main-title text-center">
-              <h2 className="title">People Love To Learn With Freeio</h2>
+              <h2 className="title">People Love To Learn With ShortWorks</h2>
               <p className="paragraph">
                 Lorem ipsum dolor sit amet, consectetur.
               </p>

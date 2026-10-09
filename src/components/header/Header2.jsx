@@ -27,7 +27,7 @@ export default function Header2() {
                                         >
                                             <Image
                                                 height={40}
-                                                width={133}
+                                                width={180}
                                                 src="/images/header-logo.svg"
                                                 alt="Header Logo"
                                             />
@@ -38,7 +38,7 @@ export default function Header2() {
                                         >
                                             <Image
                                                 height={40}
-                                                width={133}
+                                                width={180}
                                                 src="/images/header-logo2.svg"
                                                 alt="Header Logo"
                                             />

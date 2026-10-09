@@ -35,7 +35,7 @@ export default function Invoice() {
                       <div className="main_logo mb30-md">
                         <Image
                           height={40}
-                          width={133}
+                          width={180}
                           src="/images/header-logo-dark.svg"
                           alt="logo"
                         />
@@ -139,12 +139,12 @@ export default function Invoice() {
                   <div className="row justify-content-center">
                     <div className="col-auto">
                       <div className="invoice_footer_content text-center">
-                        <a className="ff-heading">www.freeio.com</a>
+                        <a className="ff-heading">www.shortworks.com</a>
                       </div>
                     </div>
                     <div className="col-auto">
                       <div className="invoice_footer_content text-center">
-                        <a className="ff-heading">invoice@freeio.com</a>
+                        <a className="ff-heading">invoice@shortworks.com</a>
                       </div>
                     </div>
                     <div className="col-auto">

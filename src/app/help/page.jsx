@@ -3,7 +3,7 @@ import Header20 from "@/components/header/Header20";
 import OurFaqSection1 from "@/components/section/OurFaqSection1";
 
 export const metadata = {
-    title: "Freeio - Freelance Marketplace React/Next Js Template | Help",
+    title: "ShortWorks - Freelance Marketplace | Help",
 };
 
 export default function page() {

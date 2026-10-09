@@ -28,7 +28,7 @@ export default function Header17() {
                                             href="/"
                                         >
                                             <Image
-                                                width={133}
+                                                width={180}
                                                 height={40}
                                                 src="/images/header-logo-white.svg"
                                                 alt="Header Logo"
@@ -39,7 +39,7 @@ export default function Header17() {
                                             href="/"
                                         >
                                             <Image
-                                                width={133}
+                                                width={180}
                                                 height={40}
                                                 src="/images/header-logo2.svg"
                                                 alt="Header Logo"

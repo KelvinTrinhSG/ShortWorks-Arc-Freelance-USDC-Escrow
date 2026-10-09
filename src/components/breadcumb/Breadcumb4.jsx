@@ -69,7 +69,7 @@ export default function Breadcumb4() {
                     >
                       <i className="fal fa-play" />
                     </a>
-                    <h6 className="mb-0">How Freeio Works</h6>
+                    <h6 className="mb-0">How ShortWorks Works</h6>
                   </div>
                 </div>
               </div>

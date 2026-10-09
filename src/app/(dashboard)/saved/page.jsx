@@ -4,7 +4,7 @@ import SavedInfo from "@/components/dashboard/section/SavedInfo";
 import MobileNavigation2 from "@/components/header/MobileNavigation2";
 
 export const metadata = {
-  title: "Freeio - Freelance Marketplace React/Next Js Template | Saved",
+  title: "ShortWorks - Freelance Marketplace | Saved",
 };
 
 export default function page() {

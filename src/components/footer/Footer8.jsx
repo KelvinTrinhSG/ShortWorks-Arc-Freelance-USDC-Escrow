@@ -88,7 +88,7 @@ export default function Footer8() {
                                 <Link className="footer-logo" href="/">
                                     <Image
                                         height={40}
-                                        width={133}
+                                        width={180}
                                         className="mb40"
                                         src="images/header-logo4.svg"
                                         alt="logo4"
@@ -118,9 +118,9 @@ export default function Footer8() {
                                             <h5 className="info-mail">
                                                 <Link
                                                     className="text-white"
-                                                    href="mailto:hi@freeio.com"
+                                                    href="mailto:hi@shortworks.com"
                                                 >
-                                                    hi@freeio.com
+                                                    hi@shortworks.com
                                                 </Link>
                                             </h5>
                                         </div>
@@ -177,7 +177,7 @@ export default function Footer8() {
                         <div className="col-sm-6">
                             <div className="text-center text-lg-start">
                                 <p className="copyright-text mb-2 mb-md-0 text-white-light ff-heading">
-                                    © Freeio. 2023{" "}
+                                    © ShortWorks. 2023{" "}
                                     <Link
                                         href="https://themeforest.net/user/ib-themes/portfolio"
                                         target="_blank"

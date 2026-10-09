@@ -40,7 +40,7 @@ export default function AboutMe1() {
                 <i className="flaticon-mail text-thm2 pe-2 vam" />
                 Email
               </span>
-              <span>info@freeio.com</span>
+              <span>info@shortworks.com</span>
             </a>
             <a className="d-flex align-items-center justify-content-between mb-3">
               <span className="text">

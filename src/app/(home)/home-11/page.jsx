@@ -12,7 +12,7 @@ import Testimonials11 from "@/components/section/Testimonials11";
 import React from "react";
 
 export const metadata = {
-    title: "Freeio - Freelance Marketplace React/Next Js Template | Home 11",
+    title: "ShortWorks - Freelance Marketplace | Home 11",
 };
 
 export default function page() {

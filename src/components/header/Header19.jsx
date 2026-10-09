@@ -15,7 +15,7 @@ export default function Header19() {
                   <div className="logos">
                     <Link className="header-logo logo1" href="/">
                       <Image
-                        width={133}
+                        width={180}
                         height={40}
                         src="/images/header-logo-dark2.svg"
                         alt="Header Logo"

@@ -24,7 +24,7 @@ export default function Header16() {
                   <div className="logos">
                     <Link className="header-logo logo1" href="/">
                       <Image
-                        width={133}
+                        width={180}
                         height={40}
                         src="/images/header-logo-white.svg"
                         alt="Header Logo"
@@ -32,7 +32,7 @@ export default function Header16() {
                     </Link>
                     <Link className="header-logo logo2" href="/">
                       <Image
-                        width={133}
+                        width={180}
                         height={40}
                         src="/images/header-logo2.svg"
                         alt="Header Logo"

@@ -10,10 +10,10 @@ export default function CtaBanner6() {
               <div className="testimonial-style4 position-relative ps-0">
                 <h2 className="sub-title text-thm mb20">Envato</h2>
                 <h4 className="title mb45 mb30-md">
-                  “ I have used Freeio numerous times for several different
+                  “ I have used ShortWorks numerous times for several different
                   companies. I have always had great experiences. I once tried
                   using someone else and I ended up having to cancel the order
-                  and move back to Freeio. ”
+                  and move back to ShortWorks. ”
                 </h4>
                 <h6 className="author fz14">Ali Tufan</h6>
                 <p className="desig mb-0">Product Manager, Apple Inc</p>

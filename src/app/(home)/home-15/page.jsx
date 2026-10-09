@@ -13,7 +13,7 @@ import TrendingService15 from "@/components/section/TrendingService15";
 import React from "react";
 
 export const metadata = {
-    title: "Freeio - Freelance Marketplace React/Next Js Template | Home 15",
+    title: "ShortWorks - Freelance Marketplace | Home 15",
 };
 
 export default function page() {

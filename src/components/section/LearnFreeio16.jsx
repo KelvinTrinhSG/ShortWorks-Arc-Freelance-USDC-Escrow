@@ -81,7 +81,7 @@ export default function LearnFreeio16() {
                   </ul>
                   <p className="fz15 dark-color">
                     Clients rate <br />
-                    professionals on Freeio
+                    professionals on ShortWorks
                   </p>
                 </div>
                 <div className="funfact-style1 at-home5 bdrs16 text-center ms-md-auto">

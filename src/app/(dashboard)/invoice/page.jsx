@@ -4,7 +4,7 @@ import InvoiceInfo from "@/components/dashboard/section/InvoiceInfo";
 import MobileNavigation2 from "@/components/header/MobileNavigation2";
 
 export const metadata = {
-  title: "Freeio - Freelance Marketplace React/Next Js Template | Invoice",
+  title: "ShortWorks - Freelance Marketplace | Invoice",
 };
 
 export default function page() {

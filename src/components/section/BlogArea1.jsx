@@ -29,7 +29,7 @@ export default function BlogArea1() {
           <div className="row">
             <div className="col-lg-12">
               <div className="main-title mb50">
-                <h2 className="title">Freeio Blog</h2>
+                <h2 className="title">ShortWorks Blog</h2>
                 <p className="text mb-0">
                   Give your visitor a smooth online experience with a solid UX
                   design

@@ -23,7 +23,7 @@ export default function Header20() {
                                     >
                                         <Image
                                             height={40}
-                                            width={133}
+                                            width={180}
                                             className="w-100 h-100 object-fit-contain"
                                             src="/images/header-logo-dark.svg"
                                             alt="Header Logo"

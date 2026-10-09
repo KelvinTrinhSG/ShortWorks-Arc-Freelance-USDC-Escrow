@@ -12,7 +12,7 @@ export default function MobileNavigation7() {
                 <Link className="mobile_logo" href="/home-7">
                   <Image
                     height={40}
-                    width={133}
+                    width={180}
                     src="/images/header-logo-dark.svg"
                     alt="Header Logo"
                   />

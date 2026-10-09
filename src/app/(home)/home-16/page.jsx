@@ -13,7 +13,7 @@ import PopularService1 from "@/components/section/PopularService1";
 import React from "react";
 
 export const metadata = {
-    title: "Freeio - Freelance Marketplace React/Next Js Template | Home 16",
+    title: "ShortWorks - Freelance Marketplace | Home 16",
 };
 
 export default function page() {

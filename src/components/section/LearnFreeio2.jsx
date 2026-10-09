@@ -10,7 +10,7 @@ export default function LearnFreeio2() {
           <div className="row align-items-center wow fadeInUp">
             <div className="col-lg-9">
               <div className="main-title">
-                <h2 className="title">People Love To Learn With Freeio</h2>
+                <h2 className="title">People Love To Learn With ShortWorks</h2>
                 <p className="paragraph">
                   Lorem ipsum dolor sit amet, consectetur.
                 </p>
@@ -51,7 +51,7 @@ export default function LearnFreeio2() {
                     </li>
                   </ul>
                   <p className="text mb-0">
-                    Clients rate professionals on Freeio
+                    Clients rate professionals on ShortWorks
                   </p>
                 </div>
               </div>

@@ -13,7 +13,7 @@ export default function InspiringService11() {
         >
           <div className="col-lg-9">
             <div className="main-title">
-              <h2 className="title">Inspiring work made on Freeio</h2>
+              <h2 className="title">Inspiring work made on ShortWorks</h2>
               <p className="paragraph">
                 Get some Inspirations from 1800+ skills
               </p>
