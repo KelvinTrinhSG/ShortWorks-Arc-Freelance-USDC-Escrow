@@ -3,15 +3,8 @@ import { useState } from "react";
 
 const categories = [
   "All Categories",
-  "Graphics Design",
-  "Digital Marketing",
-  "Writing Translation",
-  "Video Animation",
-  "Music Audio",
-  "Programming Tech",
-  "Business",
-  "Lifestyle",
-  "Trending",
+  "Short-Form Video Editor",
+  "Short-Form Video Animator",
 ];
 
 export default function TabSection2() {
