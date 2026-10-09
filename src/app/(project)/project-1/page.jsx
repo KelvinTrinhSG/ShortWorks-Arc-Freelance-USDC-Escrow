@@ -1,4 +1,4 @@
-import Breadcumb3 from "@/components/breadcumb/Breadcumb3";
+import { projectBanner } from "@/data/categoryBanner";
 import Breadcumb9 from "@/components/breadcumb/Breadcumb9";
 import Header20 from "@/components/header/Header20";
 
@@ -14,8 +14,7 @@ export default function page() {
         <>
             <Header20 />
             <TabSection1 />
-            <Breadcumb3 path={["Home", "Projects"]} showVideoCategory />
-            <Breadcumb9 />
+            <Breadcumb9 content={projectBanner} />
             <Listing8 />
         </>
     );

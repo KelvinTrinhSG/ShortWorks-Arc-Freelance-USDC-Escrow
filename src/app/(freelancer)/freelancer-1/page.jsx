@@ -1,5 +1,5 @@
-import Breadcumb16 from "@/components/breadcumb/Breadcumb16";
-import Breadcumb3 from "@/components/breadcumb/Breadcumb3";
+import { freelancerBanner } from "@/data/categoryBanner";
+import Breadcumb9 from "@/components/breadcumb/Breadcumb9";
 import Footer from "@/components/footer/Footer";
 import Header20 from "@/components/header/Header20";
 
@@ -15,8 +15,7 @@ export default function page() {
         <>
             <Header20 />
             <TabSection1 />
-            <Breadcumb3 path={["Home", "Freelancers"]} showVideoCategory />
-            <Breadcumb16 />
+            <Breadcumb9 content={freelancerBanner} />
             <Listing13 />
             <Footer />
         </>

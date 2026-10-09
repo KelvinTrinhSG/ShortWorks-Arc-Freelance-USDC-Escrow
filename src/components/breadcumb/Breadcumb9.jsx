@@ -1,8 +1,10 @@
 import Image from "next/image";
+import CategoryHeading from "./CategoryHeading";
 
 export default function Breadcumb9({
   title = "Projects List",
   description = "All the Lorem Ipsum generators on the Internet tend to repeat.",
+  content,
 }) {
   return (
     <>
@@ -33,8 +35,14 @@ export default function Breadcumb9({
             <div className="row wow fadeInUp">
               <div className="col-xl-7">
                 <div className="position-relative">
-                  <h2>{title}</h2>
-                  <p className="text mb30">{description}</p>
+                  {content ? (
+                    <CategoryHeading content={content} textClassName="text mb30" />
+                  ) : (
+                    <>
+                      <h2>{title}</h2>
+                      <p className="text mb30">{description}</p>
+                    </>
+                  )}
                 </div>
                 <div className="advance-search-tab bgc-white p10 bdrs4 zi1 position-relative">
                   <div className="row">
