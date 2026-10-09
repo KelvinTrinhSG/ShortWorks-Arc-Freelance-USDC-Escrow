@@ -23,7 +23,7 @@ export default function Header2() {
                                     <div className="logos">
                                         <Link
                                             className="header-logo logo1"
-                                            href="/home-2"
+                                            href="/"
                                         >
                                             <Image
                                                 height={40}
@@ -34,7 +34,7 @@ export default function Header2() {
                                         </Link>
                                         <Link
                                             className="header-logo logo2"
-                                            href="/home-2"
+                                            href="/"
                                         >
                                             <Image
                                                 height={40}
@@ -64,7 +64,7 @@ export default function Header2() {
                                         href="/become-seller"
                                     >
                                         <span className="d-none d-xl-inline-block">
-                                            Become a
+                                            Become a{" "}
                                         </span>
                                         Seller
                                     </Link>

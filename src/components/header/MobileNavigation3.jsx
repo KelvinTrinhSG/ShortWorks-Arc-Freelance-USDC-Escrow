@@ -9,7 +9,7 @@ export default function MobileNavigation3() {
           <div className="header bgc-thm5 bdrb1">
             <div className="menu_and_widgets">
               <div className="mobile_menu_bar d-flex justify-content-between align-items-center">
-                <Link className="mobile_logo" href="/home-2">
+                <Link className="mobile_logo" href="/">
                   <Image
                     height={40}
                     width={180}

@@ -10,7 +10,7 @@ export default function CtaBanner1() {
       <section className="p-0">
         <div
           className={`cta-banner3 mx-auto maxw1600 pt120 pt60-lg pb90 pb60-lg position-relative overflow-hidden ${
-            path === "/" || path === "/about-1"
+            path === "/about-1"
               ? "bgc-light-yellow"
               : path === "/become-seller"
               ? "bgc-thm4"

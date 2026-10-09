@@ -22,7 +22,7 @@ export default function PopularServiceSlideCard1({
       <div
         className={`listing-style1 ${path === "/home-7" ? "style5" : ""} 
                 ${
-                  path === "/home-2" ||
+                  path === "/" ||
                   path === "/home-9" ||
                   path === "/home-16" ||
                   path === "/home-14"

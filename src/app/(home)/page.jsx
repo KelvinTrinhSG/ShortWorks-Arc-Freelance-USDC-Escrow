@@ -1,38 +1,34 @@
-import Footer from "@/components/footer/Footer";
-import Header1 from "@/components/header/Header1";
-import Hero1 from "@/components/hero/Hero1";
-import About1 from "@/components/section/About1";
-import BrowserCategory1 from "@/components/section/BrowserCategory1";
-import CounterInfo1 from "@/components/section/CounterInfo1";
-import CtaBanner1 from "@/components/section/CtaBanner1";
-import NeedSomething1 from "@/components/section/NeedSomething1";
-import OurBlog1 from "@/components/section/OurBlog1";
-import OurCta1 from "@/components/section/OurCta1";
+import Footer2 from "@/components/footer/Footer2";
+import Header2 from "@/components/header/Header2";
+import Hero2 from "@/components/hero/Hero2";
+import BrowserCategory2 from "@/components/section/BrowserCategory2";
+import CtaBanner2 from "@/components/section/CtaBanner2";
+import HighestRated1 from "@/components/section/HighestRated1";
+import LearnFreeio1 from "@/components/section/LearnFreeio1";
+import NeedSomething2 from "@/components/section/NeedSomething2";
 import OurPartner1 from "@/components/section/OurPartner1";
-import Testimonial1 from "@/components/section/Testimonial1";
-import TrendingService1 from "@/components/section/TrendingService1";
+import PopularService1 from "@/components/section/PopularService1";
+import PriceTable1 from "@/components/section/PriceTable1";
 
 export const metadata = {
-    title: "ShortWorks - Freelance Marketplace | Home 1",
+    title: "ShortWorks - Freelance Marketplace",
 };
 
 export default function page() {
     return (
         <>
             <div className="wrapper ovh">
-                <Header1 />
-                <Hero1 />
-                <BrowserCategory1 />
-                <TrendingService1 />
-                <NeedSomething1 />
-                <CtaBanner1 />
-                <CounterInfo1 />
-                <Testimonial1 />
-                <About1 />
-                <OurBlog1 />
+                <Header2 />
+                <Hero2 />
+                <NeedSomething2 />
+                <PopularService1 />
+                <CtaBanner2 />
                 <OurPartner1 />
-                <OurCta1 />
-                <Footer />
+                <BrowserCategory2 />
+                <HighestRated1 />
+                <LearnFreeio1 />
+                <PriceTable1 />
+                <Footer2 />
             </div>
         </>
     );
