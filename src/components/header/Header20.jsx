@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import Mega from "./Mega";
 import Navigation from "./Navigation";
 import MobileNavigation2 from "./MobileNavigation2";
+import HeaderAuthLinks from "./HeaderAuthLinks";
 
 export default function Header20() {
     const path = usePathname();
@@ -57,20 +58,10 @@ export default function Header20() {
                                         </span>{" "}
                                         Seller
                                     </Link>
-                                    <Link
-                                        className={`login-info mr15-lg mr30 ${
-                                            path === "/login" ? "ui-active" : ""
-                                        }`}
-                                        href="/login"
-                                    >
-                                        Sign in
-                                    </Link>
-                                    <Link
-                                        className="ud-btn btn-thm add-joining"
-                                        href="/register"
-                                    >
-                                        Join
-                                    </Link>
+                                    <HeaderAuthLinks
+                                        signInClassName="login-info mr15-lg mr30"
+                                        joinClassName="ud-btn btn-thm add-joining"
+                                    />
                                 </div>
                             </div>
                         </div>

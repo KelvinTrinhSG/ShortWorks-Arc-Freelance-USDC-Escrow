@@ -1,11 +1,13 @@
 "use client";
 import { dasboardNavigation } from "@/data/dashboard";
+import authStore from "@/store/authStore";
 import Link from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 export default function DashboardNavigation() {
   const [isActive, setActive] = useState(false);
   const path = usePathname()
+  const logout = authStore((state) => state.logout);
 
   return (
     <>
@@ -44,7 +46,10 @@ export default function DashboardNavigation() {
             </li>
             {dasboardNavigation.slice(13, 15).map((item,i) => (
               <li className={path == item.path ? 'mobile-dasboard-menu-active' : ''}  onClick={() => setActive(false)} key={i}>
-                <Link href={item.path}>
+                <Link
+                  href={item.path}
+                  onClick={item.name === "Logout" ? logout : undefined}
+                >
                   <i className={`${item.icon} mr10`} />
                   {item.name}
                 </Link>

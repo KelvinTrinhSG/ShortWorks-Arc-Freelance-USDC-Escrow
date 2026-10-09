@@ -13,9 +13,8 @@ const menus = [
     id: 3,
     name: "Users",
     children: [
-      { id: 1, name: "Dashboard", path: "/dashboard" },
-      { id: 2, name: "Employer", path: "/employee-1" },
-      { id: 3, name: "Freelancer", path: "/freelancer-1" },
+      { id: 1, name: "Employer", path: "/employee-1" },
+      { id: 2, name: "Freelancer", path: "/freelancer-1" },
     ],
   },
   {

@@ -1,10 +1,12 @@
 "use client";
 import { dasboardNavigation } from "@/data/dashboard";
+import authStore from "@/store/authStore";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 export default function DashboardSidebar() {
   const path = usePathname();
+  const logout = authStore((state) => state.logout);
 
   return (
     <>
@@ -46,6 +48,7 @@ export default function DashboardSidebar() {
             <div key={ i } className="sidebar_list_item mb-1">
               <Link
                 href={item.path}
+                onClick={item.name === "Logout" ? logout : undefined}
                 className={`items-center ${
                   path === item.path ? "-is-active" : ""
                 }`}

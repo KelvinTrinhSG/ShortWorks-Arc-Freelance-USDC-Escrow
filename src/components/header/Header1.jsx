@@ -5,6 +5,7 @@ import Image from "next/image";
 import Navigation from "./Navigation";
 import useStickyMenu from "@/hook/useStickyMenu";
 import MobileNavigation1 from "./MobileNavigation1";
+import HeaderAuthLinks from "./HeaderAuthLinks";
 
 export default function Header1() {
     const sticky = useStickyMenu(50);
@@ -69,18 +70,10 @@ export default function Header1() {
                                         </span>{" "}
                                         Seller
                                     </Link>
-                                    <Link
-                                        className={`login-info mr15-lg mr30`}
-                                        href="/login"
-                                    >
-                                        Sign in
-                                    </Link>
-                                    <Link
-                                        className="ud-btn btn-white add-joining"
-                                        href="/register"
-                                    >
-                                        Join
-                                    </Link>
+                                    <HeaderAuthLinks
+                                        signInClassName="login-info mr15-lg mr30"
+                                        joinClassName="ud-btn btn-white add-joining"
+                                    />
                                 </div>
                             </div>
                         </div>

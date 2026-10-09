@@ -1,3 +1,4 @@
+import LoginButton from "@/components/button/LoginButton";
 import Footer from "@/components/footer/Footer";
 import Header20 from "@/components/header/Header20";
 import Link from "next/link";
@@ -83,13 +84,10 @@ export default function page() {
                                         />
                                     </div>
                                     <div className="d-grid mb20">
-                                        <button
-                                            className="ud-btn btn-thm default-box-shadow2"
-                                            type="button"
-                                        >
+                                        <LoginButton className="ud-btn btn-thm default-box-shadow2">
                                             Creat Account{" "}
                                             <i className="fal fa-arrow-right-long" />
-                                        </button>
+                                        </LoginButton>
                                     </div>
                                     <div className="hr_content mb20">
                                         <hr />

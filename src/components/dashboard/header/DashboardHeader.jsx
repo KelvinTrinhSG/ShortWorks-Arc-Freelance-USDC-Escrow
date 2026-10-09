@@ -1,5 +1,6 @@
 "use client";
 import { dasboardNavigation } from "@/data/dashboard";
+import authStore from "@/store/authStore";
 import toggleStore from "@/store/toggleStore";
 import Image from "next/image";
 import Link from "next/link";
@@ -8,6 +9,7 @@ import { usePathname } from "next/navigation";
 export default function DashboardHeader() {
   const toggle = toggleStore((state) => state.dashboardSlidebarToggleHandler);
   const path = usePathname();
+  const logout = authStore((state) => state.logout);
 
   return (
     <>
@@ -322,6 +324,9 @@ export default function DashboardHeader() {
                                   path === item.path ? "active" : ""
                                 }`}
                                 href={item.path}
+                                onClick={
+                                  item.name === "Logout" ? logout : undefined
+                                }
                               >
                                 <i className={`${item.icon} mr10`} />
                                 {item.name}

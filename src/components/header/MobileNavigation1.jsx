@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import SignInLink from "./SignInLink";
 
 export default function MobileNavigation1() {
   return (
@@ -18,9 +19,11 @@ export default function MobileNavigation1() {
                   />
                 </Link>
                 <div className="right-side text-end">
-                  <Link className="text-white" href="/login">
-                    join
-                  </Link>
+                  <SignInLink
+                    className="text-white"
+                    signInText="join"
+                    dashboardText="dashboard"
+                  />
                   <a
                     className="menubar ml30"
                     data-bs-toggle="offcanvas"
