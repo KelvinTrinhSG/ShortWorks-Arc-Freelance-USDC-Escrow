@@ -19,11 +19,7 @@ export default function MobileNavigation1() {
                   />
                 </Link>
                 <div className="right-side text-end">
-                  <SignInLink
-                    className="text-white"
-                    signInText="join"
-                    dashboardText="dashboard"
-                  />
+                  <SignInLink className="text-white" />
                   <a
                     className="menubar ml30"
                     data-bs-toggle="offcanvas"
