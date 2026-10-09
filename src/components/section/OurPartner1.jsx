@@ -18,6 +18,7 @@ export default function OurPartner1() {
     <>
       <section
         className={`our-partners ${
+          path === "/" ||
           path === "/home-3" ||
           path === "/about-2" ||
           path === "/home-15" ||

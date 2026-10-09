@@ -16,7 +16,7 @@ export default function PopularServiceCard1({
     <>
       <div
         className={`listing-style1 ${
-          path === "/" ||
+          path === "/home-2" ||
           path === "/home-9" ||
           path === "/home-16" ||
           path === "/home-14"
