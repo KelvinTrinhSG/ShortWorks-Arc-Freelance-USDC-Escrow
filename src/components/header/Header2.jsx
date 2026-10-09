@@ -5,13 +5,11 @@ import MobileNavigation2 from "./MobileNavigation2";
 import HeaderAuthLinks from "./HeaderAuthLinks";
 import Navigation from "./Navigation";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
 import useStickyMenu from "@/hook/useStickyMenu";
 
 // `inner` renders the same layout on a solid white bar for pages without a dark hero.
 export default function Header2({ inner = false }) {
     const sticky = useStickyMenu(50);
-    const path = usePathname();
 
     const headerClassName = inner
         ? "header-nav nav-innerpage-style main-menu"
@@ -71,19 +69,6 @@ export default function Header2({ inner = false }) {
                             </div>
                             <div className="col-auto pe-0 pe-xl-3">
                                 <div className="d-flex align-items-center">
-                                    <Link
-                                        className={`login-info mx15-xl mx30 ${
-                                            path === "/become-seller"
-                                                ? "ui-active"
-                                                : ""
-                                        }`}
-                                        href="/become-seller"
-                                    >
-                                        <span className="d-none d-xl-inline-block">
-                                            Become a
-                                        </span>{" "}
-                                        Seller
-                                    </Link>
                                     <HeaderAuthLinks
                                         signInClassName="login-info mr15-xl mr30"
                                         joinClassName={
