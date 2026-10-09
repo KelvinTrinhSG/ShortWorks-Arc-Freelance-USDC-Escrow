@@ -71,13 +71,6 @@ export default function Header2({ inner = false }) {
                             </div>
                             <div className="col-auto pe-0 pe-xl-3">
                                 <div className="d-flex align-items-center">
-                                    <a
-                                        className="login-info"
-                                        data-bs-toggle="modal"
-                                        href="#exampleModalToggle"
-                                    >
-                                        <span className="flaticon-loupe" />
-                                    </a>
                                     <Link
                                         className={`login-info mx15-xl mx30 ${
                                             path === "/become-seller"
