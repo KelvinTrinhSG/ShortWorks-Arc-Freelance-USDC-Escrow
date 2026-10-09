@@ -15,6 +15,12 @@ export default function Listing13() {
   const getLevel = listingStore((state) => state.getLevel);
   const getSpeak = listingStore((state) => state.getSpeak);
   const getBestSeller = listingStore((state) => state.getBestSeller);
+  const getVideoCategory = listingStore((state) => state.getVideoCategory);
+
+  // video category tab filter
+  const videoCategoryFilter = (item) =>
+    getVideoCategory === "All Categories" ||
+    item.videoCategory === getVideoCategory;
 
   // category filter
   const categoryFilter = (item) =>
@@ -57,6 +63,7 @@ export default function Listing13() {
           <div className="row">
             {freelancer1
               .slice(0, 12)
+              .filter(videoCategoryFilter)
               .filter(categoryFilter)
               .filter(priceFilter)
               .filter(locationFilter)

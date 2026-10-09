@@ -1,6 +1,7 @@
 "use client";
+import listingStore from "@/store/listingStore";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect } from "react";
 
 const categories = [
   "All Categories",
@@ -11,9 +12,15 @@ const categories = [
 // categories_list_section overflow-hidden
 
 export default function TabSection1() {
-  const [getCurrentTab, setCurrentTab] = useState("All Categories");
+  const getCurrentTab = listingStore((state) => state.getVideoCategory);
+  const setCurrentTab = listingStore((state) => state.setVideoCategory);
 
   const path = usePathname();
+
+  // start each page on "All Categories"
+  useEffect(() => {
+    setCurrentTab("All Categories");
+  }, [path, setCurrentTab]);
 
   return (
     <>

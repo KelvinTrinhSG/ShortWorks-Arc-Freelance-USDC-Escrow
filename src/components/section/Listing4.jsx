@@ -19,6 +19,12 @@ export default function Listing4() {
   const getDesginTool = listingStore((state) => state.getDesginTool);
   const getSpeak = listingStore((state) => state.getSpeak);
   const getSearch = listingStore((state) => state.getSearch);
+  const getVideoCategory = listingStore((state) => state.getVideoCategory);
+
+  // video category tab filter
+  const videoCategoryFilter = (item) =>
+    getVideoCategory === "All Categories" ||
+    item.videoCategory === getVideoCategory;
 
   // delivery filter
   const deliveryFilter = (item) =>
@@ -57,6 +63,7 @@ export default function Listing4() {
 
   let content = product1
     .slice(0, 7)
+    .filter(videoCategoryFilter)
     .filter(deliveryFilter)
     .filter(priceFilter)
     .filter(levelFilter)

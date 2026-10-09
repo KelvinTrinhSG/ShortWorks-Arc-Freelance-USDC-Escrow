@@ -13,6 +13,8 @@ const listingStore = create((set) => ({
   getEnglishLevel: [],
   getJobType: [],
   getNoOfEmployee: [],
+  getVideoCategory: "All Categories",
+  setVideoCategory: (payload) => set(() => ({ getVideoCategory: payload })),
   setDeliveryTime: (payload) => set(() => ({ getDeliveryTime: payload })),
   setLevel: (payload) =>
     set((state) => {

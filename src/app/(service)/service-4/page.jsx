@@ -15,7 +15,7 @@ export default function page() {
         <>
             <Header20 />
             <TabSection1 />
-            <Breadcumb3 path={["Home", "Services", "Design & Creative"]} />
+            <Breadcumb3 path={["Home", "Services"]} showVideoCategory />
             <Breadcumb9
                 title="Services List"
                 description="Find short-form video editors and animators for your content."

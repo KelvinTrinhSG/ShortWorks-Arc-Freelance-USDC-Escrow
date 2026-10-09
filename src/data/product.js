@@ -1,6 +1,7 @@
 export const product1 = [
   {
     id: 1,
+    videoCategory: "Short-Form Video Editor",
     img: "/images/listings/g-1.jpg",
     img2: "/images/listings/g-17.jpg",
     category: "Web & App Design",
@@ -25,6 +26,7 @@ export const product1 = [
   },
   {
     id: 2,
+    videoCategory: "Short-Form Video Animator",
     img: "/images/listings/g-2.jpg",
     img2: "/images/listings/g-18.jpg",
     category: "Art & Illustration",
@@ -54,6 +56,7 @@ export const product1 = [
   },
   {
     id: 3,
+    videoCategory: "Short-Form Video Editor",
     img: "/images/listings/g-3.jpg",
     img2: "/images/listings/g-19.jpg",
     category: "Design & Creative",
@@ -79,6 +82,7 @@ export const product1 = [
   },
   {
     id: 4,
+    videoCategory: "Short-Form Video Animator",
     img: "/images/listings/g-4.jpg",
     img2: "/images/listings/g-20.jpg",
     category: "Web & App Design",
@@ -103,6 +107,7 @@ export const product1 = [
   },
   {
     id: 5,
+    videoCategory: "Short-Form Video Editor",
     img: "/images/listings/g-5.jpg",
     img2: "/images/listings/g-21.jpg",
     category: "Web & App Design",
@@ -127,6 +132,7 @@ export const product1 = [
   },
   {
     id: 6,
+    videoCategory: "Short-Form Video Animator",
     img: "/images/listings/g-6.jpg",
     img2: "/images/listings/g-22.jpg",
     category: "Web & App Design",
@@ -151,6 +157,7 @@ export const product1 = [
   },
   {
     id: 7,
+    videoCategory: "Short-Form Video Editor",
     img: "/images/listings/g-7.jpg",
     img2: "/images/listings/g-17.jpg",
     category: "Design & Creative",
@@ -174,6 +181,7 @@ export const product1 = [
   },
   {
     id: 8,
+    videoCategory: "Short-Form Video Animator",
     img: "/images/listings/g-1.jpg",
     img2: "/images/listings/g-18.jpg",
     category: "Web & App Design",
@@ -196,6 +204,7 @@ export const product1 = [
   },
   {
     id: 9,
+    videoCategory: "Short-Form Video Editor",
     img: "/images/listings/g-9.jpg",
     img2: "/images/listings/g-17.jpg",
     category: "Web & App Design",
@@ -218,6 +227,7 @@ export const product1 = [
   },
   {
     id: 10,
+    videoCategory: "Short-Form Video Animator",
     img: "/images/listings/g-10.jpg",
     img2: "/images/listings/g-18.jpg",
     category: "Art & Illustration",
@@ -245,6 +255,7 @@ export const product1 = [
   },
   {
     id: 11,
+    videoCategory: "Short-Form Video Editor",
     img: "/images/listings/g-11.jpg",
     img2: "/images/listings/g-19.jpg",
     category: "Design & Creative",
@@ -268,6 +279,7 @@ export const product1 = [
   },
   {
     id: 12,
+    videoCategory: "Short-Form Video Animator",
     img: "/images/listings/g-12.jpg",
     img2: "/images/listings/g-20.jpg",
     category: "Web & App Design",
@@ -634,6 +646,7 @@ export const shopProduct1 = [
 export const project1 = [
   {
     id: 1,
+    videoCategory: "Short-Form Video Editor",
     title: "Food Delviery Mobile App",
     img: "/images/team/client-1.png",
     brief:
@@ -653,6 +666,7 @@ export const project1 = [
   },
   {
     id: 2,
+    videoCategory: "Short-Form Video Animator",
     title: "Swift / SwiftUI Developer for B2B iOS apps",
     img: "/images/team/client-2.png",
     brief:
@@ -672,6 +686,7 @@ export const project1 = [
   },
   {
     id: 3,
+    videoCategory: "Short-Form Video Editor",
     title: "English content writer for Fintech",
     img: "/images/team/client-3.png",
     brief:
@@ -691,6 +706,7 @@ export const project1 = [
   },
   {
     id: 4,
+    videoCategory: "Short-Form Video Animator",
     title: "Full-stack Developer to help us to build our",
     img: "/images/team/client-4.png",
     brief:
@@ -710,6 +726,7 @@ export const project1 = [
   },
   {
     id: 5,
+    videoCategory: "Short-Form Video Editor",
     title: "Looking for team members for web agency",
     img: "/images/team/client-5.png",
     brief:
@@ -729,6 +746,7 @@ export const project1 = [
   },
   {
     id: 6,
+    videoCategory: "Short-Form Video Animator",
     title: "Video animator to bring some illustrations to life",
     img: "/images/team/client-6.png",
     brief:
@@ -748,6 +766,7 @@ export const project1 = [
   },
   {
     id: 7,
+    videoCategory: "Short-Form Video Editor",
     title: "Food Delviery Mobile App",
     img: "/images/team/client-7.png",
     brief:
@@ -767,6 +786,7 @@ export const project1 = [
   },
   {
     id: 8,
+    videoCategory: "Short-Form Video Animator",
     title: "Food Delviery Mobile App",
     img: "/images/team/client-8.png",
     brief:
@@ -834,6 +854,7 @@ export const projectProposal1 = [
 export const employee = [
   {
     id: 1,
+    videoCategory: "Short-Form Video Editor",
     img: "/images/team/client-1.png",
     server: "Mailchimp",
     rating: 4.9,
@@ -846,6 +867,7 @@ export const employee = [
   },
   {
     id: 2,
+    videoCategory: "Short-Form Video Animator",
     img: "/images/team/client-2.png",
     server: "Mailchimp",
     rating: 4.5,
@@ -858,6 +880,7 @@ export const employee = [
   },
   {
     id: 3,
+    videoCategory: "Short-Form Video Editor",
     img: "/images/team/client-3.png",
     server: "Mailchimp",
     rating: 3.8,
@@ -870,6 +893,7 @@ export const employee = [
   },
   {
     id: 4,
+    videoCategory: "Short-Form Video Animator",
     img: "/images/team/client-4.png",
     server: "Mailchimp",
     rating: 4.2,
@@ -882,6 +906,7 @@ export const employee = [
   },
   {
     id: 5,
+    videoCategory: "Short-Form Video Editor",
     img: "/images/team/client-5.png",
     server: "Mailchimp",
     rating: 4.7,
@@ -894,6 +919,7 @@ export const employee = [
   },
   {
     id: 6,
+    videoCategory: "Short-Form Video Animator",
     img: "/images/team/client-6.png",
     server: "Mailchimp",
     rating: 3.5,
@@ -906,6 +932,7 @@ export const employee = [
   },
   {
     id: 7,
+    videoCategory: "Short-Form Video Editor",
     img: "/images/team/client-7.png",
     server: "Mailchimp",
     rating: 4.6,
@@ -918,6 +945,7 @@ export const employee = [
   },
   {
     id: 8,
+    videoCategory: "Short-Form Video Animator",
     img: "/images/team/client-8.png",
     server: "Mailchimp",
     rating: 4.3,
@@ -930,6 +958,7 @@ export const employee = [
   },
   {
     id: 9,
+    videoCategory: "Short-Form Video Editor",
     img: "/images/team/client-1.png",
     server: "Mailchimp",
     rating: 3.9,
@@ -942,6 +971,7 @@ export const employee = [
   },
   {
     id: 10,
+    videoCategory: "Short-Form Video Animator",
     img: "/images/team/client-2.png",
     server: "Mailchimp",
     rating: 4.8,
@@ -954,6 +984,7 @@ export const employee = [
   },
   {
     id: 11,
+    videoCategory: "Short-Form Video Editor",
     img: "/images/team/client-3.png",
     server: "Mailchimp",
     rating: 4.0,
@@ -966,6 +997,7 @@ export const employee = [
   },
   {
     id: 12,
+    videoCategory: "Short-Form Video Animator",
     img: "/images/team/client-4.png",
     server: "Mailchimp",
     rating: 4.6,
@@ -978,6 +1010,7 @@ export const employee = [
   },
   {
     id: 13,
+    videoCategory: "Short-Form Video Editor",
     img: "/images/team/client-5.png",
     server: "Mailchimp",
     rating: 4.1,
@@ -990,6 +1023,7 @@ export const employee = [
   },
   {
     id: 14,
+    videoCategory: "Short-Form Video Animator",
     img: "/images/team/client-6.png",
     server: "Mailchimp",
     rating: 4.4,
@@ -1002,6 +1036,7 @@ export const employee = [
   },
   {
     id: 15,
+    videoCategory: "Short-Form Video Editor",
     img: "/images/team/client-7.png",
     server: "Mailchimp",
     rating: 4.9,
@@ -1014,6 +1049,7 @@ export const employee = [
   },
   {
     id: 16,
+    videoCategory: "Short-Form Video Animator",
     img: "/images/team/client-8.png",
     server: "Mailchimp",
     rating: 3.7,
@@ -1029,6 +1065,7 @@ export const employee = [
 export const freelancer1 = [
   {
     id: 1,
+    videoCategory: "Short-Form Video Editor",
     img: "/images/team/fl-1.png",
     name: "Robert Fox",
     profession: "Nursing Assistant",
@@ -1045,6 +1082,7 @@ export const freelancer1 = [
   },
   {
     id: 2,
+    videoCategory: "Short-Form Video Animator",
     img: "/images/team/fl-2.png",
     name: "Jane Doe",
     profession: "Graphic Designer",
@@ -1061,6 +1099,7 @@ export const freelancer1 = [
   },
   {
     id: 3,
+    videoCategory: "Short-Form Video Editor",
     img: "/images/team/fl-3.png",
     name: "Michael Johnson",
     profession: "Web Developer",
@@ -1077,6 +1116,7 @@ export const freelancer1 = [
   },
   {
     id: 4,
+    videoCategory: "Short-Form Video Animator",
     img: "/images/team/fl-4.png",
     name: "Emily Williams",
     profession: "Content Writer",
@@ -1094,6 +1134,7 @@ export const freelancer1 = [
   },
   {
     id: 5,
+    videoCategory: "Short-Form Video Editor",
     img: "/images/team/fl-1.png",
     name: "David Smith",
     profession: "Photographer",
@@ -1110,6 +1151,7 @@ export const freelancer1 = [
   },
   {
     id: 6,
+    videoCategory: "Short-Form Video Animator",
     img: "/images/team/fl-2.png",
     name: "Sophia Brown",
     profession: "UI/UX Designer",
@@ -1127,6 +1169,7 @@ export const freelancer1 = [
   },
   {
     id: 7,
+    videoCategory: "Short-Form Video Editor",
     img: "/images/team/fl-3.png",
     name: "Daniel Wilson",
     profession: "Video Editor",
@@ -1144,6 +1187,7 @@ export const freelancer1 = [
   },
   {
     id: 8,
+    videoCategory: "Short-Form Video Animator",
     img: "/images/team/fl-4.png",
     name: "Olivia Taylor",
     profession: "Social Media Manager",
@@ -1161,6 +1205,7 @@ export const freelancer1 = [
   },
   {
     id: 9,
+    videoCategory: "Short-Form Video Editor",
     img: "/images/team/fl-1.png",
     name: "William Clark",
     profession: "Mobile App Developer",
@@ -1178,6 +1223,7 @@ export const freelancer1 = [
   },
   {
     id: 10,
+    videoCategory: "Short-Form Video Animator",
     img: "/images/team/fl-2.png",
     name: "Ava Turner",
     profession: "Illustrator",
@@ -1195,6 +1241,7 @@ export const freelancer1 = [
   },
   {
     id: 11,
+    videoCategory: "Short-Form Video Editor",
     img: "/images/team/fl-3.png",
     name: "James Rodriguez",
     profession: "Copywriter",
@@ -1211,6 +1258,7 @@ export const freelancer1 = [
   },
   {
     id: 12,
+    videoCategory: "Short-Form Video Animator",
     img: "/images/team/fl-4.png",
     name: "Ella Martinez",
     profession: "SEO Specialist",

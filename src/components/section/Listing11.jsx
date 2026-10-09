@@ -10,6 +10,12 @@ export default function Listing11() {
   const getCategory = listingStore((state) => state.getCategory);
   const getNoOfEmployee = listingStore((state) => state.getNoOfEmployee);
   const getBestSeller = listingStore((state) => state.getBestSeller);
+  const getVideoCategory = listingStore((state) => state.getVideoCategory);
+
+  // video category tab filter
+  const videoCategoryFilter = (item) =>
+    getVideoCategory === "All Categories" ||
+    item.videoCategory === getVideoCategory;
 
   // category filter
   const categoryFilter = (item) =>
@@ -26,6 +32,7 @@ export default function Listing11() {
   // content
   const content = employee
     .slice(0, 16)
+    .filter(videoCategoryFilter)
     .filter(categoryFilter)
     .filter(noOfEmployeeFilter)
     .filter(sortByFilter)

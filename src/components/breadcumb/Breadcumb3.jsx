@@ -1,4 +1,15 @@
-export default function Breadcumb3({ path }) {
+"use client";
+import listingStore from "@/store/listingStore";
+
+export default function Breadcumb3({ path, showVideoCategory = false }) {
+  const getVideoCategory = listingStore((state) => state.getVideoCategory);
+
+  // append the selected category tab, if any
+  const items =
+    showVideoCategory && getVideoCategory !== "All Categories"
+      ? [...path, getVideoCategory]
+      : path;
+
   return (
     <>
       <section className="breadcumb-section">
@@ -7,7 +18,7 @@ export default function Breadcumb3({ path }) {
             <div className="col-lg-12">
               <div className="breadcumb-style1">
                 <div className="breadcumb-list">
-                  {path?.map((item, i) => (
+                  {items?.map((item, i) => (
                     <a key={i}>{item}</a>
                   ))}
                 </div>

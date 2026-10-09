@@ -15,7 +15,7 @@ export default function page() {
         <>
             <Header20 />
             <TabSection1 />
-            <Breadcumb3 path={["Home", "Services", "Design & Creative"]} />
+            <Breadcumb3 path={["Home", "Freelancers"]} showVideoCategory />
             <Breadcumb16 />
             <Listing13 />
             <Footer />

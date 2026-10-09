@@ -18,6 +18,12 @@ export default function Listing8() {
   const getSpeak = listingStore((state) => state.getSpeak);
   const getBestSeller = listingStore((state) => state.getBestSeller);
   const getEnglishLevel = listingStore((state) => state.getEnglishLevel);
+  const getVideoCategory = listingStore((state) => state.getVideoCategory);
+
+  // video category tab filter
+  const videoCategoryFilter = (item) =>
+    getVideoCategory === "All Categories" ||
+    item.videoCategory === getVideoCategory;
 
   // category filter
   const categoryFilter = (item) =>
@@ -74,6 +80,7 @@ export default function Listing8() {
   // content
   let content = project1
     .slice(0, 8)
+    .filter(videoCategoryFilter)
     .filter(categoryFilter)
     .filter(projectTypeFilter)
     .filter(priceFilter)

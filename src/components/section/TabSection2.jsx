@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import listingStore from "@/store/listingStore";
+import { useEffect } from "react";
 
 const categories = [
   "All Categories",
@@ -8,7 +9,13 @@ const categories = [
 ];
 
 export default function TabSection2() {
-  const [getCurrentTab, setCurrentTab] = useState("All Categories");
+  const getCurrentTab = listingStore((state) => state.getVideoCategory);
+  const setCurrentTab = listingStore((state) => state.setVideoCategory);
+
+  // start each page on "All Categories"
+  useEffect(() => {
+    setCurrentTab("All Categories");
+  }, [setCurrentTab]);
 
   return (
     <>
