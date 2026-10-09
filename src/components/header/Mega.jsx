@@ -13,7 +13,12 @@ const categories = [
   },
 ];
 
+// Categories menu is hidden site-wide; remove this flag to show it again.
+const SHOW_CATEGORIES = false;
+
 export default function Mega({ staticMenuClass }) {
+  if (!SHOW_CATEGORIES) return null;
+
   return (
     <>
       <div id="mega-menu">

@@ -1,25 +1,13 @@
 const menus = [
   {
     id: 2,
-    name: "Browse Jobs",
-    children: [
-      {
-        id: 1,
-        name: "Services",
-        children: [
-          { id: 1, name: "Short-Form Video Editor", path: "/service-4" },
-          { id: 2, name: "Short-Form Video Animator", path: "/service-4" },
-        ],
-      },
-      {
-        id: 2,
-        name: "Projects",
-        children: [
-          { id: 1, name: "Short-Form Video Editor", path: "/project-1" },
-          { id: 2, name: "Short-Form Video Animator", path: "/project-1" },
-        ],
-      },
-    ],
+    name: "Services",
+    path: "/service-4",
+  },
+  {
+    id: 6,
+    name: "Projects",
+    path: "/project-1",
   },
   {
     id: 3,
