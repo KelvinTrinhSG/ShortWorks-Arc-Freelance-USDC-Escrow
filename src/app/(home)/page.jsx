@@ -8,7 +8,6 @@ import LearnFreeio1 from "@/components/section/LearnFreeio1";
 import NeedSomething2 from "@/components/section/NeedSomething2";
 import OurPartner1 from "@/components/section/OurPartner1";
 import PopularService1 from "@/components/section/PopularService1";
-import PriceTable1 from "@/components/section/PriceTable1";
 
 export const metadata = {
     title: "ShortWorks - Freelance Marketplace",
@@ -27,7 +26,6 @@ export default function page() {
                 <BrowserCategory2 />
                 <HighestRated1 />
                 <LearnFreeio1 />
-                <PriceTable1 />
                 <Footer2 />
             </div>
         </>

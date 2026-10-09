@@ -18,6 +18,7 @@ export default function ClearButton() {
   const setEnglishLevel = listingStore((state) => state.setEnglishLevel);
   const setJobType = listingStore((state) => state.setJobType);
   const setNoOfEmployee = listingStore((state) => state.setNoOfEmployee);
+  const setKeyword = listingStore((state) => state.setKeyword);
 
   // get state
   const getDeliveryTime = listingStore((state) => state.getDeliveryTime);
@@ -33,6 +34,7 @@ export default function ClearButton() {
   const getEnglishLevel = listingStore((state) => state.getEnglishLevel);
   const getJobType = listingStore((state) => state.getJobType);
   const getNoOfEmployee = listingStore((state) => state.getNoOfEmployee);
+  const getKeyword = listingStore((state) => state.getKeyword);
 
   // clear handler
   const clearHandler = () => {
@@ -49,6 +51,7 @@ export default function ClearButton() {
     setEnglishLevel([]);
     setJobType([]);
     setNoOfEmployee([]);
+    setKeyword("");
   };
 
   return (
@@ -66,7 +69,8 @@ export default function ClearButton() {
       getProjectType?.length !== 0 ||
       getEnglishLevel?.length !== 0 ||
       getJobType?.length !== 0 ||
-      getNoOfEmployee?.length !== 0 ? (
+      getNoOfEmployee?.length !== 0 ||
+      getKeyword !== "" ? (
         <button
           onClick={clearHandler}
           className="ud-btn btn-thm ui-clear-btn w-100"

@@ -10,9 +10,21 @@ const searchResult = [
   "mobile app design",
 ];
 
-export default function HeroSearch1() {
+export default function HeroSearch1({ onChange, onSubmit }) {
   const [isSearchDropdownOpen, setSearchDropdownOpen] = useState(false);
-  const [getSelectedResult, setSelectedResult] = useState("");
+  const [getSelectedResult, setResult] = useState("");
+
+  // keep the parent in sync with the typed/selected keyword
+  const setSelectedResult = (value) => {
+    setResult(value);
+    onChange?.(value);
+  };
+
+  // enter key submits the search instead of reloading the page
+  const submitHandler = (e) => {
+    e.preventDefault();
+    onSubmit?.();
+  };
 
   // search dropdown
   const focusDropdown = () => {
@@ -28,7 +40,10 @@ export default function HeroSearch1() {
 
   return (
     <>
-      <form className="form-search position-relative">
+      <form
+        className="form-search position-relative"
+        onSubmit={submitHandler}
+      >
         <div className="box-search">
           <span className="icon far fa-magnifying-glass" />
           <input

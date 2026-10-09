@@ -1,4 +1,5 @@
 "use client";
+import { useEffect } from "react";
 import { product1 } from "@/data/product";
 import ListingOption2 from "../element/ListingOption2";
 import ListingSidebarModal1 from "../modal/ListingSidebarModal1";
@@ -20,6 +21,25 @@ export default function Listing4() {
   const getSpeak = listingStore((state) => state.getSpeak);
   const getSearch = listingStore((state) => state.getSearch);
   const getVideoCategory = listingStore((state) => state.getVideoCategory);
+  const getKeyword = listingStore((state) => state.getKeyword);
+  const setKeyword = listingStore((state) => state.setKeyword);
+
+  // start with the ?q= keyword from the home search
+  useEffect(() => {
+    setKeyword(new URLSearchParams(window.location.search).get("q") ?? "");
+  }, [setKeyword]);
+
+  // keyword filter
+  const keywordFilter = (item) => {
+    const keyword = getKeyword.trim().toLowerCase();
+    return (
+      keyword === "" ||
+      [item.title, item.category, item.videoCategory, item.author?.name]
+        .join(" ")
+        .toLowerCase()
+        .includes(keyword)
+    );
+  };
 
   // video category tab filter
   const videoCategoryFilter = (item) =>
@@ -64,6 +84,7 @@ export default function Listing4() {
   let content = product1
     .slice(0, 7)
     .filter(videoCategoryFilter)
+    .filter(keywordFilter)
     .filter(deliveryFilter)
     .filter(priceFilter)
     .filter(levelFilter)

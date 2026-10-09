@@ -7,16 +7,13 @@ import { useRouter } from "next/navigation";
 
 const role = [
   "Choose Category",
-  "Graphics & Design",
-  "Digital Marketing",
-  "Writing & Translation",
-  "Video & Animation",
-  "Music & Audio",
-  "Programming & Tech",
+  "Short-Form Video Editor",
+  "Short-Form Video Animator",
 ];
 
 export default function Hero2() {
   const [getSelectedRole, setSelectedRole] = useState(null);
+  const [getKeyword, setKeyword] = useState("");
 
   // choose a category
   const roleHandler = (select) => {
@@ -27,7 +24,15 @@ export default function Hero2() {
 
   // search handler
   const searchHandler = () => {
-    router.push("/service-1");
+    const params = new URLSearchParams();
+    if (getSelectedRole && getSelectedRole !== "Choose Category") {
+      params.set("category", getSelectedRole);
+    }
+    if (getKeyword.trim() !== "") {
+      params.set("q", getKeyword.trim());
+    }
+    const query = params.toString();
+    router.push(query ? `/service-4?${query}` : "/service-4");
   };
 
   return (
@@ -38,20 +43,23 @@ export default function Hero2() {
             <div className="col-xl-7">
               <div className="pr30 pr0-lg mb30-md position-relative">
                 <h1 className="animate-up-1 mb25 text-white">
-                  Find the perfect freelance{" "}
+                  Hire short-form video{" "}
                   <br className="d-none d-xl-block" />
-                  services for your business
+                  talent that stops the scroll
                 </h1>
                 <p className="text-white animate-up-2">
-                  Work with talented people at the most affordable price to get
-                  the most <br className="d-none d-lg-block" /> out of your time
-                  and cost
+                  Work with skilled video editors and animators to create Reels,
+                  TikToks <br className="d-none d-lg-block" /> and Shorts that
+                  grow your brand — fast and on budget
                 </p>
                 <div className="advance-search-tab bgc-white p10 bdrs4-sm bdrs60 banner-btn position-relative zi1 animate-up-3 mt30">
                   <div className="row">
                     <div className="col-md-5 col-lg-6 col-xl-6">
                       <div className="advance-search-field mb10-sm">
-                        <HeroSearch1 />
+                        <HeroSearch1
+                          onChange={setKeyword}
+                          onSubmit={searchHandler}
+                        />
                       </div>
                     </div>
                     <div className="col-md-4 col-lg-4 col-xl-3">
@@ -182,7 +190,7 @@ export default function Hero2() {
                 height={551}
                 width={663}
                 style={{ height: "fit-content" }}
-                src="/images/about/about-1.png"
+                src="/images/about/home-hero.png"
                 alt="hero"
                 className="animate-up-1 main-img-home2"
               />

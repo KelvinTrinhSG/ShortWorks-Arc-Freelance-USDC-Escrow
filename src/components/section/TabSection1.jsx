@@ -17,9 +17,14 @@ export default function TabSection1() {
 
   const path = usePathname();
 
-  // start each page on "All Categories"
+  // start each page on the ?category= tab, or "All Categories"
   useEffect(() => {
-    setCurrentTab("All Categories");
+    const category = new URLSearchParams(window.location.search).get(
+      "category",
+    );
+    setCurrentTab(
+      categories.includes(category) ? category : "All Categories",
+    );
   }, [path, setCurrentTab]);
 
   return (
