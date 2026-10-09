@@ -7,8 +7,8 @@ const menus = [
         id: 1,
         name: "Services",
         children: [
-          { id: 1, name: "Short-Form Video Editor", path: "/service-1" },
-          { id: 2, name: "Short-Form Video Animator", path: "/service-1" },
+          { id: 1, name: "Short-Form Video Editor", path: "/service-4" },
+          { id: 2, name: "Short-Form Video Animator", path: "/service-4" },
         ],
       },
       {

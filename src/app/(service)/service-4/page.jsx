@@ -1,5 +1,5 @@
 import Breadcumb3 from "@/components/breadcumb/Breadcumb3";
-import Breadcumb6 from "@/components/breadcumb/Breadcumb6";
+import Breadcumb9 from "@/components/breadcumb/Breadcumb9";
 import Footer from "@/components/footer/Footer";
 import Header20 from "@/components/header/Header20";
 
@@ -16,7 +16,10 @@ export default function page() {
             <Header20 />
             <TabSection1 />
             <Breadcumb3 path={["Home", "Services", "Design & Creative"]} />
-            <Breadcumb6 />
+            <Breadcumb9
+                title="Services List"
+                description="Find short-form video editors and animators for your content."
+            />
             <Listing4 />
             <Footer />
         </>

@@ -4,12 +4,12 @@ const categories = [
   {
     name: "Short-Form Video Editor",
     icon: "flaticon-sliders",
-    path: "/service-1",
+    path: "/service-4",
   },
   {
     name: "Short-Form Video Animator",
     icon: "flaticon-video-file",
-    path: "/service-1",
+    path: "/service-4",
   },
 ];
 
