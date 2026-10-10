@@ -30,6 +30,17 @@ export function dueLabel(date, today) {
   return { text: `${-days} ${days === -1 ? "day" : "days"} overdue`, className: "text-danger" };
 }
 
+// Badge in the top-right corner: where the logged-in freelancer stands on the project
+// (project.myStatus from /api/projects). Colours: blue = waiting on you, grey = waiting
+// on the client, green = hired, red = declined (by either side).
+const MY_STATUS = {
+  invited: { label: "Invited", color: "#1d4ed8", bg: "#e8efff" },
+  submitted: { label: "Submitted", color: "#4b5563", bg: "#eef0f3" },
+  accepted: { label: "Hired", color: "#15803d", bg: "#e3f6ea" },
+  declined: { label: "Declined", color: "#b91c1c", bg: "#fdecec" },
+  invite_declined: { label: "Invite declined", color: "#b91c1c", bg: "#fdecec" },
+};
+
 // How a project reads to a freelancer: scope, cost, time and quality at a glance.
 // Works both for a saved project (has id, client, createdAt…) and for the live
 // preview of a draft in the Create Project form, where those are missing.
@@ -63,18 +74,29 @@ export default function ProjectCard({ project, now, ctaLabel = "View & Send Prop
 
   const title = project.title || "Untitled project";
   const href = project.id ? `/project-single/${project.id}` : null;
+  const status = MY_STATUS[project.myStatus];
 
   return (
     <div className="bdr1 bdrs8 p20 bgc-white hover-box-shadow h-100">
-      <h5 className="mb10">
-        {href ? (
-          <Link href={href} className="dark-color">
-            {title}
-          </Link>
-        ) : (
-          title
+      <div className="d-flex align-items-start justify-content-between gap-2 mb10">
+        <h5 className="mb-0">
+          {href ? (
+            <Link href={href} className="dark-color">
+              {title}
+            </Link>
+          ) : (
+            title
+          )}
+        </h5>
+        {status && (
+          <span
+            className="badge rounded-pill fw500 flex-shrink-0"
+            style={{ color: status.color, backgroundColor: status.bg, fontSize: 12, padding: "6px 12px" }}
+          >
+            {status.label}
+          </span>
         )}
-      </h5>
+      </div>
       {meta.length > 0 && <p className="fz13 text mb10">{meta.join(" · ")}</p>}
       {scope.length > 0 && <p className="text-thm fz14 mb5">{scope.join(" · ")}</p>}
       {terms.length > 0 && <p className="fz14 dark-color mb0">{terms.join(" · ")}</p>}

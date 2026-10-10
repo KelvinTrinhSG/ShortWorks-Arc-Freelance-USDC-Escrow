@@ -15,6 +15,16 @@ export const VIDEO_LENGTHS = [
   { value: "90-180", label: "1.5–3 min" },
 ];
 
+// Where a freelancer stands on a project (project.myStatus). "none" = no proposal,
+// no invitation. Used by the Status filter on /project-1; badge colours live in ProjectCard.
+export const MY_STATUSES = [
+  { value: "none", label: "Not applied" },
+  { value: "invited", label: "Invited" },
+  { value: "submitted", label: "Submitted" },
+  { value: "declined", label: "Declined" },
+  { value: "invite_declined", label: "Invite declined" },
+];
+
 export const PROJECT_TITLE_MAX = 70;
 export const BRIEF_MAX = 1000;
 export const MIN_VIDEO_COUNT = 1;

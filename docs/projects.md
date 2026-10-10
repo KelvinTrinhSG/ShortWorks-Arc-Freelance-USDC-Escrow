@@ -30,9 +30,21 @@ Toàn bộ logic nằm trong `src/lib/projects.js`. `src/lib/viewer.js` dùng đ
 
 - Banner và ô tìm kiếm theo tiêu đề hoặc mô tả.
 - Bộ lọc: **Platform · Type of work · Video length · Budget** (từ $25/$50/$100/$200 mỗi video). Có nút Clear all.
+- Bộ lọc **Status** chỉ hiện với freelancer đã đăng nhập, chọn được nhiều giá trị: Not applied · Invited · Submitted · Declined · Invite declined (tham số `status`, danh sách nằm trong `MY_STATUSES` ở `data/projectOptions.js`). API bỏ qua tham số này với khách và người thuê.
 - Sắp xếp: Mới nhất · Ngân sách/video cao nhất · Tổng ngân sách cao nhất · Hạn chót gần nhất.
 - Phân trang thật. Bộ lọc được giữ trên URL.
 - Mỗi thẻ (`ProjectCard`) hiện: tiêu đề, người đăng, đăng bao lâu trước, số proposal, công việc, nền tảng, số video × độ dài, ngân sách (kèm tổng), hạn chót, số video tham khảo, 2 dòng đầu của mô tả, và nút **View & Send Proposal**.
+- **Nhãn trạng thái ở góc phải trên thẻ**, chỉ hiện với freelancer đã đăng nhập (`myStatus` từ `GET /api/projects`). Nếu đã gửi proposal thì trạng thái proposal được ưu tiên hơn lời mời.
+
+  | Nhãn | Khi nào | Màu |
+  |---|---|---|
+  | Invited | Được mời, chưa trả lời | Xanh dương: đang chờ bạn |
+  | Submitted | Đã gửi proposal, người thuê chưa trả lời | Xám: đang chờ người thuê |
+  | Hired | Proposal được chấp nhận | Xanh lá |
+  | Declined | Người thuê từ chối proposal | Đỏ |
+  | Invite declined | Bạn đã từ chối lời mời | Đỏ |
+
+  Dự án đã thuê người thì không nằm trong danh sách này, nên nhãn "Hired" hiếm khi xuất hiện ở đây.
 
 ## Trang chi tiết `/project-single/{id}`
 

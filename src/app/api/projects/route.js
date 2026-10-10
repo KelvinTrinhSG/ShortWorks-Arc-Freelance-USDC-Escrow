@@ -6,11 +6,14 @@ import {
 } from "@/lib/projects";
 import { getViewer } from "@/lib/viewer";
 
-// Public list of open projects.
+// Public list of open projects. For a logged-in freelancer each project also
+// carries `myStatus` (their proposal / invitation), shown as a badge on the card.
 // GET /api/projects?q=&platform=tiktok,reels&workType=&length=&minBudget=&sort=&page=
 export async function GET(request) {
   const filters = parseProjectFilters(request.nextUrl.searchParams);
-  return Response.json(await searchProjects(filters));
+  const viewer = await getViewer();
+  const freelancerId = viewer?.accountType === "freelancer" ? viewer.id : null;
+  return Response.json(await searchProjects(filters, freelancerId));
 }
 
 // Post a project. Client accounts only.

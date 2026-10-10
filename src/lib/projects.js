@@ -5,6 +5,7 @@ import {
   MAX_REFERENCES,
   MAX_VIDEO_COUNT,
   MIN_VIDEO_COUNT,
+  MY_STATUSES,
   PROJECTS_PAGE_SIZE,
   PROJECT_TITLE_MAX,
   VIDEO_LENGTHS,
@@ -170,13 +171,27 @@ export function parseProjectFilters(params) {
     workTypes: known(WORK_TYPES, list("workType")),
     lengths: known(VIDEO_LENGTHS, list("length")),
     minBudget: Number.isFinite(minBudget) && minBudget > 0 ? minBudget : null,
+    // Only applied for a logged-in freelancer (see searchProjects).
+    statuses: known(MY_STATUSES, list("status")),
     sort: params.get("sort") in SORTS ? params.get("sort") : "newest",
     page: page > 0 ? page : 1,
   };
 }
 
+// Where a freelancer stands on a project, for the badge on its card:
+// their proposal's status wins over the invitation.
+const MY_STATUS_SQL = (param) => `
+  COALESCE(
+    (SELECT CASE pr.status WHEN 'pending' THEN 'submitted' ELSE pr.status END
+     FROM proposals pr WHERE pr.project_id = p.id AND pr.freelancer_id = ${param}),
+    (SELECT CASE WHEN i.declined_at IS NULL THEN 'invited' ELSE 'invite_declined' END
+     FROM project_invitations i WHERE i.project_id = p.id AND i.freelancer_id = ${param})
+  )`;
+
 // Open projects only: not closed, deadline not passed, nobody hired yet. Newest first by default.
-export async function searchProjects(f) {
+// `freelancerId` (optional) adds `myStatus` to each project: submitted | accepted |
+// declined | invited | invite_declined | null, and enables the `statuses` filter.
+export async function searchProjects(f, freelancerId = null) {
   const where = [
     "p.status = 'open'",
     "p.deadline >= CURRENT_DATE",
@@ -193,9 +208,17 @@ export async function searchProjects(f) {
   if (f.lengths.length) add("p.video_length = ANY(?::text[])", f.lengths);
   if (f.minBudget) add("p.budget_per_video >= ?", f.minBudget);
 
+  let myStatus = "";
+  if (freelancerId) {
+    args.push(freelancerId);
+    const status = MY_STATUS_SQL(`$${args.length}`);
+    myStatus = `, ${status} AS my_status`;
+    if (f.statuses.length) add(`COALESCE(${status}, 'none') = ANY(?::text[])`, f.statuses);
+  }
+
   args.push(PROJECTS_PAGE_SIZE, (f.page - 1) * PROJECTS_PAGE_SIZE);
   const { rows } = await pool.query(
-    `SELECT ${PROJECT_COLUMNS}, COUNT(*) OVER() AS total
+    `SELECT ${PROJECT_COLUMNS}${myStatus}, COUNT(*) OVER() AS total
      FROM projects p JOIN users c ON c.id = p.client_id
      WHERE ${where.join(" AND ")}
      ORDER BY ${SORTS[f.sort]}
@@ -203,7 +226,7 @@ export async function searchProjects(f) {
     args,
   );
   return {
-    projects: rows.map(toProject),
+    projects: rows.map((r) => (freelancerId ? { ...toProject(r), myStatus: r.my_status } : toProject(r))),
     total: rows[0] ? Number(rows[0].total) : 0,
     page: f.page,
     pageSize: PROJECTS_PAGE_SIZE,

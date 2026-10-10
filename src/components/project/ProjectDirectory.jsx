@@ -1,5 +1,5 @@
 "use client";
-import { VIDEO_LENGTHS, WORK_TYPES } from "@/data/projectOptions";
+import { MY_STATUSES, VIDEO_LENGTHS, WORK_TYPES } from "@/data/projectOptions";
 import { PLATFORMS } from "@/data/talentOptions";
 import { useCurrentUser } from "@/store/authStore";
 import Link from "next/link";
@@ -8,10 +8,12 @@ import { FilterCheck, FilterDropdown } from "../listing/FilterDropdown";
 import Pagination from "../listing/Pagination";
 import ProjectCard from "./ProjectCard";
 
+// `freelancerOnly`: the API only applies it for a logged-in freelancer (their proposal / invitation).
 const LIST_FILTERS = [
   { key: "platform", label: "Platform", options: PLATFORMS },
   { key: "workType", label: "Type of work", options: WORK_TYPES },
   { key: "length", label: "Video length", options: VIDEO_LENGTHS },
+  { key: "status", label: "Status", options: MY_STATUSES, freelancerOnly: true },
 ];
 
 const BUDGETS = [
@@ -28,7 +30,7 @@ const SORT_OPTIONS = [
   { value: "deadline-asc", label: "Deadline soonest" },
 ];
 
-const EMPTY = { q: "", platform: [], workType: [], length: [], minBudget: "", sort: "newest", page: 1 };
+const EMPTY = { q: "", platform: [], workType: [], length: [], status: [], minBudget: "", sort: "newest", page: 1 };
 
 // Filters <-> query string, so a filtered list can be shared or bookmarked.
 function parseQuery(query) {
@@ -39,6 +41,7 @@ function parseQuery(query) {
     platform: list("platform"),
     workType: list("workType"),
     length: list("length"),
+    status: list("status"),
     minBudget: params.get("minBudget") || "",
     sort: params.get("sort") || "newest",
     page: Math.max(1, Number(params.get("page")) || 1),
@@ -59,7 +62,9 @@ export default function ProjectDirectory({ initialQuery = "" }) {
   const [filters, setFilters] = useState(() => parseQuery(initialQuery));
   const [search, setSearch] = useState(filters.q);
   const [result, setResult] = useState(null); // { query, projects, total, ... } | { query, error }
-  const isClient = useCurrentUser()?.accountType === "client";
+  const accountType = useCurrentUser()?.accountType;
+  const isClient = accountType === "client";
+  const filtersShown = LIST_FILTERS.filter((f) => !f.freelancerOnly || accountType === "freelancer");
   const query = toQuery(filters);
   const loading = result?.query !== query;
 
@@ -94,7 +99,7 @@ export default function ProjectDirectory({ initialQuery = "" }) {
   };
 
   const activeCount =
-    LIST_FILTERS.reduce((n, { key }) => n + filters[key].length, 0) +
+    filtersShown.reduce((n, { key }) => n + filters[key].length, 0) +
     (filters.minBudget ? 1 : 0) +
     (filters.q ? 1 : 0);
   const shown = !loading && result?.projects ? result : null;
@@ -171,7 +176,7 @@ export default function ProjectDirectory({ initialQuery = "" }) {
           <div className="row align-items-center mb20">
             <div className="col-lg-9">
               <ul className="p-0 mb-0 dropdown-lists">
-                {LIST_FILTERS.map(({ key, label, options }) => (
+                {filtersShown.map(({ key, label, options }) => (
                   <FilterDropdown key={key} label={label} count={filters[key].length}>
                     {options.map((o) => (
                       <FilterCheck
