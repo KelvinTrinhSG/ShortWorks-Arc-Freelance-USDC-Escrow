@@ -109,12 +109,6 @@ const menus = [
     ],
   },
   // Contact lives in the footer (data/footer.js).
-  {
-    id: 8,
-    name: "Create Service",
-    path: "/add-services",
-    showFor: "freelancer",
-  },
 ];
 
 // Menu items the given user (or guest, when null) should see.
