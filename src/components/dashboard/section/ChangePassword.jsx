@@ -17,9 +17,8 @@ export default function ChangePassword() {
                       Old Password
                     </label>
                     <input
-                      type="text"
+                      type="password"
                       className="form-control"
-                      placeholder="********"
                     />
                   </div>
                 </div>
@@ -31,9 +30,8 @@ export default function ChangePassword() {
                       New Password
                     </label>
                     <input
-                      type="text"
+                      type="password"
                       className="form-control"
-                      placeholder="********"
                     />
                   </div>
                 </div>
@@ -43,9 +41,8 @@ export default function ChangePassword() {
                       Confirm New Password
                     </label>
                     <input
-                      type="text"
+                      type="password"
                       className="form-control"
-                      placeholder="********"
                     />
                   </div>
                 </div>
