@@ -228,7 +228,7 @@ export async function getProject(id, viewer) {
   const isOwner = viewer?.id === rows[0].client_id;
   const proposalQuery = `
     SELECT pr.id, pr.price_per_video, to_char(pr.delivery_date, 'YYYY-MM-DD') AS delivery_date,
-           pr.cover_letter, pr.sample_url, pr.status, pr.created_at,
+           pr.cover_letter, pr.sample_url, pr.status, pr.created_at, pr.accepted_at,
            u.id AS freelancer_id, u.username, u.display_name, u.headline, u.country, u.avatar_updated_at
     FROM proposals pr JOIN users u ON u.id = pr.freelancer_id
     WHERE pr.project_id = $1`;
@@ -241,6 +241,7 @@ export async function getProject(id, viewer) {
     sampleEmbedUrl: r.sample_url ? parseVideoUrl(r.sample_url)?.embedUrl ?? null : null,
     status: r.status,
     createdAt: r.created_at,
+    acceptedAt: r.accepted_at,
     freelancer: {
       username: r.username,
       displayName: r.display_name,
@@ -362,8 +363,15 @@ export async function updateProposal(id, d) {
   );
 }
 
+// accepted_at marks the start of the job; it is cleared when the client undoes or declines.
 export async function setProposalStatus(id, status) {
-  await pool.query("UPDATE proposals SET status = $2 WHERE id = $1", [id, status]);
+  await pool.query(
+    `UPDATE proposals
+     SET status = $2::varchar,
+         accepted_at = CASE WHEN $2::varchar = 'accepted' THEN COALESCE(accepted_at, NOW()) ELSE NULL END
+     WHERE id = $1`,
+    [id, status],
+  );
 }
 
 export async function deleteProposal(id) {

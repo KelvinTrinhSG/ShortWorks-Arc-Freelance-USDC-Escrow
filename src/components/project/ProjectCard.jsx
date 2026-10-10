@@ -18,6 +18,18 @@ export function timeAgo(iso, now = Date.now()) {
   return days === 1 ? "1 day ago" : `${days} days ago`;
 }
 
+// Whole days from `today` to `date` (both yyyy-mm-dd).
+export const daysUntil = (date, today) =>
+  Math.round((Date.parse(date) - Date.parse(today)) / 86400000);
+
+export function dueLabel(date, today) {
+  const days = daysUntil(date, today);
+  if (days > 1) return { text: `${days} days left`, className: "text-thm" };
+  if (days === 1) return { text: "Due tomorrow", className: "text-warning" };
+  if (days === 0) return { text: "Due today", className: "text-warning" };
+  return { text: `${-days} ${days === -1 ? "day" : "days"} overdue`, className: "text-danger" };
+}
+
 // How a project reads to a freelancer: scope, cost, time and quality at a glance.
 // Works both for a saved project (has id, client, createdAt…) and for the live
 // preview of a draft in the Create Project form, where those are missing.

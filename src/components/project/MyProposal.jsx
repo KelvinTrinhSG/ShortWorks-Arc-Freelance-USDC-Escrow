@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import ProposalCard from "./ProposalCard";
@@ -60,6 +61,11 @@ export default function MyProposal({ proposal, project, username, now }) {
         actions={
           <>
             {note && <p className={`fz14 mb10 ${proposal.status === "accepted" ? "text-success" : "text-muted"}`}>{note}</p>}
+            {proposal.status === "accepted" && (
+              <Link href={`/manage-jobs/${proposal.id}`} className="btn btn-sm btn-dark">
+                Open your job →
+              </Link>
+            )}
             {canChange && (
               <div className="d-flex flex-wrap gap-2">
                 <button type="button" className="btn btn-sm btn-outline-dark" onClick={() => setEditing(true)} disabled={busy}>
