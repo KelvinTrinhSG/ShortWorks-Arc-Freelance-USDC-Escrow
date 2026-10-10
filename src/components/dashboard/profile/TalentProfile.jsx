@@ -17,7 +17,9 @@ import {
   TOOLS,
   TURNAROUND,
 } from "@/data/talentOptions";
+import authStore from "@/store/authStore";
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import ChipSelect from "./ChipSelect";
 import PortfolioEditor from "./PortfolioEditor";
@@ -80,33 +82,92 @@ function Label({ children, required, hint }) {
   );
 }
 
+// API uses null for "not set"; the Select component uses undefined for that.
+const fromApi = (p) => ({
+  ...p,
+  country: p.country ?? undefined,
+  timezone: p.timezone ?? undefined,
+  turnaroundHours: p.turnaroundHours ?? undefined,
+  freeRevisions: p.freeRevisions ?? undefined,
+  startingPrice: p.startingPrice === null ? "" : String(p.startingPrice),
+});
+
+const toApi = (p) => ({
+  displayName: p.displayName,
+  headline: p.headline,
+  bio: p.bio,
+  roles: p.roles,
+  country: p.country ?? null,
+  timezone: p.timezone ?? null,
+  languages: p.languages,
+  availability: p.availability,
+  platforms: p.platforms,
+  niches: p.niches,
+  tools: p.tools,
+  startingPrice: p.startingPrice === "" ? null : p.startingPrice,
+  turnaroundHours: p.turnaroundHours ?? null,
+  freeRevisions: p.freeRevisions ?? null,
+  phone: p.phone,
+  paypalEmail: p.paypalEmail,
+});
+
+// Center-crop and shrink to a 256x256 JPEG so uploads stay ~30KB.
+async function resizeAvatar(file) {
+  const bitmap = await createImageBitmap(file);
+  const side = Math.min(bitmap.width, bitmap.height);
+  const canvas = document.createElement("canvas");
+  canvas.width = canvas.height = 256;
+  canvas
+    .getContext("2d")
+    .drawImage(
+      bitmap,
+      (bitmap.width - side) / 2,
+      (bitmap.height - side) / 2,
+      side,
+      side,
+      0,
+      0,
+      256,
+      256,
+    );
+  bitmap.close();
+  return new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.85));
+}
+
+async function request(url, options) {
+  const res = await fetch(url, options);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || "Something went wrong.");
+  return data;
+}
+
 export default function TalentProfile() {
+  const updateUser = authStore((state) => state.updateUser);
   const [profile, setProfile] = useState(initialProfile);
   const [videos, setVideos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [avatarBusy, setAvatarBusy] = useState(false);
   const [avatarError, setAvatarError] = useState("");
-  const [notice, setNotice] = useState("");
+  const [notice, setNotice] = useState(null); // { ok: boolean, text: string }
 
   const set = (field) => (value) =>
     setProfile((prev) => ({ ...prev, [field]: value }));
   const setFromInput = (field) => (e) => set(field)(e.target.value);
 
-  // Fill in what the account already has. The rest has no backend yet.
+  // Load the saved profile every time the page opens, e.g. after logging in again.
   useEffect(() => {
-    fetch("/api/me")
-      .then((res) => res.json())
-      .then(({ user }) => {
-        if (!user) return;
-        setProfile((prev) => ({
-          ...prev,
-          displayName: prev.displayName || user.displayName,
-          username: user.username,
-          email: user.email,
-        }));
+    request("/api/profile")
+      .then((data) => {
+        setProfile(fromApi(data.profile));
+        setVideos(data.videos);
       })
-      .catch(() => {});
+      .catch((err) => setLoadError(err.message))
+      .finally(() => setLoading(false));
   }, []);
 
-  const handleAvatar = (e) => {
+  const handleAvatar = async (e) => {
     const file = e.target.files[0];
     e.target.value = "";
     if (!file) return;
@@ -119,23 +180,92 @@ export default function TalentProfile() {
       return;
     }
     setAvatarError("");
-    set("avatarUrl")(URL.createObjectURL(file));
+    setAvatarBusy(true);
+    try {
+      const { avatarUrl } = await request("/api/profile/avatar", {
+        method: "POST",
+        headers: { "Content-Type": "image/jpeg" },
+        body: await resizeAvatar(file),
+      });
+      set("avatarUrl")(avatarUrl);
+      updateUser({ avatarUrl });
+    } catch (err) {
+      setAvatarError(err.message);
+    } finally {
+      setAvatarBusy(false);
+    }
+  };
+
+  const removeAvatar = async () => {
+    if (!profile.avatarUrl || avatarBusy) return;
+    setAvatarBusy(true);
+    try {
+      await request("/api/profile/avatar", { method: "DELETE" });
+      set("avatarUrl")(null);
+      updateUser({ avatarUrl: null });
+    } catch (err) {
+      setAvatarError(err.message);
+    } finally {
+      setAvatarBusy(false);
+    }
   };
 
   const checks = requiredChecks(profile, videos);
   const doneCount = checks.filter((c) => c.done).length;
   const missing = checks.filter((c) => !c.done);
 
-  const handleSave = () => {
-    // TODO: send to PATCH /api/profile and /api/profile/videos once they exist.
-    setNotice(
-      missing.length
-        ? `Saving is not connected yet. Still missing: ${missing
-            .map((c) => c.label)
-            .join(", ")}.`
-        : "Saving is not connected yet. Your profile is complete, but nothing was stored.",
-    );
+  const handleSave = async () => {
+    setSaving(true);
+    setNotice(null);
+    try {
+      const saved = await request("/api/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(toApi(profile)),
+      });
+      const { videos: savedVideos } = await request("/api/profile/videos", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          videos: videos.map(({ url, niche, role, result }) => ({
+            url,
+            niche,
+            role,
+            result,
+          })),
+        }),
+      });
+      setProfile(fromApi(saved.profile));
+      setVideos(savedVideos);
+      updateUser({ displayName: saved.profile.displayName });
+      setNotice({
+        ok: true,
+        text: missing.length
+          ? `Saved. Complete ${missing.length} more to be shown to clients.`
+          : "Saved. Your profile is complete.",
+      });
+    } catch (err) {
+      setNotice({ ok: false, text: err.message });
+    } finally {
+      setSaving(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="ps-widget bgc-white bdrs4 p30 mb30">
+        <p className="text mb-0">Loading your profile...</p>
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="ps-widget bgc-white bdrs4 p30 mb30">
+        <p className="text-danger mb-0">{loadError}</p>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -143,8 +273,18 @@ export default function TalentProfile() {
       <div className="ps-widget bgc-white bdrs4 p30 mb30">
         <div className="d-flex justify-content-between align-items-center mb10">
           <h5 className="list-title mb-0">Profile completion</h5>
-          <span className="fw500">
-            {doneCount}/{checks.length}
+          <span className="d-flex align-items-center gap-3">
+            {profile.username && (
+              <Link
+                href={`/talents/${encodeURIComponent(profile.username)}`}
+                className="fz14 text-thm"
+              >
+                View public profile ↗
+              </Link>
+            )}
+            <span className="fw500">
+              {doneCount}/{checks.length}
+            </span>
           </span>
         </div>
         <div className="progress mb15" style={{ height: 8 }}>
@@ -180,7 +320,9 @@ export default function TalentProfile() {
             <div className="d-flex align-items-center my-3">
               <a
                 className="tag-delt text-thm2"
-                onClick={() => set("avatarUrl")(null)}
+                onClick={removeAvatar}
+                role="button"
+                aria-label="Remove photo"
               >
                 <span className="flaticon-delete text-thm2" />
               </a>
@@ -190,9 +332,11 @@ export default function TalentProfile() {
                   accept=".png, .jpg, .jpeg"
                   className="d-none"
                   onChange={handleAvatar}
+                  disabled={avatarBusy}
                 />
                 <a className="upload-btn ml10">
-                  Upload photo <span className="text-danger">*</span>
+                  {avatarBusy ? "Uploading..." : "Upload photo"}{" "}
+                  <span className="text-danger">*</span>
                 </a>
               </label>
             </div>
@@ -438,9 +582,19 @@ export default function TalentProfile() {
       </Card>
 
       <div className="mb30">
-        {notice && <p className="text-danger fz14 mb15">{notice}</p>}
-        <button type="button" className="ud-btn btn-thm" onClick={handleSave}>
-          Save Profile <i className="fal fa-arrow-right-long" />
+        {notice && (
+          <p className={`fz14 mb15 ${notice.ok ? "text-success" : "text-danger"}`}>
+            {notice.text}
+          </p>
+        )}
+        <button
+          type="button"
+          className="ud-btn btn-thm"
+          onClick={handleSave}
+          disabled={saving}
+        >
+          {saving ? "Saving..." : "Save Profile"}{" "}
+          <i className="fal fa-arrow-right-long" />
         </button>
       </div>
     </>

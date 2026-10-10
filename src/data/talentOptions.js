@@ -97,13 +97,13 @@ export const TURNAROUND = [
   { value: 168, label: "7 days" },
 ];
 
-// null = unlimited
+// -1 = unlimited (null means the user has not picked yet)
 export const REVISIONS = [
   { value: 0, label: "No free revisions" },
   { value: 1, label: "1 revision" },
   { value: 2, label: "2 revisions" },
   { value: 3, label: "3 revisions" },
-  { value: null, label: "Unlimited" },
+  { value: -1, label: "Unlimited" },
 ];
 
 export const VIDEO_ROLES = [
@@ -119,3 +119,13 @@ export const MAX_VIDEOS = 6;
 export const HEADLINE_MAX = 70;
 export const BIO_MAX = 300;
 export const AVATAR_MAX_BYTES = 1024 * 1024;
+
+// Label for a stored value, e.g. labelOf(NICHES, "food") -> "F&B".
+export const labelOf = (options, value) =>
+  options.find((o) => o.value === value)?.label ?? value;
+
+// Chosen on the Register page. Only freelancers are listed as talent.
+export const ACCOUNT_TYPES = [
+  { value: "client", label: "Hire A Freelancer" },
+  { value: "freelancer", label: "Become a Freelancer" },
+];

@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import pool from "@/lib/db";
+import { toSessionUser } from "@/lib/profile";
 import { createSession } from "@/lib/session";
 
 export async function POST(request) {
@@ -26,10 +27,5 @@ export async function POST(request) {
 
   await createSession(user.id);
 
-  return Response.json({
-    id: user.id,
-    displayName: user.display_name,
-    username: user.username,
-    email: user.email,
-  });
+  return Response.json(toSessionUser(user));
 }

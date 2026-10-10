@@ -47,6 +47,19 @@ export async function getSession() {
   return decrypt((await cookies()).get(COOKIE_NAME)?.value);
 }
 
+// For API routes: the logged-in user's id, or a 401 response to return as-is.
+export async function requireUser() {
+  const session = await getSession();
+  if (session?.userId) return { userId: session.userId, response: null };
+  return {
+    userId: null,
+    response: Response.json(
+      { error: "Your session has expired. Please log in again." },
+      { status: 401 },
+    ),
+  };
+}
+
 export async function deleteSession() {
   (await cookies()).delete(COOKIE_NAME);
 }

@@ -389,3 +389,54 @@ a {
   height: 100%;
   object-fit: cover;
 }
+
+/* Register page: account-type choice at 1.5x the normal checkbox size */
+.main-title.register-title {
+  margin-bottom: 20px;
+}
+.account-type-choice .custom_checkbox {
+  font-size: 26px;
+  line-height: 48px;
+  padding-left: 36px;
+}
+.account-type-choice .custom_checkbox .checkmark {
+  top: 12px;
+  width: 24px;
+  height: 24px;
+  border-width: 2px;
+  border-radius: 6px;
+}
+.account-type-choice .custom_checkbox .checkmark:after {
+  left: 7px;
+  top: 2px;
+  width: 7px;
+  height: 13px;
+  border-width: 0 3px 3px 0;
+}
+/* The template draws the white tick on unchecked boxes too; hide it on this tinted background. */
+.account-type-choice .custom_checkbox input:not(:checked) ~ .checkmark:after {
+  display: none;
+}
+@media (max-width: 575.98px) {
+  .account-type-choice .custom_checkbox {
+    font-size: 20px;
+    line-height: 40px;
+    padding-left: 30px;
+  }
+  .account-type-choice .custom_checkbox .checkmark {
+    top: 10px;
+    width: 20px;
+    height: 20px;
+  }
+  .account-type-choice .custom_checkbox .checkmark:after {
+    left: 6px;
+    top: 2px;
+    width: 6px;
+    height: 11px;
+  }
+}
+
+/* Create Project: the length select sits next to the count input, without its own label */
+.no-label-select label {
+  display: none;
+}

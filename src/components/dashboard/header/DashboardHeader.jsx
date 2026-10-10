@@ -1,6 +1,6 @@
 "use client";
 import { dasboardNavigation } from "@/data/dashboard";
-import authStore from "@/store/authStore";
+import authStore, { useCurrentUser } from "@/store/authStore";
 import toggleStore from "@/store/toggleStore";
 import Image from "next/image";
 import Link from "next/link";
@@ -10,6 +10,7 @@ export default function DashboardHeader() {
   const toggle = toggleStore((state) => state.dashboardSlidebarToggleHandler);
   const path = usePathname();
   const logout = authStore((state) => state.logout);
+  const user = useCurrentUser();
 
   return (
     <>
@@ -278,8 +279,14 @@ export default function DashboardHeader() {
                           <Image
                             height={50}
                             width={50}
-                            src="/images/resource/user.png"
-                            alt="user.png"
+                            className="rounded-circle"
+                            style={{ objectFit: "cover" }}
+                            src={
+                              user?.avatarUrl ||
+                              "/images/resource/default-avatar.svg"
+                            }
+                            alt={user?.displayName || "avatar"}
+                            unoptimized
                           />
                         </a>
                         <div className="dropdown-menu">

@@ -18,7 +18,7 @@
 | Phiên đăng nhập | `src/lib/session.js` | Tạo, đọc, xoá cookie `session` (JWT, thư viện `jose`) |
 | Chặn trang | `src/proxy.js` | Khách mở trang dashboard → chuyển về `/login?next=...` |
 | Kết nối DB | `src/lib/db.js` | Pool `pg` dùng chung (SSL, `max: 3`) |
-| Schema | `db/schema.sql` | Bảng `users` |
+| Schema | `db/*.sql` (chạy `npm run db:migrate`) | Bảng `users` và các bảng profile |
 | Store | `src/store/authStore.js` | Phản chiếu trạng thái đăng nhập cho UI (lấy từ `/api/me`) |
 | Link header (desktop) | `src/components/header/HeaderAuthLinks.jsx` | Hiện "Sign in"/"Join" hoặc avatar + "Dashboard" |
 | Link header (mobile) | `src/components/header/SignInLink.jsx` | Hiện "Sign in"/"Join" hoặc "Dashboard" |
@@ -54,7 +54,7 @@ Header: [avatar → /my-profile] [Dashboard → /dashboard]
 
 | Endpoint | Body | Thành công | Lỗi |
 |---|---|---|---|
-| `POST /api/register` | `{ displayName, username, email, password }` | `201` + `{ id, displayName, username, email }` | `400` thiếu trường · `409` email/username đã tồn tại |
+| `POST /api/register` | `{ displayName, username, email, password, accountType }` (`client` hoặc `freelancer`) | `201` + `{ id, displayName, username, accountType, email, avatarUrl }` | `400` thiếu trường hoặc sai `accountType` · `409` email/username đã tồn tại |
 | `POST /api/login` | `{ email, password }` | `200` + `{ id, displayName, username, email }` | `400` thiếu trường · `401` sai email hoặc mật khẩu |
 | `POST /api/logout` | — | `{ ok: true }`, xoá cookie | — |
 | `GET /api/me` | — | `{ user: {...} }` hoặc `{ user: null }` | — |
@@ -99,6 +99,18 @@ Dùng trong `MobileNavigation1` và `MobileNavigation2`.
 
 ## Trang Join (`/register`)
 
+**Loại tài khoản (bắt buộc):** dưới chữ "Register" có 2 checkbox nằm ngang, **Hire A Freelancer** và **Become a Freelancer**. Chỉ chọn được một, chọn cái này thì cái kia tự bỏ chọn. Nếu chưa chọn mà bấm Create Account, form báo lỗi.
+
+| Lựa chọn | Lưu vào `users.account_type` | Sau khi đăng ký chuyển tới |
+|---|---|---|
+| Hire A Freelancer | `client` | `/freelancer-1` (xem danh sách talent) |
+| Become a Freelancer | `freelancer` | `/my-profile` (điền profile) |
+
+- Link `/register?as=freelancer` hoặc `/register?as=client` sẽ chọn sẵn loại tài khoản.
+- **Chỉ tài khoản `freelancer`** mới hiện trong danh sách talent và có trang `/talents/{username}`. Tài khoản `client` mở trang này sẽ nhận 404.
+- Các tài khoản tạo trước khi có tính năng này được tính là `freelancer` (xem `db/003_account_type.sql`).
+- Phần giao diện nằm ở `src/components/auth/RegisterSection.jsx`, form ở `RegisterForm.jsx`.
+
 | Trường | Kiểu input |
 |---|---|
 | Display Name | `text` (bắt buộc) |
@@ -106,20 +118,21 @@ Dùng trong `MobileNavigation1` và `MobileNavigation2`.
 | Email | `email` (bắt buộc) |
 | Password | `password` (bắt buộc) |
 
-- Nút **Create Account** gọi API. Đăng ký thành công thì đăng nhập luôn và chuyển về `/`.
+- Nút **Create Account** gọi API. Đăng ký thành công thì đăng nhập luôn và chuyển trang theo loại tài khoản (bảng trên).
 - Link "Log In!" → `/login`.
 - Nút mạng xã hội giống trang Sign in, chưa có xử lý.
 
 ## Store — `authStore.js`
 
 ```js
-{ isLoggedIn: false, checked: false, login(), logout() }
+{ user: null, checked: false, login(user), updateUser(changes), logout() }
+// user = { id, displayName, username, email, avatarUrl }
 ```
 
 - **Không còn lưu vào `localStorage`.** Store chỉ phản chiếu cookie phiên để header hiển thị đúng.
-- Hook **`useIsLoggedIn()`** gọi `GET /api/me` một lần mỗi lần tải trang. Lần render đầu luôn trả `false` (giống nhau ở server và client nên không bị hydration mismatch), rồi cập nhật khi có kết quả. Vì vậy với người đã đăng nhập, header có thể hiện "Sign in" trong tích tắc rồi mới đổi sang "Dashboard".
+- Hook **`useCurrentUser()`** (và `useIsLoggedIn()` dựa trên nó) gọi `GET /api/me` một lần mỗi lần tải trang. Lần render đầu luôn trả `null`/`false` (giống nhau ở server và client nên không bị hydration mismatch), rồi cập nhật khi có kết quả. Vì vậy với người đã đăng nhập, header có thể hiện "Sign in" trong tích tắc rồi mới đổi sang "Dashboard".
 - `login()` chỉ cập nhật UI, còn cookie đã được API đặt sẵn. `logout()` gọi `POST /api/logout` để xoá cookie.
-- Thông tin user mà API trả về **chưa được lưu** vào store.
+- `login(user)` nhận user do API trả về, nên header hiện đúng tên và avatar ngay sau khi đăng nhập. Trang My Profile gọi `updateUser()` sau khi đổi ảnh hoặc tên.
 
 ## Logout
 

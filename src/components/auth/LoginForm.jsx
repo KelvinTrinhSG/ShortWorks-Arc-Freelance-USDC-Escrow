@@ -30,7 +30,7 @@ export default function LoginForm({ redirectTo }) {
         setError(data.error || "Something went wrong.");
         return;
       }
-      login();
+      login(data);
       router.push(safeRedirect(redirectTo));
     } catch {
       setError("Could not reach the server. Please try again.");

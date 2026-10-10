@@ -67,7 +67,7 @@ Kết nối bằng một trong các cách sau:
 - **psql:** dán lệnh **PSQL Command** vào terminal (cần cài PostgreSQL client trước).
 - **Công cụ có giao diện** (DBeaver, pgAdmin, TablePlus): dùng External URL và bật **SSL = require**.
 
-Chạy đoạn SQL sau (có sẵn trong file [`db/schema.sql`](../db/schema.sql)). Các cột khớp với form Join hiện có (Display Name, Username, Email, Password):
+Chạy đoạn SQL sau (có sẵn trong file [`db/001_users.sql`](../db/001_users.sql)). Các cột khớp với form Join hiện có (Display Name, Username, Email, Password):
 
 ```sql
 CREATE TABLE users (

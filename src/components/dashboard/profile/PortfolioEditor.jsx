@@ -8,7 +8,7 @@ import {
 } from "@/data/talentOptions";
 import { useState } from "react";
 import Select from "./Select";
-import { parseVideoUrl } from "./videoUrl";
+import { parseVideoUrl } from "@/lib/videoUrl";
 
 const emptyDraft = { url: "", niche: undefined, role: undefined, result: "" };
 const labelOf = (options, value) =>

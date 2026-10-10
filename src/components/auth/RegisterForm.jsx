@@ -34,7 +34,10 @@ function useIsTaken(field, value) {
   return result.query === query && result.taken;
 }
 
-export default function RegisterForm() {
+// Freelancers go straight to filling in their profile; clients go browse talent.
+const AFTER_SIGNUP = { freelancer: "/my-profile", client: "/freelancer-1" };
+
+export default function RegisterForm({ accountType }) {
   const login = authStore((state) => state.login);
   const router = useRouter();
   const [form, setForm] = useState({
@@ -53,21 +56,25 @@ export default function RegisterForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!accountType) {
+      setError("Choose Hire A Freelancer or Become a Freelancer at the top.");
+      return;
+    }
     setError("");
     setLoading(true);
     try {
       const res = await fetch("/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, accountType }),
       });
       const data = await res.json();
       if (!res.ok) {
         setError(data.error || "Something went wrong.");
         return;
       }
-      login();
-      router.push("/");
+      login(data);
+      router.push(AFTER_SIGNUP[data.accountType] ?? "/");
     } catch {
       setError("Could not reach the server. Please try again.");
     } finally {

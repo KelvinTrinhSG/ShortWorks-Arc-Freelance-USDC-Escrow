@@ -1,4 +1,5 @@
 import pool from "@/lib/db";
+import { toSessionUser } from "@/lib/profile";
 import { deleteSession, getSession } from "@/lib/session";
 
 // Current user from the session cookie, or { user: null } for guests.
@@ -7,7 +8,7 @@ export async function GET() {
   if (!session) return Response.json({ user: null });
 
   const { rows } = await pool.query(
-    "SELECT id, display_name, username, email FROM users WHERE id = $1",
+    "SELECT id, display_name, username, email, account_type, avatar_updated_at FROM users WHERE id = $1",
     [session.userId],
   );
   const user = rows[0];
@@ -18,12 +19,5 @@ export async function GET() {
     return Response.json({ user: null });
   }
 
-  return Response.json({
-    user: {
-      id: user.id,
-      displayName: user.display_name,
-      username: user.username,
-      email: user.email,
-    },
-  });
+  return Response.json({ user: toSessionUser(user) });
 }

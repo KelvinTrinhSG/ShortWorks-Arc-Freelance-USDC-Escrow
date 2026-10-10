@@ -1,9 +1,60 @@
 # Trang My Profile (`/my-profile`) — hiện trạng & đề xuất
 
-> **Trạng thái:**
-> - ✅ **Frontend theo đề xuất đã xong:** `src/components/dashboard/profile/` và `src/data/talentOptions.js`.
-> - ❌ **Backend chưa làm:** bấm Save chỉ hiện thông báo, chưa lưu gì. Ảnh đại diện chỉ xem trước trên máy.
-> - Phần "Hiện trạng" bên dưới mô tả **giao diện cũ của template** (đã bị thay thế), giữ lại để tham khảo.
+> **Trạng thái: ✅ Đã triển khai đầy đủ** (database + API + frontend). Xem phần [Triển khai](#triển-khai) ngay bên dưới.
+> Các phần "Hiện trạng" và "Đề xuất" phía sau là tài liệu lúc khảo sát và thiết kế, giữ lại để tham khảo. Chỗ nào khác với phần Triển khai thì **phần Triển khai là đúng**.
+
+## Triển khai
+
+### Database — `db/002_profile.sql`
+
+Chạy bằng `npm run db:migrate`. Lệnh này chạy lần lượt mọi file `db/*.sql`, và chạy lại nhiều lần vẫn an toàn.
+
+| Bảng | Nội dung |
+|---|---|
+| `users` *(thêm cột)* | `headline`, `bio`, `roles[]`, `country`, `timezone`, `languages[]`, `availability`, `platforms[]`, `niches[]`, `tools[]`, `starting_price`, `turnaround_hours`, `free_revisions` (`-1` = không giới hạn, `NULL` = chưa chọn), `phone`, `paypal_email`, `avatar_updated_at`, `updated_at` |
+| `portfolio_videos` | `user_id`, `url`, `platform`, `niche`, `role`, `result`, `sort_order` |
+| `user_avatars` | `user_id`, `data` (bytea), `mime_type`, `updated_at` |
+
+Các bảng con dùng `ON DELETE CASCADE`: đóng tài khoản là xoá luôn video và ảnh.
+
+**Ảnh đại diện lưu trong PostgreSQL**, không dùng Vercel Blob hay Cloudinary. Trình duyệt cắt ảnh thành hình vuông và thu nhỏ về **256×256 JPEG (khoảng 30KB)** trước khi tải lên, nên database không bị phình to và không cần đăng ký thêm dịch vụ nào. Nếu sau này cần ảnh lớn hơn hoặc cho phép upload video, nên chuyển sang dịch vụ lưu file riêng.
+
+### API
+
+Mọi route (trừ `GET /api/avatar/:id`) lấy `userId` từ cookie phiên qua `requireUser()`, không bao giờ nhận `userId` từ body hay URL. Kiểm tra dữ liệu nằm trong `src/lib/profile.js` và dùng chung danh sách lựa chọn `src/data/talentOptions.js` với frontend.
+
+| Method | Endpoint | Việc làm |
+|---|---|---|
+| `GET` | `/api/profile` | `{ profile, videos }` của chính mình, gồm cả thông tin riêng tư |
+| `PATCH` | `/api/profile` | Cập nhật bất kỳ trường nào gửi lên. Trả về `400` kèm `errors` theo từng trường nếu sai. Username và email **không** sửa được ở đây. |
+| `PUT` | `/api/profile/videos` | Ghi đè **toàn bộ** danh sách video theo đúng thứ tự gửi lên (tối đa 6, trong một transaction). `platform` được server tự xác định từ link, không tin giá trị client gửi. |
+| `POST` | `/api/profile/avatar` | Body là dữ liệu ảnh thô. Tối đa 300KB. Server kiểm tra các byte đầu của file để chắc chắn là PNG/JPEG thật. |
+| `DELETE` | `/api/profile/avatar` | Xoá ảnh |
+| `GET` | `/api/avatar/:id` | Trả ảnh công khai. URL có `?v=<thời điểm upload>` nên được cache lâu dài. |
+| `POST` | `/api/account/password` | `{ currentPassword, newPassword }`, mật khẩu mới tối thiểu 8 ký tự |
+| `DELETE` | `/api/account` | `{ password }`. Xoá tài khoản và cookie phiên. |
+| `GET` | `/api/me` · `POST /api/login` · `POST /api/register` | Giờ trả thêm `avatarUrl` |
+
+So với đề xuất: video dùng **một** endpoint `PUT` thay cho thêm/sửa/xoá từng video, vì form gửi cả danh sách khi bấm Save. Profile công khai và danh sách talent: xem [talent-directory.md](./talent-directory.md).
+
+### Frontend
+
+- `TalentProfile.jsx` gọi `GET /api/profile` **mỗi lần mở trang**, nên đăng xuất rồi đăng nhập lại (kể cả trên máy khác) vẫn thấy đúng dữ liệu đã lưu.
+- **Save Profile** gửi `PATCH /api/profile` rồi `PUT /api/profile/videos`, sau đó hiện "Saved." hoặc lỗi trả về từ server.
+- **Ảnh đại diện** được tải lên ngay khi chọn ảnh (không cần bấm Save). Avatar ở header trang chủ và header dashboard đổi theo ngay.
+- `authStore` giờ lưu `user` (`displayName`, `avatarUrl`, ...) thay vì chỉ cờ đăng nhập. Dùng `useCurrentUser()` để đọc thông tin này.
+- **Change password** và **Close account** đã gọi API thật. Close account hỏi xác nhận trước, rồi đăng xuất và về trang chủ.
+
+### Đã kiểm tra
+
+- Toàn bộ API được test bằng curl, gồm cả các trường hợp lỗi: sai lựa chọn, vượt giới hạn, link video lạ, file giả làm ảnh, chưa đăng nhập.
+- Một kịch bản chạy trên trình duyệt Edge thật: đăng ký → điền đủ profile, upload ảnh, thêm 3 video → Save (10/10) → đăng xuất → đăng nhập lại → mọi dữ liệu hiện đúng → đổi mật khẩu → đóng tài khoản.
+
+### Còn lại
+
+- Cookie JWT không thu hồi được: đổi mật khẩu không đăng xuất các thiết bị khác.
+- Form Join chưa yêu cầu mật khẩu tối thiểu 8 ký tự như form đổi mật khẩu.
+- Profile công khai `/talents/{username}` và danh sách `/freelancer-1` đã làm, xem [talent-directory.md](./talent-directory.md). Mọi tài khoản đều được hiện, profile hoàn chỉnh chỉ được xếp lên đầu.
 
 - Route: `src/app/(dashboard)/my-profile/page.jsx` (đã được `src/proxy.js` chặn, phải đăng nhập mới vào được)
 - Nội dung trang: `src/components/dashboard/section/MyProfileInfo.jsx`, gồm 7 khối:
@@ -21,7 +72,7 @@
 
 Education, Work & Experience và Awards hiện chưa có ô nhập nào.
 
-👉 Đề xuất **thu gọn còn 14 trường** cho phù hợp với nền tảng thuê người làm video ngắn: xem phần [Đề xuất](#đề-xuất-profile-cho-talent-làm-video-ngắn-chưa-làm) ở cuối file.
+👉 Đề xuất **thu gọn còn 14 trường** cho phù hợp với nền tảng thuê người làm video ngắn: xem phần [Đề xuất](#đề-xuất-profile-cho-talent-làm-video-ngắn) ở cuối file.
 
 ---
 
@@ -106,7 +157,7 @@ Nút **Change Password** là link sang `/contact`.
 
 ---
 
-## Đề xuất: profile cho talent làm video ngắn (chưa làm)
+## Đề xuất: profile cho talent làm video ngắn
 
 ShortWorks chỉ tập trung vào việc thuê người làm **video ngắn** (TikTok, Reels, Shorts). Profile nên trả lời được 4 câu hỏi của người thuê trong khoảng 30 giây:
 
