@@ -1,9 +1,10 @@
-import LoginButton from "@/components/button/LoginButton";
+import LoginForm from "@/components/auth/LoginForm";
 import Footer from "@/components/footer/Footer";
 import Header20 from "@/components/header/Header20";
 import Link from "next/link";
 
-export default function page() {
+export default async function page({ searchParams }) {
+    const { next } = await searchParams;
     return (
         <>
             <div className="bgc-thm4">
@@ -42,45 +43,7 @@ export default function page() {
                                             </Link>
                                         </p>
                                     </div>
-                                    <div className="mb20">
-                                        <label className="form-label fw600 dark-color">
-                                            Email Address
-                                        </label>
-                                        <input
-                                            type="email"
-                                            className="form-control"
-                                            placeholder="alitfn58@gmail.com"
-                                        />
-                                    </div>
-                                    <div className="mb15">
-                                        <label className="form-label fw600 dark-color">
-                                            Password
-                                        </label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            placeholder="*******"
-                                        />
-                                    </div>
-                                    <div className="checkbox-style1 d-block d-sm-flex align-items-center justify-content-between mb20">
-                                        <label className="custom_checkbox fz14 ff-heading">
-                                            Remember me
-                                            <input
-                                                type="checkbox"
-                                                defaultChecked="checked"
-                                            />
-                                            <span className="checkmark" />
-                                        </label>
-                                        <a className="fz14 ff-heading">
-                                            Lost your password?
-                                        </a>
-                                    </div>
-                                    <div className="d-grid mb20">
-                                        <LoginButton className="ud-btn btn-thm">
-                                            Log In{" "}
-                                            <i className="fal fa-arrow-right-long" />
-                                        </LoginButton>
-                                    </div>
+                                    <LoginForm redirectTo={next} />
                                     <div className="hr_content mb20">
                                         <hr />
                                         <span className="hr_top_text">OR</span>

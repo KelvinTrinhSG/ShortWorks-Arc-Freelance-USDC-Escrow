@@ -1,4 +1,4 @@
-import LoginButton from "@/components/button/LoginButton";
+import RegisterForm from "@/components/auth/RegisterForm";
 import Footer from "@/components/footer/Footer";
 import Header20 from "@/components/header/Header20";
 import Link from "next/link";
@@ -43,52 +43,7 @@ export default function page() {
                                             </Link>
                                         </p>
                                     </div>
-                                    <div className="mb25">
-                                        <label className="form-label fw500 dark-color">
-                                            Display Name
-                                        </label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            placeholder="ali"
-                                        />
-                                    </div>
-                                    <div className="mb25">
-                                        <label className="form-label fw500 dark-color">
-                                            Username
-                                        </label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            placeholder="alitf"
-                                        />
-                                    </div>
-                                    <div className="mb25">
-                                        <label className="form-label fw500 dark-color">
-                                            Email
-                                        </label>
-                                        <input
-                                            type="email"
-                                            className="form-control"
-                                            placeholder="alitfn58@gmail.com"
-                                        />
-                                    </div>
-                                    <div className="mb15">
-                                        <label className="form-label fw500 dark-color">
-                                            Password
-                                        </label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            placeholder="*******"
-                                        />
-                                    </div>
-                                    <div className="d-grid mb20">
-                                        <LoginButton className="ud-btn btn-thm default-box-shadow2">
-                                            Creat Account{" "}
-                                            <i className="fal fa-arrow-right-long" />
-                                        </LoginButton>
-                                    </div>
+                                    <RegisterForm />
                                     <div className="hr_content mb20">
                                         <hr />
                                         <span className="hr_top_text">OR</span>
