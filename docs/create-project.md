@@ -1,6 +1,6 @@
 # Trang Create Project (`/create-projects`)
 
-> **Trạng thái:** ✅ Frontend xong · ❌ Backend chưa làm. Bấm **Publish Project** chỉ kiểm tra dữ liệu rồi hiện thông báo, chưa lưu gì.
+> **Trạng thái:** ✅ Frontend + backend xong. **Publish Project** lưu dự án và chuyển sang trang chi tiết `/project-single/{id}`. Xem [projects.md](./projects.md) cho danh sách dự án, trang chi tiết và proposal.
 
 Form 8 trường, đủ để freelancer đọc là hiểu ngay **scope · time · cost · quality**.
 
@@ -33,9 +33,6 @@ Form 8 trường, đủ để freelancer đọc là hiểu ngay **scope · time 
 
 Đã xoá `BasicInformation2.jsx` và `UploadAttachment.jsx` (form cũ của template, không trang nào khác dùng).
 
-## Việc tiếp theo (backend)
+## Backend
 
-1. Bảng `projects` gồm các cột: `client_id`, `title`, `platforms[]`, `work_type`, `video_count`, `video_length`, `brief`, `deadline`, `budget_per_video`, `status`, `created_at`. Thêm bảng `project_references` để lưu link video tham khảo.
-2. `POST /api/projects`: chỉ tài khoản `client` được gọi. Kiểm tra dữ liệu bằng `projectOptions.js` và `parseVideoUrl()`.
-3. Trang danh sách dự án công khai cho freelancer, dùng `ProjectCard`.
-4. Trang "Manage Project" để người thuê xem và sửa các dự án đã đăng.
+Đã làm: bảng `projects` + `project_references` (`db/004_projects.sql`) và `POST /api/projects` (chỉ tài khoản `client`). Chi tiết ở [projects.md](./projects.md).

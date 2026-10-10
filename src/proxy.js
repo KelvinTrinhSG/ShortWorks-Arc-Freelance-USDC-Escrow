@@ -16,6 +16,7 @@ export async function proxy(request) {
 export const config = {
   matcher: [
     "/dashboard/:path*",
+    "/edit-project/:path*",
     "/add-services/:path*",
     "/create-projects/:path*",
     "/invoice/:path*",

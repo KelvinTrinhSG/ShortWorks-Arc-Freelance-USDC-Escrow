@@ -20,3 +20,6 @@ export const BRIEF_MAX = 1000;
 export const MIN_VIDEO_COUNT = 1;
 export const MAX_VIDEO_COUNT = 50;
 export const MAX_REFERENCES = 3;
+
+export const COVER_LETTER_MAX = 1500;
+export const PROJECTS_PAGE_SIZE = 10;

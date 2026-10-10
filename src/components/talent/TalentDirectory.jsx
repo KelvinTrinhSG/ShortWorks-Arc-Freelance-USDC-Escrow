@@ -7,6 +7,8 @@ import {
   TURNAROUND,
 } from "@/data/talentOptions";
 import { useEffect, useState } from "react";
+import { FilterCheck, FilterDropdown } from "../listing/FilterDropdown";
+import Pagination from "../listing/Pagination";
 import TalentCard from "./TalentCard";
 
 const LIST_FILTERS = [
@@ -81,50 +83,6 @@ function toQuery(f) {
   return params.toString();
 }
 
-function Dropdown({ label, count, children }) {
-  return (
-    <li className="list-inline-item position-relative mb10">
-      <button
-        className={`open-btn dropdown-toggle ${count ? "fw600" : ""}`}
-        type="button"
-        data-bs-toggle="dropdown"
-        data-bs-auto-close="outside"
-      >
-        {label}
-        {count ? ` (${count})` : ""}
-        <i className="fa fa-angle-down ms-2" />
-      </button>
-      <div className="dropdown-menu dd4 pb10">
-        <div className="widget-wrapper pr20">
-          <div className="checkbox-style1">{children}</div>
-        </div>
-      </div>
-    </li>
-  );
-}
-
-function Check({ label, checked, onChange, type = "checkbox" }) {
-  return (
-    <label className="custom_checkbox">
-      {label}
-      <input type={type} checked={checked} onChange={onChange} />
-      <span className="checkmark" />
-    </label>
-  );
-}
-
-// Page numbers with "…" gaps, e.g. 1 … 4 5 6 … 20
-function pageItems(page, totalPages) {
-  const pages = new Set([1, totalPages, page - 1, page, page + 1]);
-  const sorted = [...pages].filter((p) => p >= 1 && p <= totalPages).sort((a, b) => a - b);
-  const items = [];
-  sorted.forEach((p, i) => {
-    if (i && p - sorted[i - 1] > 1) items.push("gap-" + p);
-    items.push(p);
-  });
-  return items;
-}
-
 export default function TalentDirectory({ initialQuery = "" }) {
   const [filters, setFilters] = useState(() => parseQuery(initialQuery));
   const [search, setSearch] = useState(filters.q);
@@ -169,7 +127,6 @@ export default function TalentDirectory({ initialQuery = "" }) {
     (filters.available ? 1 : 0) +
     (filters.q ? 1 : 0);
 
-  const totalPages = result?.total ? Math.ceil(result.total / result.pageSize) : 0;
   const shown = !loading && result?.talents ? result : null;
 
   return (
@@ -230,26 +187,26 @@ export default function TalentDirectory({ initialQuery = "" }) {
             <div className="col-lg-9">
               <ul className="p-0 mb-0 dropdown-lists">
                 {LIST_FILTERS.map(({ key, label, options }) => (
-                  <Dropdown key={key} label={label} count={filters[key].length}>
+                  <FilterDropdown key={key} label={label} count={filters[key].length}>
                     {options.map((o) => (
-                      <Check
+                      <FilterCheck
                         key={o.value}
                         label={o.label}
                         checked={filters[key].includes(o.value)}
                         onChange={() => toggle(key, o.value)}
                       />
                     ))}
-                  </Dropdown>
+                  </FilterDropdown>
                 ))}
-                <Dropdown label="Price" count={filters.maxPrice ? 1 : 0}>
-                  <Check
+                <FilterDropdown label="Price" count={filters.maxPrice ? 1 : 0}>
+                  <FilterCheck
                     type="radio"
                     label="Any price"
                     checked={!filters.maxPrice}
                     onChange={() => change({ maxPrice: "" })}
                   />
                   {PRICES.map((o) => (
-                    <Check
+                    <FilterCheck
                       key={o.value}
                       type="radio"
                       label={o.label}
@@ -257,16 +214,16 @@ export default function TalentDirectory({ initialQuery = "" }) {
                       onChange={() => change({ maxPrice: o.value })}
                     />
                   ))}
-                </Dropdown>
-                <Dropdown label="Delivery" count={filters.maxDelivery ? 1 : 0}>
-                  <Check
+                </FilterDropdown>
+                <FilterDropdown label="Delivery" count={filters.maxDelivery ? 1 : 0}>
+                  <FilterCheck
                     type="radio"
                     label="Any time"
                     checked={!filters.maxDelivery}
                     onChange={() => change({ maxDelivery: "" })}
                   />
                   {DELIVERIES.map((o) => (
-                    <Check
+                    <FilterCheck
                       key={o.value}
                       type="radio"
                       label={o.label}
@@ -274,7 +231,7 @@ export default function TalentDirectory({ initialQuery = "" }) {
                       onChange={() => change({ maxDelivery: o.value })}
                     />
                   ))}
-                </Dropdown>
+                </FilterDropdown>
                 <li className="list-inline-item mb10">
                   <button
                     type="button"
@@ -361,55 +318,14 @@ export default function TalentDirectory({ initialQuery = "" }) {
             </div>
           )}
 
-          {/* Pagination */}
-          {shown && totalPages > 1 && (
-            <div className="mbp_pagination text-center mt30">
-              <ul className="page_navigation">
-                <li className={`page-item ${filters.page === 1 ? "disabled" : ""}`}>
-                  <button
-                    type="button"
-                    className="page-link"
-                    onClick={() => goToPage(filters.page - 1)}
-                    disabled={filters.page === 1}
-                    aria-label="Previous page"
-                  >
-                    <span className="fas fa-angle-left" />
-                  </button>
-                </li>
-                {pageItems(filters.page, totalPages).map((p) =>
-                  typeof p === "string" ? (
-                    <li key={p} className="page-item">
-                      <span className="page-link">...</span>
-                    </li>
-                  ) : (
-                    <li
-                      key={p}
-                      className={`page-item ${p === filters.page ? "active" : ""}`}
-                      aria-current={p === filters.page ? "page" : undefined}
-                    >
-                      <button type="button" className="page-link" onClick={() => goToPage(p)}>
-                        {p}
-                      </button>
-                    </li>
-                  ),
-                )}
-                <li className={`page-item ${filters.page === totalPages ? "disabled" : ""}`}>
-                  <button
-                    type="button"
-                    className="page-link"
-                    onClick={() => goToPage(filters.page + 1)}
-                    disabled={filters.page === totalPages}
-                    aria-label="Next page"
-                  >
-                    <span className="fas fa-angle-right" />
-                  </button>
-                </li>
-              </ul>
-              <p className="mt10 mb-0 text-center">
-                {(filters.page - 1) * shown.pageSize + 1} –{" "}
-                {Math.min(filters.page * shown.pageSize, shown.total)} of {shown.total} talents
-              </p>
-            </div>
+          {shown && (
+            <Pagination
+              page={filters.page}
+              pageSize={shown.pageSize}
+              total={shown.total}
+              noun="talents"
+              onChange={goToPage}
+            />
           )}
         </div>
       </section>

@@ -1,3 +1,4 @@
+// `hideFor` lists account types that should not see the item (see visibleFor).
 export const dasboardNavigation = [
   {
     id: 1,
@@ -50,12 +51,14 @@ export const dasboardNavigation = [
   {
     id: 9,
     name: "Manage Services",
+    hideFor: ["client"],
     icon: "flaticon-presentation",
     path: "/manage-services",
   },
   {
     id: 10,
     name: "Manage Jobs",
+    hideFor: ["client"],
     icon: "flaticon-briefcase",
     path: "/manage-jobs",
   },
@@ -68,6 +71,7 @@ export const dasboardNavigation = [
   {
     id: 12,
     name: "Add Services",
+    hideFor: ["client"],
     icon: "flaticon-document",
     path: "/add-services",
   },
@@ -90,6 +94,10 @@ export const dasboardNavigation = [
     path: "/login",
   },
 ];
+
+// Filter for dasboardNavigation: drops items hidden for this account type.
+export const visibleFor = (accountType) => (item) =>
+  !item.hideFor?.includes(accountType);
 
 export const invoice = [
   {

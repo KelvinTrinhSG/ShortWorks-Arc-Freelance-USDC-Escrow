@@ -12,6 +12,7 @@ import { PLATFORMS } from "@/data/talentOptions";
 import { parseVideoUrl } from "@/lib/videoUrl";
 import { useCurrentUser } from "@/store/authStore";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import ProjectCard from "../../project/ProjectCard";
 import ChipSelect from "../profile/ChipSelect";
@@ -65,13 +66,16 @@ function Label({ children, required, hint }) {
 const FieldError = ({ message }) =>
   message ? <p className="text-danger fz14 mt5 mb0">{message}</p> : null;
 
-export default function CreateProjectForm() {
+// Pass `projectId` and `initial` to edit an existing project instead of creating one.
+export default function CreateProjectForm({ projectId, initial }) {
   const user = useCurrentUser();
-  const [project, setProject] = useState(initialProject);
+  const [project, setProject] = useState(initial ?? initialProject);
   const [referenceUrl, setReferenceUrl] = useState("");
   const [referenceError, setReferenceError] = useState("");
   const [showErrors, setShowErrors] = useState(false);
   const [notice, setNotice] = useState(null); // { ok: boolean, text: string }
+  const [publishing, setPublishing] = useState(false);
+  const router = useRouter();
   const [minDeadline] = useState(() => {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -106,17 +110,33 @@ export default function CreateProjectForm() {
     setReferenceError("");
   };
 
-  const handlePublish = () => {
+  const handlePublish = async () => {
     setShowErrors(true);
     if (Object.keys(errors).length) {
       setNotice({ ok: false, text: "Please fix the highlighted fields." });
       return;
     }
-    // TODO: POST /api/projects once the backend exists.
-    setNotice({
-      ok: true,
-      text: "Your project is ready. Publishing is not connected yet, so nothing was saved.",
-    });
+    setPublishing(true);
+    setNotice(null);
+    try {
+      const res = await fetch(projectId ? `/api/projects/${projectId}` : "/api/projects", {
+        method: projectId ? "PATCH" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...project,
+          videoCount: Number(project.videoCount),
+          budgetPerVideo: Number(project.budgetPerVideo),
+          references: project.references.map((r) => r.url),
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Something went wrong.");
+      router.push(`/project-single/${projectId ?? data.id}`);
+      router.refresh();
+    } catch (err) {
+      setNotice({ ok: false, text: err.message });
+      setPublishing(false);
+    }
   };
 
   // Projects are posted by clients; freelancers browse and apply instead.
@@ -375,8 +395,14 @@ export default function CreateProjectForm() {
               {notice.text}
             </p>
           )}
-          <button type="button" className="ud-btn btn-thm w-100 mt20" onClick={handlePublish}>
-            Publish Project <i className="fal fa-arrow-right-long" />
+          <button
+            type="button"
+            className="ud-btn btn-thm w-100 mt20"
+            onClick={handlePublish}
+            disabled={publishing}
+          >
+            {publishing ? "Saving..." : projectId ? "Save Changes" : "Publish Project"}{" "}
+            <i className="fal fa-arrow-right-long" />
           </button>
         </div>
       </div>

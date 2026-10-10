@@ -1,5 +1,5 @@
 "use client";
-import { dasboardNavigation } from "@/data/dashboard";
+import { dasboardNavigation, visibleFor } from "@/data/dashboard";
 import authStore, { useCurrentUser } from "@/store/authStore";
 import toggleStore from "@/store/toggleStore";
 import Image from "next/image";
@@ -309,7 +309,7 @@ export default function DashboardHeader() {
                             <p className="fz15 fw400 ff-heading mt30 pl30">
                               Organize and Manage
                             </p>
-                            {dasboardNavigation.slice(8, 13).map((item,i) => (
+                            {dasboardNavigation.slice(8, 13).filter(visibleFor(user?.accountType)).map((item,i) => (
                               <Link
                                 key={i}
                                 className={`dropdown-item ${

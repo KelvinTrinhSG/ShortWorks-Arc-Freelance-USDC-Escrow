@@ -1,18 +1,30 @@
 import { VIDEO_LENGTHS, WORK_TYPES } from "@/data/projectOptions";
 import { PLATFORMS, labelOf } from "@/data/talentOptions";
+import Link from "next/link";
 
-const formatDeadline = (date) =>
+export const formatDate = (date) =>
   new Date(`${date}T00:00:00`).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
   });
 
+export function timeAgo(iso, now = Date.now()) {
+  const minutes = Math.max(0, Math.round((now - new Date(iso).getTime()) / 60000));
+  if (minutes < 60) return minutes <= 1 ? "just now" : `${minutes} minutes ago`;
+  const hours = Math.round(minutes / 60);
+  if (hours < 24) return hours === 1 ? "1 hour ago" : `${hours} hours ago`;
+  const days = Math.round(hours / 24);
+  return days === 1 ? "1 day ago" : `${days} days ago`;
+}
+
 // How a project reads to a freelancer: scope, cost, time and quality at a glance.
-// Missing fields are skipped, so it also works as a live preview of a draft.
-export default function ProjectCard({ project }) {
+// Works both for a saved project (has id, client, createdAt…) and for the live
+// preview of a draft in the Create Project form, where those are missing.
+export default function ProjectCard({ project, now }) {
   const count = Number(project.videoCount) || 0;
   const perVideo = Number(project.budgetPerVideo) || 0;
+  const references = project.referenceCount ?? project.references?.length ?? 0;
 
   const scope = [
     project.workType && labelOf(WORK_TYPES, project.workType),
@@ -25,16 +37,52 @@ export default function ProjectCard({ project }) {
   const terms = [
     perVideo > 0 &&
       `💰 $${perVideo}/video${count > 1 ? ` (total $${Math.round(perVideo * count * 100) / 100})` : ""}`,
-    project.deadline && `⏰ Due ${formatDeadline(project.deadline)}`,
-    project.references.length > 0 &&
-      `▶ ${project.references.length} reference ${project.references.length === 1 ? "video" : "videos"}`,
+    project.deadline && `⏰ Due ${formatDate(project.deadline)}`,
+    references > 0 && `▶ ${references} reference ${references === 1 ? "video" : "videos"}`,
   ].filter(Boolean);
 
+  const meta = [
+    project.client?.displayName,
+    project.createdAt && timeAgo(project.createdAt, now),
+    project.proposalCount !== undefined &&
+      `${project.proposalCount} ${project.proposalCount === 1 ? "proposal" : "proposals"}`,
+  ].filter(Boolean);
+
+  const title = project.title || "Untitled project";
+  const href = project.id ? `/project-single/${project.id}` : null;
+
   return (
-    <div className="bdr1 bdrs8 p20 bgc-white">
-      <h5 className="mb10">{project.title || "Untitled project"}</h5>
+    <div className="bdr1 bdrs8 p20 bgc-white hover-box-shadow h-100">
+      <h5 className="mb10">
+        {href ? (
+          <Link href={href} className="dark-color">
+            {title}
+          </Link>
+        ) : (
+          title
+        )}
+      </h5>
+      {meta.length > 0 && <p className="fz13 text mb10">{meta.join(" · ")}</p>}
       {scope.length > 0 && <p className="text-thm fz14 mb5">{scope.join(" · ")}</p>}
       {terms.length > 0 && <p className="fz14 dark-color mb0">{terms.join(" · ")}</p>}
+      {href && project.brief && (
+        <p
+          className="fz14 text mt10 mb0"
+          style={{
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+          }}
+        >
+          {project.brief}
+        </p>
+      )}
+      {href && (
+        <Link href={href} className="ud-btn btn-light-thm mt15 d-inline-block">
+          View & Send Proposal <i className="fal fa-arrow-right-long" />
+        </Link>
+      )}
     </div>
   );
 }

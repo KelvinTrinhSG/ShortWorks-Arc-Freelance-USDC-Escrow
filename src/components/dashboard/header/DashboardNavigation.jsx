@@ -1,6 +1,6 @@
 "use client";
-import { dasboardNavigation } from "@/data/dashboard";
-import authStore from "@/store/authStore";
+import { dasboardNavigation, visibleFor } from "@/data/dashboard";
+import authStore, { useCurrentUser } from "@/store/authStore";
 import Link from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
@@ -8,6 +8,7 @@ export default function DashboardNavigation() {
   const [isActive, setActive] = useState(false);
   const path = usePathname()
   const logout = authStore((state) => state.logout);
+  const user = useCurrentUser();
 
   return (
     <>
@@ -33,7 +34,7 @@ export default function DashboardNavigation() {
                 Organize and Manage
               </p>
             </li>
-            {dasboardNavigation.slice(8, 13).map((item,i) => (
+            {dasboardNavigation.slice(8, 13).filter(visibleFor(user?.accountType)).map((item,i) => (
               <li className={path == item.path ? 'mobile-dasboard-menu-active' : ''}  onClick={() => setActive(false)} key={i}>
                 <Link href={item.path}>
                   <i className={`${item.icon} mr10`} />
