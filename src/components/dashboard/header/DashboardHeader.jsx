@@ -2,6 +2,7 @@
 import { dasboardNavigation, visibleFor } from "@/data/dashboard";
 import authStore, { useCurrentUser } from "@/store/authStore";
 import toggleStore from "@/store/toggleStore";
+import NotificationBell from "../../header/NotificationBell";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -67,79 +68,9 @@ export default function DashboardHeader() {
               <div className="col-6 col-lg-auto">
                 <div className="text-center text-lg-end header_right_widgets">
                   <ul className="dashboard_dd_menu_list d-flex align-items-center justify-content-center justify-content-sm-end mb-0 p-0">
-                    <li className="d-none d-sm-block">
-                      <a
-                        className="text-center mr5 text-thm2 dropdown-toggle fz20"
-                        type="button"
-                        data-bs-toggle="dropdown"
-                      >
-                        <span className="flaticon-notification" />
-                      </a>
-                      <div className="dropdown-menu">
-                        <div className="dboard_notific_dd px30 pt10 pb15">
-                          <div className="notif_list d-flex align-items-center bdrb1 pb15 mb10">
-                            <Image
-                              height={40}
-                              width={40}
-                              src="/images/resource/notif-1.png"
-                              alt="notif"
-                            />
-                            <div className="details ml10">
-                              <p className="text mb-0">Your resume</p>
-                              <p className="text mb-0">updated!</p>
-                            </div>
-                          </div>
-                          <div className="notif_list d-flex align-items-center bdrb1 pb15 mb10">
-                            <Image
-                              height={40}
-                              width={40}
-                              src="/images/resource/notif-2.png"
-                              alt="notif"
-                            />
-                            <div className="details ml10">
-                              <p className="text mb-0">You changed</p>
-                              <p className="text mb-0">password</p>
-                            </div>
-                          </div>
-                          <div className="notif_list d-flex align-items-center bdrb1 pb15 mb10">
-                            <Image
-                              height={40}
-                              width={40}
-                              src="/images/resource/notif-3.png"
-                              alt="notif"
-                            />
-                            <div className="details ml10">
-                              <p className="text mb-0">Your account has been</p>
-                              <p className="text mb-0">created successfully</p>
-                            </div>
-                          </div>
-                          <div className="notif_list d-flex align-items-center bdrb1 pb15 mb10">
-                            <Image
-                              height={40}
-                              width={40}
-                              src="/images/resource/notif-4.png"
-                              alt="notif"
-                            />
-                            <div className="details ml10">
-                              <p className="text mb-0">
-                                You applied for a job{" "}
-                              </p>
-                              <p className="text mb-0">Front-end Developer</p>
-                            </div>
-                          </div>
-                          <div className="notif_list d-flex align-items-center">
-                            <Image
-                              height={40}
-                              width={40}
-                              src="/images/resource/notif-5.png"
-                              alt="notif"
-                            />
-                            <div className="details ml10">
-                              <p className="text mb-0">Your course uploaded</p>
-                              <p className="text mb-0">successfully</p>
-                            </div>
-                          </div>
-                        </div>
+                    <li className="mr5">
+                      <div className="d-flex justify-content-center" style={{ width: 44 }}>
+                        <NotificationBell className="text-thm2" />
                       </div>
                     </li>
                     <li className="d-none d-sm-block">
@@ -309,7 +240,7 @@ export default function DashboardHeader() {
                             <p className="fz15 fw400 ff-heading mt30 pl30">
                               Organize and Manage
                             </p>
-                            {dasboardNavigation.slice(8, 13).filter(visibleFor(user?.accountType)).map((item,i) => (
+                            {dasboardNavigation.slice(8, 14).filter(visibleFor(user?.accountType)).map((item,i) => (
                               <Link
                                 key={i}
                                 className={`dropdown-item ${
@@ -324,7 +255,7 @@ export default function DashboardHeader() {
                             <p className="fz15 fw400 ff-heading mt30 pl30">
                               Account
                             </p>
-                            {dasboardNavigation.slice(13, 15).map((item,i) => (
+                            {dasboardNavigation.slice(14, 16).map((item,i) => (
                               <Link
                                 key={i}
                                 className={`dropdown-item ${

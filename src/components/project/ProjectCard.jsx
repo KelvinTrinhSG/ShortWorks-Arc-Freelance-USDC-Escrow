@@ -33,7 +33,8 @@ export function dueLabel(date, today) {
 // How a project reads to a freelancer: scope, cost, time and quality at a glance.
 // Works both for a saved project (has id, client, createdAt…) and for the live
 // preview of a draft in the Create Project form, where those are missing.
-export default function ProjectCard({ project, now }) {
+// `ctaLabel`: the button text; clients can't send proposals, so they get "View Details".
+export default function ProjectCard({ project, now, ctaLabel = "View & Send Proposal" }) {
   const count = Number(project.videoCount) || 0;
   const perVideo = Number(project.budgetPerVideo) || 0;
   const references = project.referenceCount ?? project.references?.length ?? 0;
@@ -92,7 +93,7 @@ export default function ProjectCard({ project, now }) {
       )}
       {href && (
         <Link href={href} className="ud-btn btn-light-thm mt15 d-inline-block">
-          View & Send Proposal <i className="fal fa-arrow-right-long" />
+          {ctaLabel} <i className="fal fa-arrow-right-long" />
         </Link>
       )}
     </div>

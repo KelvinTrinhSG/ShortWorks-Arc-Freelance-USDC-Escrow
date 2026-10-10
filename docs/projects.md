@@ -94,7 +94,7 @@ Thay cho form cũ của template (Your hourly price · Estimated Hours · Cover 
 ## Quản lý ngay trên trang chi tiết
 
 - **Chủ dự án:**
-  - Dưới tiêu đề có Edit · Close/Reopen · Delete. Xoá xong quay về `/manage-projects`.
+  - Dưới tiêu đề có Edit · Close/Reopen · Delete. Xoá xong chuyển về trang danh sách dự án `/project-1`.
   - Mỗi proposal có **Accept** · **Decline**. Sau khi chọn hiện "You accepted/declined this proposal" kèm nút **Undo**.
   - Có thể chấp nhận nhiều proposal, vì dự án nhiều video có thể chia cho nhiều freelancer.
 - **Freelancer:**

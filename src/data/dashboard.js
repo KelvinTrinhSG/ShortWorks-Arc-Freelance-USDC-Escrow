@@ -63,6 +63,13 @@ export const dasboardNavigation = [
     path: "/manage-jobs",
   },
   {
+    id: 16,
+    name: "Invitations",
+    hideFor: ["client"],
+    icon: "flaticon-mail",
+    path: "/invitations",
+  },
+  {
     id: 11,
     name: "Manage Project",
     icon: "flaticon-content",

@@ -12,7 +12,8 @@ const toDateInput = (d) =>
 // Short-form proposal: price per video, delivery date, cover letter and one
 // optional sample. The freelancer's public profile is attached automatically.
 // Pass `existing` (the freelancer's proposal) to edit it instead of sending a new one.
-export default function ProposalForm({ project, username, existing, onDone, onCancel }) {
+// `footer` is shown under the submit button (the Decline button for invited freelancers).
+export default function ProposalForm({ project, username, existing, onDone, onCancel, footer }) {
   const router = useRouter();
   const [form, setForm] = useState({
     pricePerVideo: String(existing?.pricePerVideo ?? project.budgetPerVideo),
@@ -170,6 +171,7 @@ export default function ProposalForm({ project, username, existing, onDone, onCa
               </button>
             )}
           </div>
+          {footer && <div className="mt15">{footer}</div>}
         </div>
       </div>
     </form>

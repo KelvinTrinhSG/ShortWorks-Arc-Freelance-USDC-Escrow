@@ -34,7 +34,7 @@ export default function DashboardNavigation() {
                 Organize and Manage
               </p>
             </li>
-            {dasboardNavigation.slice(8, 13).filter(visibleFor(user?.accountType)).map((item,i) => (
+            {dasboardNavigation.slice(8, 14).filter(visibleFor(user?.accountType)).map((item,i) => (
               <li className={path == item.path ? 'mobile-dasboard-menu-active' : ''}  onClick={() => setActive(false)} key={i}>
                 <Link href={item.path}>
                   <i className={`${item.icon} mr10`} />
@@ -45,7 +45,7 @@ export default function DashboardNavigation() {
             <li>
               <p className="fz15 fw400 ff-heading mt30 pl30">Account</p>
             </li>
-            {dasboardNavigation.slice(13, 15).map((item,i) => (
+            {dasboardNavigation.slice(14, 16).map((item,i) => (
               <li className={path == item.path ? 'mobile-dasboard-menu-active' : ''}  onClick={() => setActive(false)} key={i}>
                 <Link
                   href={item.path}

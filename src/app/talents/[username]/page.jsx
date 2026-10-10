@@ -14,8 +14,11 @@ import {
   VIDEO_ROLES,
   labelOf,
 } from "@/data/talentOptions";
+import InviteButton from "@/components/talent/InviteButton";
+import { getFreelancerByUsername, getInviteOptions } from "@/lib/invitations";
 import { getSession } from "@/lib/session";
 import { getPublicProfile } from "@/lib/talents";
+import { getViewer } from "@/lib/viewer";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -24,6 +27,18 @@ async function load(params) {
   const { username } = await params;
   const session = await getSession();
   return getPublicProfile(decodeURIComponent(username), session?.userId);
+}
+
+// For a client: their open projects to invite this freelancer to. The project from
+// ?invite= (when they came from the invite list) goes first. null for everyone else.
+async function loadInviteOptions(username, inviteId) {
+  const viewer = await getViewer();
+  if (viewer?.accountType !== "client") return null;
+  const freelancer = await getFreelancerByUsername(username);
+  if (!freelancer) return null;
+  const projects = await getInviteOptions(viewer.id, freelancer.id);
+  const from = projects.find((p) => String(p.id) === inviteId);
+  return from ? [from, ...projects.filter((p) => p !== from)] : projects;
 }
 
 export async function generateMetadata({ params }) {
@@ -59,10 +74,18 @@ function Fact({ label, children }) {
   );
 }
 
-export default async function TalentPage({ params }) {
+export default async function TalentPage({ params, searchParams }) {
   const data = await load(params);
   if (!data) notFound();
   const { talent, videos, complete, isOwner } = data;
+  const { invite } = await searchParams;
+  const inviteId = typeof invite === "string" && /^\d+$/.test(invite) ? invite : null;
+  const inviteOptions = await loadInviteOptions(talent.username, inviteId);
+  // Came from the invite list: go back there instead of the plain talent list.
+  const backHref =
+    inviteId && inviteOptions?.some((p) => String(p.id) === inviteId)
+      ? `/freelancer-1?invite=${inviteId}`
+      : "/freelancer-1";
 
   // Any of these may still be empty; only filled-in groups are shown.
   const expertise = [
@@ -185,6 +208,50 @@ export default async function TalentPage({ params }) {
             </div>
 
             <div className="col-lg-4">
+              {inviteOptions && (
+                <div className="bgc-white bdrs12 p30 mb30 default-box-shadow1">
+                  <h4 className="mb10">Invite to a project</h4>
+                  {inviteOptions.length === 0 ? (
+                    <>
+                      <p className="text fz14 mb20">
+                        You have no open projects. Post one, then invite{" "}
+                        {talent.displayName} to send a proposal.
+                      </p>
+                      <Link href="/create-projects" className="ud-btn btn-thm w-100">
+                        Create Project
+                        <i className="fal fa-arrow-right-long" />
+                      </Link>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text fz14 mb15">
+                        {talent.availability === "available"
+                          ? `${talent.displayName} gets the project in their invitations and can send you a proposal.`
+                          : `${talent.displayName} is not available for work right now, so they can't be invited.`}
+                      </p>
+                      {inviteOptions.map((p) => (
+                        <div key={p.id} className="py-3 bdrt1">
+                          <Link
+                            href={`/project-single/${p.id}`}
+                            className="d-block fw500 dark-color mb10 text-truncate"
+                            title={p.title}
+                          >
+                            {p.title}
+                          </Link>
+                          <InviteButton
+                            projectId={p.id}
+                            username={talent.username}
+                            initial={p.status}
+                            available={talent.availability === "available"}
+                            redirectAfterInvite
+                          />
+                        </div>
+                      ))}
+                    </>
+                  )}
+                </div>
+              )}
+
               <div className="bgc-white bdrs12 p30 mb30 default-box-shadow1">
                 <h4 className="mb15">
                   {talent.startingPrice !== null || talent.turnaroundHours
@@ -224,8 +291,8 @@ export default async function TalentPage({ params }) {
                 </div>
               )}
 
-              <Link href="/freelancer-1" className="ud-btn btn-light-thm w-100">
-                Back to all talents
+              <Link href={backHref} className="ud-btn btn-light-thm w-100">
+                {backHref === "/freelancer-1" ? "Back to all talents" : "Back to invite list"}
               </Link>
             </div>
           </div>

@@ -1,0 +1,139 @@
+import "server-only";
+import pool from "@/lib/db";
+import { avatarUrlOf } from "@/lib/profile";
+
+// Notifications are written next to the event that causes them (lib/projects.js,
+// lib/invitations.js) and removed again when that event is undone, so the bell
+// never shows something that is no longer true.
+
+export const NOTIFICATIONS_LIMIT = 20;
+
+// The client invited a freelancer.
+export async function notifyInvited(projectId, freelancerId) {
+  await pool.query(
+    `INSERT INTO notifications (user_id, actor_id, type, project_id)
+     SELECT $2, client_id, 'invited', id FROM projects WHERE id = $1`,
+    [projectId, freelancerId],
+  );
+}
+
+export async function removeInvitedNotice(projectId, freelancerId) {
+  await pool.query(
+    "DELETE FROM notifications WHERE type = 'invited' AND project_id = $1 AND user_id = $2",
+    [projectId, freelancerId],
+  );
+}
+
+// The owner cancelled an invitation: a "declined" notice about it no longer matters.
+export async function removeDeclinedNotice(projectId, freelancerId) {
+  await pool.query(
+    "DELETE FROM notifications WHERE type = 'invitation_declined' AND project_id = $1 AND actor_id = $2",
+    [projectId, freelancerId],
+  );
+}
+
+// The freelancer declined: their "invited" notice is settled, the owner hears about it.
+export async function notifyInvitationDeclined(projectId, freelancerId) {
+  await removeInvitedNotice(projectId, freelancerId);
+  await pool.query(
+    `INSERT INTO notifications (user_id, actor_id, type, project_id)
+     SELECT client_id, $2, 'invitation_declined', id FROM projects WHERE id = $1`,
+    [projectId, freelancerId],
+  );
+}
+
+// A freelancer sent a proposal: tell the project owner. Withdrawing the proposal
+// deletes it, and this notice with it (proposal_id ON DELETE CASCADE).
+export async function notifyProposalReceived(proposalId) {
+  await pool.query(
+    `INSERT INTO notifications (user_id, actor_id, type, project_id, proposal_id)
+     SELECT p.client_id, pr.freelancer_id, 'proposal_received', p.id, pr.id
+     FROM proposals pr JOIN projects p ON p.id = pr.project_id WHERE pr.id = $1`,
+    [proposalId],
+  );
+}
+
+// The client accepted, declined or undid (status back to "pending") a proposal.
+// Any earlier decision notice for it is replaced.
+export async function notifyProposalDecision(proposalId, status) {
+  await pool.query(
+    "DELETE FROM notifications WHERE proposal_id = $1 AND type IN ('proposal_accepted', 'proposal_declined')",
+    [proposalId],
+  );
+  if (status !== "accepted" && status !== "declined") return;
+  await pool.query(
+    `INSERT INTO notifications (user_id, actor_id, type, project_id, proposal_id)
+     SELECT pr.freelancer_id, p.client_id, $2, p.id, pr.id
+     FROM proposals pr JOIN projects p ON p.id = pr.project_id WHERE pr.id = $1`,
+    [proposalId, `proposal_${status}`],
+  );
+}
+
+// What each type says and where it leads.
+const MESSAGES = {
+  invited: (r) => ({
+    text: `invited you to send a proposal for "${r.title}"`,
+    href: `/project-single/${r.project_id}`,
+  }),
+  invitation_declined: (r) => ({
+    text: `declined your invitation to "${r.title}"`,
+    href: `/project-single/${r.project_id}`,
+  }),
+  proposal_received: (r) => ({
+    text: `sent a proposal for "${r.title}"`,
+    href: `/project-single/${r.project_id}`,
+  }),
+  proposal_accepted: (r) => ({
+    text: `accepted your proposal for "${r.title}"`,
+    href: `/manage-jobs/${r.proposal_id}`,
+  }),
+  proposal_declined: (r) => ({
+    text: `declined your proposal for "${r.title}"`,
+    href: `/project-single/${r.project_id}`,
+  }),
+};
+
+// The latest notifications for the bell, plus how many are unread in total.
+export async function getNotifications(userId) {
+  const [{ rows }, { rows: count }] = await Promise.all([
+    pool.query(
+      `SELECT n.id, n.type, n.project_id, n.proposal_id, n.created_at, n.read_at,
+              p.title, a.id AS actor_id, a.display_name, a.avatar_updated_at
+       FROM notifications n
+       JOIN projects p ON p.id = n.project_id
+       LEFT JOIN users a ON a.id = n.actor_id
+       WHERE n.user_id = $1
+       ORDER BY n.created_at DESC
+       LIMIT $2`,
+      [userId, NOTIFICATIONS_LIMIT],
+    ),
+    pool.query(
+      "SELECT COUNT(*)::int AS unread FROM notifications WHERE user_id = $1 AND read_at IS NULL",
+      [userId],
+    ),
+  ]);
+  return {
+    notifications: rows
+      .filter((r) => MESSAGES[r.type])
+      .map((r) => ({
+        id: r.id,
+        ...MESSAGES[r.type](r),
+        actor: {
+          displayName: r.display_name ?? "Someone",
+          avatarUrl: r.actor_id
+            ? avatarUrlOf({ id: r.actor_id, avatar_updated_at: r.avatar_updated_at })
+            : null,
+        },
+        createdAt: r.created_at,
+        read: Boolean(r.read_at),
+      })),
+    unread: count[0].unread,
+  };
+}
+
+export async function markAllRead(userId) {
+  await pool.query(
+    "UPDATE notifications SET read_at = NOW() WHERE user_id = $1 AND read_at IS NULL",
+    [userId],
+  );
+}

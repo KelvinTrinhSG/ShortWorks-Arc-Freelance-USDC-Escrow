@@ -1,5 +1,6 @@
 "use client";
 import authStore from "@/store/authStore";
+import { confirmDialog } from "@/store/confirmStore";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -12,13 +13,13 @@ export default function ConfirmPassword() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (
-      !window.confirm(
-        "Close your account? Your profile and portfolio will be deleted permanently.",
-      )
-    ) {
-      return;
-    }
+    const ok = await confirmDialog({
+      title: "Close your account?",
+      message: "Your profile and portfolio will be deleted permanently.",
+      confirmLabel: "Close account",
+      danger: true,
+    });
+    if (!ok) return;
     setBusy(true);
     setError("");
     try {

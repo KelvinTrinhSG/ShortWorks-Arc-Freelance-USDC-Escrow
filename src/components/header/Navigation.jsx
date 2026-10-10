@@ -1,5 +1,6 @@
 "use client";
-import navigation from "@/data/navigation";
+import { visibleMenus } from "@/data/navigation";
+import { useCurrentUser } from "@/store/authStore";
 import { isActiveNavigation } from "@/utils/isActiveNavigation";
 
 import Link from "next/link";
@@ -7,6 +8,7 @@ import { usePathname } from "next/navigation";
 
 export default function Navigation() {
   const path = usePathname();
+  const user = useCurrentUser();
 
   return (
     <>
@@ -17,7 +19,7 @@ export default function Navigation() {
             : ""
         } `}
       >
-        {navigation.map((item,i) => (
+        {visibleMenus(user).map((item,i) => (
           <li
             key={ i }
             className={`visible_list menu-active ${

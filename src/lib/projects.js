@@ -12,6 +12,7 @@ import {
 } from "@/data/projectOptions";
 import { COUNTRIES, PLATFORMS } from "@/data/talentOptions";
 import pool from "@/lib/db";
+import { notifyProposalDecision, notifyProposalReceived } from "@/lib/notifications";
 import { avatarUrlOf } from "@/lib/profile";
 import { parseVideoUrl } from "@/lib/videoUrl";
 
@@ -107,6 +108,7 @@ export async function createProposal(projectId, freelancerId, d) {
      VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
     [projectId, freelancerId, d.pricePerVideo, d.deliveryDate, d.coverLetter, d.sampleUrl],
   );
+  await notifyProposalReceived(rows[0].id);
   return rows[0].id;
 }
 
@@ -372,6 +374,7 @@ export async function setProposalStatus(id, status) {
      WHERE id = $1`,
     [id, status],
   );
+  await notifyProposalDecision(id, status);
 }
 
 export async function deleteProposal(id) {

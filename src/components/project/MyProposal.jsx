@@ -1,4 +1,5 @@
 "use client";
+import { confirmDialog } from "@/store/confirmStore";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -15,9 +16,13 @@ export default function MyProposal({ proposal, project, username, now }) {
   const canChange = proposal.status === "pending" && project.isOpen;
 
   const withdraw = async () => {
-    if (!window.confirm("Withdraw your proposal? You can send a new one while the project is open.")) {
-      return;
-    }
+    const ok = await confirmDialog({
+      title: "Withdraw your proposal?",
+      message: "The client will no longer see it. You can send a new one while the project is open.",
+      confirmLabel: "Withdraw",
+      danger: true,
+    });
+    if (!ok) return;
     setBusy(true);
     setError("");
     try {

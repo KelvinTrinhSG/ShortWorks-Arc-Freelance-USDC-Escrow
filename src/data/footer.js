@@ -24,6 +24,7 @@ export const support = [
   { id: 2, name: "Trust & Safety", path: "/" },
   { id: 3, name: "Selling on ShortWorks", path: "/" },
   { id: 4, name: "Buying on ShortWorks", path: "/" },
+  { id: 5, name: "Contact", path: "/contact" },
 ];
 
 export const momney = ["US$ USD", "Euro", "Pound"];

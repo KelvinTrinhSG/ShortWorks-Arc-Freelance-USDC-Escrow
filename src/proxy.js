@@ -19,6 +19,7 @@ export const config = {
     "/edit-project/:path*",
     "/add-services/:path*",
     "/create-projects/:path*",
+    "/invitations/:path*",
     "/invoice/:path*",
     "/manage-jobs/:path*",
     "/manage-projects/:path*",

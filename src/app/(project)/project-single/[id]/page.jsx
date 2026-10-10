@@ -1,5 +1,7 @@
 import Footer from "@/components/footer/Footer";
 import Header20 from "@/components/header/Header20";
+import CancelInviteButton from "@/components/project/CancelInviteButton";
+import DeclineInviteButton from "@/components/project/DeclineInviteButton";
 import MyProposal from "@/components/project/MyProposal";
 import { formatDate, timeAgo } from "@/components/project/ProjectCard";
 import ProjectOwnerActions from "@/components/project/ProjectOwnerActions";
@@ -9,6 +11,7 @@ import ProposalForm from "@/components/project/ProposalForm";
 import VideoFrame from "@/components/project/VideoFrame";
 import { VIDEO_LENGTHS, WORK_TYPES } from "@/data/projectOptions";
 import { COUNTRIES, PLATFORMS, labelOf } from "@/data/talentOptions";
+import { getInvitationStatus, getProjectInvitations } from "@/lib/invitations";
 import { getProject } from "@/lib/projects";
 import { getViewer } from "@/lib/viewer";
 import Image from "next/image";
@@ -19,9 +22,19 @@ async function load(params) {
   const { id } = await params;
   const viewer = await getViewer();
   const data = await getProject(id, viewer);
+  if (!data) return null;
+  // The owner sees who they invited; a freelancer sees whether they were invited.
+  const invitations = data.isOwner ? await getProjectInvitations(data.project.id) : [];
+  const invitation =
+    viewer?.accountType === "freelancer"
+      ? await getInvitationStatus(data.project.id, viewer.id)
+      : null;
   // Read the clock here, once per request, rather than during render.
-  return data && { ...data, viewer, now: Date.now() };
+  return { ...data, viewer, invitations, invitation, now: Date.now() };
 }
+
+// Talent directory in invite mode, with no filters: every freelancer is shown.
+const inviteHref = (p) => `/freelancer-1?invite=${p.id}`;
 
 export async function generateMetadata({ params }) {
   const data = await load(params);
@@ -50,7 +63,7 @@ function Fact({ icon, title, children }) {
 export default async function ProjectPage({ params }) {
   const data = await load(params);
   if (!data) notFound();
-  const { project: p, isOwner, proposals, myProposal, viewer, now } = data;
+  const { project: p, isOwner, proposals, myProposal, viewer, invitations, invitation, now } = data;
   const total = Math.round(p.budgetPerVideo * p.videoCount * 100) / 100;
   const daysLeft = Math.ceil((new Date(`${p.deadline}T23:59:59Z`).getTime() - now) / 86400000);
   const backToProject = `/login?next=${encodeURIComponent(`/project-single/${p.id}`)}`;
@@ -60,9 +73,62 @@ export default async function ProjectPage({ params }) {
   if (isOwner) {
     action = (
       <>
+        {invitations.length > 0 && (
+          <div className="mb40">
+            <h4 className="mb20">Invited ({invitations.length})</h4>
+            {invitations.map((inv) => (
+              <div key={inv.username} className="d-flex align-items-center gap-3 py-2 bdrb1">
+                <Image
+                  src={inv.avatarUrl || "/images/resource/default-avatar.svg"}
+                  alt={inv.displayName}
+                  width={40}
+                  height={40}
+                  className="rounded-circle flex-shrink-0"
+                  style={{ objectFit: "cover" }}
+                  unoptimized
+                />
+                <div className="flex-grow-1" style={{ minWidth: 0 }}>
+                  <Link
+                    href={`/talents/${encodeURIComponent(inv.username)}`}
+                    className="fw500 dark-color"
+                  >
+                    {inv.displayName}
+                  </Link>
+                  {inv.headline && <p className="fz14 text mb-0 text-truncate">{inv.headline}</p>}
+                </div>
+                {inv.proposed ? (
+                  <span className="fz14 flex-shrink-0 text-thm fw500">Sent a proposal ✓</span>
+                ) : inv.declinedAt ? (
+                  <span className="fz14 flex-shrink-0 text-danger fw500">
+                    Declined {timeAgo(inv.declinedAt, now)}
+                  </span>
+                ) : (
+                  <span className="fz14 flex-shrink-0 text">Invited {timeAgo(inv.invitedAt, now)}</span>
+                )}
+                {/* Only while still waiting for an answer. */}
+                {!inv.proposed && !inv.declinedAt && (
+                  <CancelInviteButton
+                    projectId={p.id}
+                    username={inv.username}
+                    displayName={inv.displayName}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        )}
         <h4 className="mb20">Proposals ({proposals.length})</h4>
         {proposals.length === 0 ? (
-          <p className="text">No proposals yet. Freelancers will see your project on the projects page.</p>
+          <p className="text">
+            No proposals yet. Freelancers will see your project on the projects page
+            {p.isOpen && (
+              <>
+                , or you can <Link href={inviteHref(p)} className="text-thm">invite freelancers</Link>{" "}
+                to send one
+              </>
+            )}
+            .
+          </p>
         ) : (
           proposals.map((pr) => (
             <ProposalCard
@@ -102,8 +168,31 @@ export default async function ProjectPage({ params }) {
   } else {
     action = (
       <>
+        {invitation === "invited" && (
+          <div className="bdr1 bdrs8 p20 mb30" style={{ backgroundColor: "#f0faf3" }}>
+            <p className="dark-color fw500 mb5">
+              {p.client.displayName} invited you to this project
+            </p>
+            <p className="text fz14 mb-0">
+              The client picked your profile and would like your proposal.
+            </p>
+          </div>
+        )}
+        {invitation === "declined" && (
+          <p className="text fz14 mb20">
+            You declined this invitation. You can still send a proposal if you change your mind.
+          </p>
+        )}
         <h4 className="mb20">Send your proposal</h4>
-        <ProposalForm project={p} username={viewer.username} />
+        <ProposalForm
+          project={p}
+          username={viewer.username}
+          footer={
+            invitation === "invited" && (
+              <DeclineInviteButton projectId={p.id} clientName={p.client.displayName} />
+            )
+          }
+        />
       </>
     );
   }
@@ -131,7 +220,7 @@ export default async function ProjectPage({ params }) {
             </p>
             {isOwner && (
               <div className="mt15">
-                <ProjectOwnerActions project={p} afterDelete="/manage-projects" />
+                <ProjectOwnerActions project={p} afterDelete="/project-1" />
               </div>
             )}
           </div>
@@ -201,6 +290,26 @@ export default async function ProjectPage({ params }) {
                     {daysLeft > 1 ? `${daysLeft} days` : daysLeft === 1 ? "1 day" : "Ended"}
                   </span>
                 </div>
+                {isOwner && p.isOpen && (
+                  <>
+                    <Link href={inviteHref(p)} className="ud-btn btn-thm w-100 mt20">
+                      Find & invite freelancers
+                      <i className="fal fa-arrow-right-long" />
+                    </Link>
+                    <p className="text fz14 text-center mt10 mb-0">
+                      {invitations.length > 0
+                        ? [
+                            `${invitations.length} invited`,
+                            `${invitations.filter((i) => i.proposed).length} sent a proposal`,
+                            invitations.some((i) => i.declinedAt && !i.proposed) &&
+                              `${invitations.filter((i) => i.declinedAt && !i.proposed).length} declined`,
+                          ]
+                            .filter(Boolean)
+                            .join(" · ")
+                        : "Pick freelancers you'd like a proposal from"}
+                    </p>
+                  </>
+                )}
               </div>
 
               <div className="bgc-white bdrs12 p30 mb30 default-box-shadow1">

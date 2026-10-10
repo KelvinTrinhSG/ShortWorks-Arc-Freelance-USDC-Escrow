@@ -1,4 +1,5 @@
 "use client";
+import { confirmDialog } from "@/store/confirmStore";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -38,9 +39,15 @@ export default function ProjectOwnerActions({ project, afterDelete, size = "sm" 
 
   const remove = async () => {
     const proposals = project.proposalCount
-      ? ` Its ${project.proposalCount} ${project.proposalCount === 1 ? "proposal" : "proposals"} will be deleted too.`
+      ? `Its ${project.proposalCount} ${project.proposalCount === 1 ? "proposal" : "proposals"} will be deleted too. `
       : "";
-    if (!window.confirm(`Delete "${project.title}"?${proposals} This cannot be undone.`)) return;
+    const ok = await confirmDialog({
+      title: `Delete "${project.title}"?`,
+      message: `${proposals}This cannot be undone.`,
+      confirmLabel: "Delete",
+      danger: true,
+    });
+    if (!ok) return;
     if (await call("DELETE")) {
       if (afterDelete) router.push(afterDelete);
       else router.refresh();

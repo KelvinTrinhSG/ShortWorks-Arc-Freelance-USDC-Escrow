@@ -440,3 +440,61 @@ a {
 .no-label-select label {
   display: none;
 }
+
+/* Decline invitation: looks like other white buttons, but the hover fill (ud-btn :before) is red, not green */
+.ud-btn.btn-decline:before {
+  background-color: #dc3545;
+}
+.ud-btn.btn-decline:hover {
+  border-color: #dc3545;
+  color: #fff;
+}
+
+/* Confirm dialog (components/modal/ConfirmDialog.jsx), used instead of window.confirm */
+.confirm-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background-color: rgba(15, 23, 42, 0.45);
+  animation: confirm-fade 0.15s ease-out;
+}
+.confirm-dialog {
+  width: 100%;
+  max-width: 460px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  animation: confirm-pop 0.18s ease-out;
+}
+.confirm-dialog-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  font-size: 20px;
+  color: var(--primary-color, #5bbb7b);
+  background-color: #eaf7ef;
+}
+.confirm-dialog-icon.is-danger {
+  color: #dc3545;
+  background-color: #fdecee;
+}
+/* Red confirm button; its hover fill (ud-btn :before) is a darker red, not green */
+.ud-btn.btn-danger-fill {
+  background-color: #dc3545;
+  border: 2px solid #dc3545;
+  color: #fff;
+}
+.ud-btn.btn-danger-fill:before {
+  background-color: #b02a37;
+}
+.ud-btn.btn-danger-fill:hover {
+  border-color: #b02a37;
+  color: #fff;
+}
+@keyframes confirm-fade {
+  from { opacity: 0; }
+}
+@keyframes confirm-pop {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+}

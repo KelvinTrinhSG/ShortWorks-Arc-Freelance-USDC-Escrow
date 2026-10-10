@@ -6,9 +6,11 @@ import {
   ROLES,
   TURNAROUND,
 } from "@/data/talentOptions";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { FilterCheck, FilterDropdown } from "../listing/FilterDropdown";
 import Pagination from "../listing/Pagination";
+import InviteButton from "./InviteButton";
 import TalentCard from "./TalentCard";
 
 const LIST_FILTERS = [
@@ -83,15 +85,29 @@ function toQuery(f) {
   return params.toString();
 }
 
-export default function TalentDirectory({ initialQuery = "" }) {
+// `inviteProject` (invite mode): { id, title, invitations } for a client inviting
+// freelancers to one of their open projects. Set by the page from ?invite={id}.
+export default function TalentDirectory({ initialQuery = "", inviteProject = null }) {
   const [filters, setFilters] = useState(() => parseQuery(initialQuery));
   const [search, setSearch] = useState(filters.q);
   const [result, setResult] = useState(null); // { query, talents, total, ... } | { query, error }
+  // username -> "invited" | "declined" | "proposed", kept up to date as the client invites.
+  const [invited, setInvited] = useState(() =>
+    Object.fromEntries(
+      (inviteProject?.invitations ?? []).map((i) => [
+        i.username,
+        i.proposed ? "proposed" : i.declinedAt ? "declined" : "invited",
+      ]),
+    ),
+  );
+  const inviteId = inviteProject?.id;
   const query = toQuery(filters);
   const loading = result?.query !== query;
 
   useEffect(() => {
-    window.history.replaceState(null, "", query ? `?${query}` : window.location.pathname);
+    // Keep ?invite= in the address bar so a reload stays in invite mode.
+    const urlQuery = [inviteId && `invite=${inviteId}`, query].filter(Boolean).join("&");
+    window.history.replaceState(null, "", urlQuery ? `?${urlQuery}` : window.location.pathname);
     const controller = new AbortController();
     fetch(`/api/talents?${query}`, { signal: controller.signal })
       .then((res) => {
@@ -105,7 +121,16 @@ export default function TalentDirectory({ initialQuery = "" }) {
         }
       });
     return () => controller.abort();
-  }, [query]);
+  }, [query, inviteId]);
+
+  const invitedCount = Object.values(invited).length;
+  const onInviteChange = (username, state) =>
+    setInvited((prev) => {
+      const next = { ...prev };
+      if (state) next[username] = state;
+      else delete next[username];
+      return next;
+    });
 
   // Any filter change goes back to page 1.
   const change = (patch) => setFilters((prev) => ({ ...prev, page: 1, ...patch }));
@@ -137,11 +162,30 @@ export default function TalentDirectory({ initialQuery = "" }) {
           <div className="container">
             <div className="row">
               <div className="col-xl-7">
-                <h2>Find short-form video talent</h2>
-                <p className="text mb30">
-                  Editors, UGC creators and motion designers for TikTok, Reels
-                  and Shorts. Compare portfolios, prices and delivery times.
-                </p>
+                {inviteProject ? (
+                  <>
+                    <Link href={`/project-single/${inviteProject.id}`} className="fz14 text-thm">
+                      ← Back to project
+                    </Link>
+                    <h2 className="mt10">Invite freelancers</h2>
+                    <p className="text mb30">
+                      to <span className="dark-color fw500">{inviteProject.title}</span>.
+                      Invited freelancers get the project in their Invitations
+                      and can send you a proposal.{" "}
+                      {invitedCount > 0 && (
+                        <span className="dark-color fw500">{invitedCount} invited so far.</span>
+                      )}
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <h2>Find short-form video talent</h2>
+                    <p className="text mb30">
+                      Editors, UGC creators and motion designers for TikTok, Reels
+                      and Shorts. Compare portfolios, prices and delivery times.
+                    </p>
+                  </>
+                )}
                 <form
                   className="advance-search-tab bgc-white p10 bdrs4 zi1 position-relative"
                   onSubmit={(e) => {
@@ -302,7 +346,21 @@ export default function TalentDirectory({ initialQuery = "" }) {
             {/* While a new query loads, keep the previous results visible but faded. */}
             {(result?.talents ?? []).map((t) => (
               <div key={t.username} className="col-md-6 col-lg-4 col-xl-3 mb30">
-                <TalentCard talent={t} />
+                <TalentCard
+                  talent={t}
+                  inviteId={inviteId}
+                  action={
+                    inviteProject && (
+                      <InviteButton
+                        projectId={inviteProject.id}
+                        username={t.username}
+                        initial={invited[t.username] ?? null}
+                        available={t.availability === "available"}
+                        onChange={onInviteChange}
+                      />
+                    )
+                  }
+                />
               </div>
             ))}
           </div>

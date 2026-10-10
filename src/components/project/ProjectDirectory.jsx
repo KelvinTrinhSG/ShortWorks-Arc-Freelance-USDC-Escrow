@@ -1,6 +1,8 @@
 "use client";
 import { VIDEO_LENGTHS, WORK_TYPES } from "@/data/projectOptions";
 import { PLATFORMS } from "@/data/talentOptions";
+import { useCurrentUser } from "@/store/authStore";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { FilterCheck, FilterDropdown } from "../listing/FilterDropdown";
 import Pagination from "../listing/Pagination";
@@ -57,6 +59,7 @@ export default function ProjectDirectory({ initialQuery = "" }) {
   const [filters, setFilters] = useState(() => parseQuery(initialQuery));
   const [search, setSearch] = useState(filters.q);
   const [result, setResult] = useState(null); // { query, projects, total, ... } | { query, error }
+  const isClient = useCurrentUser()?.accountType === "client";
   const query = toQuery(filters);
   const loading = result?.query !== query;
 
@@ -100,12 +103,15 @@ export default function ProjectDirectory({ initialQuery = "" }) {
     <>
       {/* Banner + search */}
       <section className="breadcumb-section pt-0">
-        <div className="cta-service-v1 cta-banner mx-auto maxw1700 pt80 pb80 bdrs16 position-relative overflow-hidden d-flex align-items-center mx20-lg px30-lg">
+        {/* The template fixes the banner at 300px; let it grow for the extra Create Project row. */}
+        <div
+          style={isClient ? { height: "auto" } : undefined}
+          className={`cta-service-v1 cta-banner mx-auto maxw1700 ${isClient ? "pt20 pb20" : "pt80 pb80"} bdrs16 position-relative overflow-hidden d-flex align-items-center mx20-lg px30-lg`}>
           <div className="container">
             <div className="row">
               <div className="col-xl-7">
                 <h2>Find short-form video projects</h2>
-                <p className="text mb30">
+                <p className="text mb15">
                   Brands and creators looking for editors, UGC creators and
                   motion designers. See the scope, budget and deadline up
                   front, then send your proposal.
@@ -140,6 +146,19 @@ export default function ProjectDirectory({ initialQuery = "" }) {
                     </div>
                   </div>
                 </form>
+                {isClient && (
+                  <div className="d-flex flex-wrap align-items-center gap-3 mt15">
+                    <Link href="/create-projects" className="ud-btn btn-thm">
+                      Create Project
+                      <i className="fal fa-arrow-right-long" />
+                    </Link>
+                    <p className="text mb-0">
+                      <span className="dark-color fw500">Need a video made?</span>{" "}
+                      Post your project and get proposals from editors and
+                      creators.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -232,7 +251,11 @@ export default function ProjectDirectory({ initialQuery = "" }) {
           <div className="row" style={{ opacity: loading && result ? 0.5 : 1 }}>
             {(result?.projects ?? []).map((p) => (
               <div key={p.id} className="col-lg-6 mb30">
-                <ProjectCard project={p} now={result.now} />
+                <ProjectCard
+                  project={p}
+                  now={result.now}
+                  ctaLabel={isClient ? "View Details" : undefined}
+                />
               </div>
             ))}
           </div>

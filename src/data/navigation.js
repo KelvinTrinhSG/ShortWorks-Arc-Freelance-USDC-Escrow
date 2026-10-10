@@ -9,17 +9,23 @@ const menus = [
     name: "Projects",
     path: "/project-1",
   },
+  // `showFor`: only shown to logged-in accounts of that type.
   {
     id: 3,
-    name: "Users",
-    children: [
-      { id: 1, name: "Employer", path: "/employee-1" },
-      { id: 2, name: "Freelancer", path: "/freelancer-1" },
-    ],
+    name: "Find Employer",
+    path: "/employee-1",
+    showFor: "freelancer",
+  },
+  {
+    id: 7,
+    name: "Find Freelancer",
+    path: "/freelancer-1",
+    showFor: "client",
   },
   {
     id: 4,
     name: "Pages",
+    hidden: true,
     children: [
       {
         id: 1,
@@ -102,11 +108,19 @@ const menus = [
       },
     ],
   },
+  // Contact lives in the footer (data/footer.js).
   {
-    id: 5,
-    name: "Contact",
-    path: "/contact",
+    id: 8,
+    name: "Create Service",
+    path: "/add-services",
+    showFor: "freelancer",
   },
 ];
+
+// Menu items the given user (or guest, when null) should see.
+export const visibleMenus = (user) =>
+  menus.filter(
+    (item) => !item.hidden && (!item.showFor || item.showFor === user?.accountType),
+  );
 
 export default menus;

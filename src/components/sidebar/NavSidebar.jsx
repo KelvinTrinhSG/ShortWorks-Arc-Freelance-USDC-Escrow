@@ -1,5 +1,6 @@
 "use client";
-import navigation from "@/data/navigation";
+import { visibleMenus } from "@/data/navigation";
+import { useCurrentUser } from "@/store/authStore";
 import { isActiveNavigation } from "@/utils/isActiveNavigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -9,6 +10,7 @@ import { Sidebar, Menu, MenuItem, SubMenu } from "react-pro-sidebar";
 
 export default function NavSidebar() {
   const path = usePathname();
+  const user = useCurrentUser();
   const crossRef = useRef(null);
 
   return (
@@ -40,7 +42,7 @@ export default function NavSidebar() {
           <div className="ui-navigation-sidebar">
             <Sidebar>
               <Menu>
-                {navigation.map((item,i) =>
+                {visibleMenus(user).map((item,i) =>
                   item?.children ? (
                     <SubMenu
                       key={ i }
