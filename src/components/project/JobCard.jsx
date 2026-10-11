@@ -10,6 +10,7 @@ const STAGES = {
   submitted: { label: "Submitted", color: "#a16207", bg: "#fdf6e3" },
   completed: { label: "Completed", color: "#15803d", bg: "#e3f6ea" },
   disputed: { label: "Disputed", color: "#b91c1c", bg: "#fdecec" },
+  cancelled: { label: "Cancelled", color: "#4b5563", bg: "#eef0f3" },
 };
 
 export const jobStage = (status, deliveryDate, today) =>

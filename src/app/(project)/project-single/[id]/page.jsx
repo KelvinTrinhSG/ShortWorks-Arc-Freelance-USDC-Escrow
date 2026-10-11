@@ -12,6 +12,7 @@ import VideoFrame from "@/components/project/VideoFrame";
 import { VIDEO_LENGTHS, WORK_TYPES } from "@/data/projectOptions";
 import { COUNTRIES, PLATFORMS, labelOf } from "@/data/talentOptions";
 import { getInvitationStatus, getProjectInvitations } from "@/lib/invitations";
+import { getPaypalAccount } from "@/lib/payments";
 import { getProject } from "@/lib/projects";
 import { getViewer } from "@/lib/viewer";
 import Image from "next/image";
@@ -25,12 +26,12 @@ async function load(params) {
   if (!data) return null;
   // The owner sees who they invited; a freelancer sees whether they were invited.
   const invitations = data.isOwner ? await getProjectInvitations(data.project.id) : [];
-  const invitation =
-    viewer?.accountType === "freelancer"
-      ? await getInvitationStatus(data.project.id, viewer.id)
-      : null;
+  const isFreelancer = viewer?.accountType === "freelancer";
+  const invitation = isFreelancer ? await getInvitationStatus(data.project.id, viewer.id) : null;
+  // A freelancer without PayPal connected can apply, but can't be hired yet.
+  const paypalReady = isFreelancer ? (await getPaypalAccount(viewer.id))?.status === "ready" : true;
   // Read the clock here, once per request, rather than during render.
-  return { ...data, viewer, invitations, invitation, now: Date.now() };
+  return { ...data, viewer, invitations, invitation, paypalReady, now: Date.now() };
 }
 
 // Talent directory in invite mode, with no filters: every freelancer is shown.
@@ -63,7 +64,19 @@ function Fact({ icon, title, children }) {
 export default async function ProjectPage({ params }) {
   const data = await load(params);
   if (!data) notFound();
-  const { project: p, isOwner, proposals, myProposal, viewer, invitations, invitation, now } = data;
+  const { project: p, isOwner, proposals, myProposal, viewer, invitations, invitation, paypalReady, now } = data;
+  const paypalNotice = !paypalReady && (myProposal?.status ?? "pending") === "pending" && (
+    <div className="bdr1 bdrs8 p20 mb30" style={{ backgroundColor: "#fff8e6" }}>
+      <p className="dark-color fw500 mb5">Connect PayPal so the client can hire you</p>
+      <p className="text fz14 mb10">
+        Clients pay through PayPal, straight into your account. Until it&apos;s connected, they can
+        read your proposal but can&apos;t hire you.
+      </p>
+      <Link href="/paypal" className="fz14 text-thm">
+        Connect PayPal →
+      </Link>
+    </div>
+  );
   const total = Math.round(p.budgetPerVideo * p.videoCount * 100) / 100;
   const daysLeft = Math.ceil((new Date(`${p.deadline}T23:59:59Z`).getTime() - now) / 86400000);
   const backToProject = `/login?next=${encodeURIComponent(`/project-single/${p.id}`)}`;
@@ -144,7 +157,10 @@ export default async function ProjectPage({ params }) {
     );
   } else if (myProposal) {
     action = (
-      <MyProposal proposal={myProposal} project={p} username={viewer.username} now={now} />
+      <>
+        {paypalNotice}
+        <MyProposal proposal={myProposal} project={p} username={viewer.username} now={now} />
+      </>
     );
   } else if (p.hired) {
     action = <p className="text">The client has already hired a freelancer for this project.</p>;
@@ -183,6 +199,7 @@ export default async function ProjectPage({ params }) {
             You declined this invitation. You can still send a proposal if you change your mind.
           </p>
         )}
+        {paypalNotice}
         <h4 className="mb20">Send your proposal</h4>
         <ProposalForm
           project={p}

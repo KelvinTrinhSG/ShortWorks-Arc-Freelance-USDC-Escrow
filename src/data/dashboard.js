@@ -1,55 +1,87 @@
-// `hideFor` lists account types that should not see the item (see visibleFor).
+// `group` is the sidebar section (see dashboardGroups); `hideFor` lists account types
+// that should not see the item (see visibleFor).
 export const dasboardNavigation = [
   {
+    id: 14,
+    group: "account",
+    name: "My Profile",
+    icon: "flaticon-photo",
+    path: "/my-profile",
+  },
+  {
+    id: 17,
+    group: "account",
+    name: "PayPal",
+    hideFor: ["client"],
+    icon: "fab fa-paypal",
+    path: "/paypal",
+  },
+  {
+    id: 15,
+    group: "account",
+    name: "Logout",
+    icon: "flaticon-logout",
+    path: "/login",
+  },
+  {
     id: 1,
+    group: "start",
     name: "Dashboard",
     icon: "flaticon-home",
     path: "/dashboard",
   },
   {
     id: 2,
+    group: "start",
     name: "My Proposals",
     icon: "flaticon-document",
     path: "/proposal",
   },
   {
     id: 3,
+    group: "start",
     name: "Saved",
     icon: "flaticon-like",
     path: "/saved",
   },
   {
     id: 4,
+    group: "start",
     name: "Message",
     icon: "flaticon-chat",
     path: "/message",
   },
   {
     id: 5,
+    group: "start",
     name: "Reviews",
     icon: "flaticon-review-1",
     path: "/reviews",
   },
   {
     id: 6,
+    group: "start",
     name: "Invoice",
     icon: "flaticon-receipt",
     path: "/invoice",
   },
   {
     id: 7,
+    group: "start",
     name: "Payouts",
     icon: "flaticon-dollar",
     path: "/payouts",
   },
   {
     id: 8,
+    group: "start",
     name: "Statements",
     icon: "flaticon-web",
     path: "/statements",
   },
   {
     id: 9,
+    group: "manage",
     name: "Manage Services",
     hideFor: ["client"],
     icon: "flaticon-presentation",
@@ -57,6 +89,7 @@ export const dasboardNavigation = [
   },
   {
     id: 10,
+    group: "manage",
     name: "Manage Jobs",
     hideFor: ["client"],
     icon: "flaticon-briefcase",
@@ -64,6 +97,7 @@ export const dasboardNavigation = [
   },
   {
     id: 16,
+    group: "manage",
     name: "Invitations",
     hideFor: ["client"],
     icon: "flaticon-mail",
@@ -71,12 +105,14 @@ export const dasboardNavigation = [
   },
   {
     id: 11,
+    group: "manage",
     name: "Manage Project",
     icon: "flaticon-content",
     path: "/manage-projects",
   },
   {
     id: 12,
+    group: "manage",
     name: "Add Services",
     hideFor: ["client"],
     icon: "flaticon-document",
@@ -84,27 +120,28 @@ export const dasboardNavigation = [
   },
   {
     id: 13,
+    group: "manage",
     name: "Create Project",
     icon: "flaticon-content",
     path: "/create-projects",
-  },
-  {
-    id: 14,
-    name: "My Profile",
-    icon: "flaticon-photo",
-    path: "/my-profile",
-  },
-  {
-    id: 15,
-    name: "Logout",
-    icon: "flaticon-logout",
-    path: "/login",
   },
 ];
 
 // Filter for dasboardNavigation: drops items hidden for this account type.
 export const visibleFor = (accountType) => (item) =>
   !item.hideFor?.includes(accountType);
+
+// The dashboard menu as titled sections, Account first. Used by the sidebar,
+// the header dropdown and the mobile menu.
+export const dashboardGroups = (accountType) =>
+  [
+    { key: "account", title: "Account" },
+    { key: "start", title: "Start" },
+    { key: "manage", title: "Organize and Manage" },
+  ].map((g) => ({
+    ...g,
+    items: dasboardNavigation.filter((i) => i.group === g.key).filter(visibleFor(accountType)),
+  }));
 
 export const invoice = [
   {

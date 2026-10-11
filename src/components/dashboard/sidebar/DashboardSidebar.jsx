@@ -1,5 +1,5 @@
 "use client";
-import { dasboardNavigation, visibleFor } from "@/data/dashboard";
+import { dashboardGroups } from "@/data/dashboard";
 import authStore, { useCurrentUser } from "@/store/authStore";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -13,50 +13,21 @@ export default function DashboardSidebar() {
     <>
       <div className="dashboard__sidebar d-none d-lg-block">
         <div className="dashboard_sidebar_list">
-          <p className="fz15 fw400 ff-heading pl30">Start</p>
-          {dasboardNavigation.slice(0, 8).map((item,i) => (
-            <div key={ i } className="sidebar_list_item mb-1">
-              <Link
-                href={item.path}
-                className={`items-center ${
-                  path === item.path ? "-is-active" : ""
-                }`}
-              >
-                <i className={`${item.icon} mr15`} />
-                {item.name}
-              </Link>
-            </div>
-          ))}
-
-          <p className="fz15 fw400 ff-heading pl30 mt30">Organize and Manage</p>
-
-          {dasboardNavigation.slice(8, 14).filter(visibleFor(user?.accountType)).map((item,i) => (
-            <div key={ i } className="sidebar_list_item mb-1">
-              <Link
-                href={item.path}
-                className={`items-center ${
-                  path === item.path ? "-is-active" : ""
-                }`}
-              >
-                <i className={`${item.icon} mr15`} />
-                {item.name}
-              </Link>
-            </div>
-          ))}
-
-          <p className="fz15 fw400 ff-heading pl30 mt30">Account</p>
-          {dasboardNavigation.slice(14, 16).map((item,i) => (
-            <div key={ i } className="sidebar_list_item mb-1">
-              <Link
-                href={item.path}
-                onClick={item.name === "Logout" ? logout : undefined}
-                className={`items-center ${
-                  path === item.path ? "-is-active" : ""
-                }`}
-              >
-                <i className={`${item.icon} mr15`} />
-                {item.name}
-              </Link>
+          {dashboardGroups(user?.accountType).map((group, g) => (
+            <div key={group.key}>
+              <p className={`fz15 fw400 ff-heading pl30 ${g > 0 ? "mt30" : ""}`}>{group.title}</p>
+              {group.items.map((item) => (
+                <div key={item.id} className="sidebar_list_item mb-1">
+                  <Link
+                    href={item.path}
+                    onClick={item.name === "Logout" ? logout : undefined}
+                    className={`items-center ${path === item.path ? "-is-active" : ""}`}
+                  >
+                    <i className={`${item.icon} mr15`} />
+                    {item.name}
+                  </Link>
+                </div>
+              ))}
             </div>
           ))}
         </div>

@@ -6,7 +6,16 @@ import { useState } from "react";
 
 // The "next step" box on /job-single/{id}: what the viewer can do now, by role and status.
 // Every action goes to POST /api/jobs/{id}; the page re-renders with the new status.
-export default function JobActions({ jobId, role, status, videoCount, total, disputeOpenedByMe }) {
+export default function JobActions({
+  jobId,
+  role,
+  status,
+  videoCount,
+  total,
+  freelancerName,
+  autoApproveAt,
+  disputeOpenedByMe,
+}) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -129,8 +138,14 @@ export default function JobActions({ jobId, role, status, videoCount, total, dis
         <>
           <h5 className="mb5">Review the delivery</h5>
           <p className="text fz14 mb15">
-            Check the delivered videos above. Approving completes the job, and the freelancer
-            is then owed <strong>${total}</strong> (see Payment).
+            Check the delivered videos above. Approving completes the job and pays{" "}
+            <strong>${total}</strong> to {freelancerName} through PayPal.
+            {autoApproveAt && (
+              <>
+                {" "}
+                If you don&apos;t answer, it&apos;s approved automatically on <strong>{autoApproveAt}</strong>.
+              </>
+            )}
           </p>
           <div className="d-flex flex-wrap gap-2">
             <button
@@ -140,7 +155,7 @@ export default function JobActions({ jobId, role, status, videoCount, total, dis
               onClick={async () => {
                 const ok = await confirmDialog({
                   title: "Approve the work?",
-                  message: `This completes the job and $${total} becomes due to the freelancer. You can't request changes afterwards.`,
+                  message: `$${total} will be paid to ${freelancerName} from the payment PayPal is holding. This completes the job; you can't request changes afterwards.`,
                   confirmLabel: "Approve & Complete",
                 });
                 if (ok) run("approve");
@@ -159,8 +174,9 @@ export default function JobActions({ jobId, role, status, videoCount, total, dis
       <>
         <h5 className="mb5">🎉 Nice work, your videos are in!</h5>
         <p className="text fz14 mb-0">
-          Now waiting for the client's review. They either approve (the job completes and the
-          payment becomes due) or ask for changes. You'll get a notification either way.
+          Now waiting for the client&apos;s review. They either approve (you&apos;re paid to your PayPal
+          account) or ask for changes. You&apos;ll get a notification either way.
+          {autoApproveAt && <> No answer by {autoApproveAt}? It&apos;s approved and paid automatically.</>}
         </p>
       </>
     );
@@ -169,7 +185,17 @@ export default function JobActions({ jobId, role, status, videoCount, total, dis
       <>
         <h5 className="mb5 text-success">🎉 Job completed</h5>
         <p className="text fz14 mb-0">
-          {role === "client" ? "You approved the work. Thanks for hiring on ShortWorks!" : "The client approved your work. Great job!"}
+          {role === "client" ? "The work is approved and the freelancer is paid. Thanks for hiring on ShortWorks!" : "The work is approved and the payment went to your PayPal account. Great job!"}
+        </p>
+      </>
+    );
+  } else if (status === "cancelled") {
+    main = (
+      <>
+        <h5 className="mb5">Job cancelled</h5>
+        <p className="text fz14 mb-0">
+          ShortWorks decided the dispute for the client: the held payment was released and nobody
+          was charged. See the decision in the activity below.
         </p>
       </>
     );
@@ -178,8 +204,8 @@ export default function JobActions({ jobId, role, status, videoCount, total, dis
       <>
         <h5 className="mb5 text-danger">This job is in dispute</h5>
         <p className="text fz14 mb15">
-          The job is on hold until the dispute is resolved. Our support team reviews the activity
-          below and contacts both sides.
+          The job and its payment are on hold. ShortWorks reviews the brief, the deliveries and the
+          activity below, then either pays the freelancer in full or releases the payment to the client.
         </p>
         {disputeOpenedByMe && (
           <button

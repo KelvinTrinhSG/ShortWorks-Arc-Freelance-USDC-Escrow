@@ -5,7 +5,7 @@ import JobActions from "@/components/project/JobActions";
 import { JobStatusBadge, jobStage } from "@/components/project/JobCard";
 import { dueLabel, formatDate } from "@/components/project/ProjectCard";
 import VideoFrame from "@/components/project/VideoFrame";
-import { DISPUTE_REASONS, VIDEO_LENGTHS, WORK_TYPES } from "@/data/projectOptions";
+import { DISPUTE_REASONS, VIDEO_LENGTHS, WORK_TYPES, estimateEarnings } from "@/data/projectOptions";
 import { COUNTRIES, PLATFORMS, labelOf } from "@/data/talentOptions";
 import { getJob } from "@/lib/jobs";
 import { getViewer } from "@/lib/viewer";
@@ -50,12 +50,76 @@ function Row({ label, children }) {
   );
 }
 
+const money2 = (n) => `$${Number(n).toFixed(2)}`;
+const SYSTEM_EVENTS = new Set(["auto_approved", "dispute_resolved"]);
+
+// The job's PayPal payment (lib/payments.js): held, paid with the fee breakdown, or released.
+function PaymentCard({ payment, job, isClient, videoCount }) {
+  const estimate = estimateEarnings(job.total);
+  const s = payment?.status;
+  const status =
+    s === "captured" ? <span className="text-success">Paid ✓</span>
+    : s === "capturing" ? "Paying…"
+    : s === "voided" ? "Released, nobody was charged"
+    : s === "expired" ? <span className="text-danger">Hold expired</span>
+    : s === "failed" ? <span className="text-danger">Payment failed</span>
+    : s === "authorized" && job.status === "disputed" ? <span className="text-danger">Held · on hold (dispute)</span>
+    : s === "authorized" ? "Held by PayPal"
+    : "No payment on record";
+
+  return (
+    <div className="bgc-white bdrs12 p30 mb30 default-box-shadow1">
+      <h5 className="mb15 d-flex align-items-center gap-2">
+        <span className="fab fa-paypal" style={{ color: "#003087" }} /> Payment
+      </h5>
+      <p className="text mb-0 fz14">{isClient ? "You pay" : "Client pays"}</p>
+      <h3 className="mb5">{money2(payment?.amount ?? job.total)}</h3>
+      <p className="text fz14 mb15">
+        ${job.pricePerVideo} per video × {videoCount}
+      </p>
+      <Row label="Status">{status}</Row>
+      {s === "authorized" && payment.expiresAt && (
+        <Row label="Held until">{formatDateTime(payment.expiresAt)}</Row>
+      )}
+      {s === "captured" ? (
+        <>
+          <Row label="PayPal fee">−{money2(payment.paypalFee ?? 0)}</Row>
+          <Row label={`Platform fee`}>−{money2(payment.platformFee)}</Row>
+          <Row label={isClient ? "Freelancer received" : "You received"}>
+            <span className="text-success">{money2(payment.netToFreelancer ?? 0)}</span>
+          </Row>
+        </>
+      ) : (
+        s !== "voided" && (
+          <>
+            <Row label="Platform fee">−{money2(payment?.platformFee ?? estimate.platformFee)}</Row>
+            <Row label={isClient ? "Freelancer receives" : "You receive"}>≈ {money2(estimate.net)}</Row>
+          </>
+        )
+      )}
+      <p className="text fz13 mt15 mb-0">
+        {s === "authorized"
+          ? isClient
+            ? "PayPal holds the money on your account. You're only charged when you approve the work."
+            : "The client's money is held by PayPal and goes straight to your PayPal account when the work is approved."
+          : s === "captured"
+            ? "Paid through PayPal, straight to the freelancer's account."
+            : s === "voided"
+              ? "The hold was released and the client was not charged."
+              : "PayPal fee is an estimate until the payment is taken."}
+      </p>
+    </div>
+  );
+}
+
 const EVENT_TEXT = {
   submitted: "submitted the videos",
   revision_requested: "asked for changes",
   approved: "approved the work",
   dispute_opened: "opened a dispute",
   dispute_withdrawn: "withdrew the dispute",
+  auto_approved: "approved the work automatically (no answer for 3 days)",
+  dispute_resolved: "decided the dispute",
 };
 
 // Hired -> In progress -> Submitted -> Completed. A dispute is shown on the step it froze.
@@ -66,7 +130,9 @@ function Progress({ status, statusBeforeDispute }) {
     { label: "Hired", done: true },
     { label: "In progress", done: at > 0, current: at === 0 },
     { label: "Submitted", done: at > 1, current: at === 1 },
-    { label: "Completed", done: at === 2, current: false },
+    status === "cancelled"
+      ? { label: "Cancelled · payment released", done: false, current: true }
+      : { label: "Completed", done: at === 2, current: false },
   ];
   return (
     <ol className="list-unstyled mb-0">
@@ -83,7 +149,7 @@ function Progress({ status, statusBeforeDispute }) {
             style={{
               width: 24,
               height: 24,
-              background: s.done ? "#5bbb7b" : s.current ? (status === "disputed" ? "#b91c1c" : "#222") : "#e9e9e9",
+              background: s.done ? "#5bbb7b" : s.current ? (status === "disputed" || status === "cancelled" ? "#b91c1c" : "#222") : "#e9e9e9",
               color: s.done || s.current ? "#fff" : "#6b7177",
             }}
           >
@@ -103,7 +169,7 @@ export default async function JobPage({ params }) {
   const data = await load(params);
   // Not the hiring client or the hired freelancer, or not (or no longer) accepted.
   if (!data) notFound();
-  const { role, project: p, job, freelancer: f, events, today } = data;
+  const { role, project: p, job, freelancer: f, events, payment, today } = data;
   const isClient = role === "client";
   const due = dueLabel(job.deliveryDate, today);
   const stage = jobStage(job.status, job.deliveryDate, today);
@@ -175,6 +241,8 @@ export default async function JobPage({ params }) {
                 status={job.status}
                 videoCount={p.videoCount}
                 total={job.total}
+                freelancerName={f.displayName}
+                autoApproveAt={job.autoApproveAt && formatDateTime(job.autoApproveAt)}
                 disputeOpenedByMe={job.disputeOpenedByMe}
               />
               {job.status === "disputed" && lastDispute && (
@@ -183,9 +251,18 @@ export default async function JobPage({ params }) {
                     {lastDispute.byMe ? "You" : lastDispute.actorName} opened a dispute ·{" "}
                     {labelOf(DISPUTE_REASONS, lastDispute.reason)}
                   </p>
-                  <p className="text fz14 mb-0" style={{ whiteSpace: "pre-line" }}>
+                  <p className="text fz14 mb10" style={{ whiteSpace: "pre-line" }}>
                     {lastDispute.note}
                   </p>
+                  {job.disputeDecideBy && (
+                    <p className="fz14 dark-color fw500 mb-0">
+                      ShortWorks will decide by {formatDateTime(job.disputeDecideBy)}: either the freelancer
+                      is paid in full, or the payment is released to the client.{" "}
+                      <Link href="/terms#disputes" className="text-thm fw400">
+                        How disputes work
+                      </Link>
+                    </p>
+                  )}
                 </div>
               )}
 
@@ -320,8 +397,13 @@ export default async function JobPage({ params }) {
                   {events.map((e) => (
                     <li key={e.id} className="py-2 bdrb1 fz14">
                       <span className="text">{formatDateTime(e.createdAt)}</span> ·{" "}
-                      {e.byMe ? "You" : e.actorName} {EVENT_TEXT[e.type] ?? e.type}
-                      {e.reason && ` (${labelOf(DISPUTE_REASONS, e.reason)})`}
+                      {/* ShortWorks' own steps show as ShortWorks, not as the admin's account. */}
+                      {SYSTEM_EVENTS.has(e.type) ? "ShortWorks" : e.byMe ? "You" : e.actorName} {EVENT_TEXT[e.type] ?? e.type}
+                      {e.type === "dispute_resolved"
+                        ? e.reason === "pay"
+                          ? ": the freelancer is paid in full"
+                          : ": the payment is released to the client"
+                        : e.reason && ` (${labelOf(DISPUTE_REASONS, e.reason)})`}
                       {e.note && e.type !== "submitted" && (
                         <p className="text mb-0 mt5" style={{ whiteSpace: "pre-line" }}>
                           “{e.note}”
@@ -339,26 +421,8 @@ export default async function JobPage({ params }) {
                 <Progress status={job.status} statusBeforeDispute={job.statusBeforeDispute} />
               </div>
 
-              <div className="bgc-white bdrs12 p30 mb30 default-box-shadow1">
-                <h5 className="mb15">Payment</h5>
-                <p className="text mb-0 fz14">{isClient ? "You pay" : "You earn"}</p>
-                <h3 className="mb5">${job.total}</h3>
-                <p className="text fz14 mb15">
-                  ${job.pricePerVideo} per video × {p.videoCount}
-                </p>
-                <Row label="Status">
-                  {job.status === "completed" ? (
-                    <span className="text-success">Due to the freelancer</span>
-                  ) : job.status === "disputed" ? (
-                    <span className="text-danger">On hold</span>
-                  ) : (
-                    "Due when the client approves"
-                  )}
-                </Row>
-                <p className="text fz13 mt15 mb-0">
-                  Payment through PayPal is coming soon.
-                </p>
-              </div>
+              <PaymentCard payment={payment} job={job} isClient={isClient} videoCount={p.videoCount} />
+
 
               <div className="bgc-white bdrs12 p30 mb30 default-box-shadow1">
                 <h5 className="mb15">{other.title}</h5>

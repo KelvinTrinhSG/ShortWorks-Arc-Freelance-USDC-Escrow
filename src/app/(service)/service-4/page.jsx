@@ -1,23 +1,31 @@
-import { serviceBanner } from "@/data/categoryBanner";
-import Breadcumb9 from "@/components/breadcumb/Breadcumb9";
 import Footer from "@/components/footer/Footer";
 import Header20 from "@/components/header/Header20";
-
-import Listing4 from "@/components/section/Listing4";
-import TabSection1 from "@/components/section/TabSection1";
+import ServiceDirectory from "@/components/service/ServiceDirectory";
 
 export const metadata = {
-    title: "ShortWorks - Freelance Marketplace | Service 4",
+  title: "ShortWorks - Short-Form Video Services",
 };
 
-export default function page() {
-    return (
-        <>
-            <Header20 />
-            <TabSection1 />
-            <Breadcumb9 content={serviceBanner} />
-            <Listing4 />
-            <Footer />
-        </>
-    );
+// The home page search sends ?category=<role>&q=: map its roles to a type of work.
+const CATEGORY_TO_WORK_TYPE = {
+  "Short-Form Video Editor": "editing",
+  "Short-Form Video Animator": "motion",
+};
+
+export default async function page({ searchParams }) {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(await searchParams)) {
+    if (typeof value === "string") params.set(key, value);
+  }
+  const workType = CATEGORY_TO_WORK_TYPE[params.get("category")];
+  params.delete("category");
+  if (workType && !params.get("workType")) params.set("workType", workType);
+
+  return (
+    <>
+      <Header20 />
+      <ServiceDirectory initialQuery={params.toString()} />
+      <Footer />
+    </>
+  );
 }

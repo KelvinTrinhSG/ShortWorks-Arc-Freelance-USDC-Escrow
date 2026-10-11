@@ -79,6 +79,20 @@ export async function notifyJobEvent(job, recipientId, actorId, event) {
   );
 }
 
+// The held payment on a job expires soon (cron, lib/payments.js): tell both sides,
+// once per job (the cron runs daily).
+export async function notifyPaymentExpiring(proposalId) {
+  await pool.query(
+    `INSERT INTO notifications (user_id, actor_id, type, project_id, proposal_id)
+     SELECT u.id, NULL, 'payment_expiring', p.id, pr.id
+     FROM proposals pr JOIN projects p ON p.id = pr.project_id
+     CROSS JOIN LATERAL (VALUES (pr.freelancer_id), (p.client_id)) AS u(id)
+     WHERE pr.id = $1
+       AND NOT EXISTS (SELECT 1 FROM notifications n WHERE n.proposal_id = pr.id AND n.type = 'payment_expiring')`,
+    [proposalId],
+  );
+}
+
 const jobHref = (r) => `/job-single/${r.proposal_id}`;
 
 // What each type says and where it leads.
@@ -88,6 +102,10 @@ const MESSAGES = {
   job_approved: (r) => ({ text: `approved your work on "${r.title}"`, href: jobHref(r) }),
   job_dispute_opened: (r) => ({ text: `opened a dispute on "${r.title}"`, href: jobHref(r) }),
   job_dispute_withdrawn: (r) => ({ text: `withdrew the dispute on "${r.title}"`, href: jobHref(r) }),
+  // Sent by ShortWorks itself (no actor).
+  job_auto_approved: (r) => ({ text: `approved "${r.title}" automatically after 3 days, and the freelancer was paid`, href: jobHref(r) }),
+  job_dispute_resolved: (r) => ({ text: `decided the dispute on "${r.title}"`, href: jobHref(r) }),
+  payment_expiring: (r) => ({ text: `reminds you: the payment held for "${r.title}" expires in less than 3 days`, href: jobHref(r) }),
   invited: (r) => ({
     text: `invited you to send a proposal for "${r.title}"`,
     href: `/project-single/${r.project_id}`,
@@ -136,7 +154,8 @@ export async function getNotifications(userId) {
         id: r.id,
         ...MESSAGES[r.type](r),
         actor: {
-          displayName: r.display_name ?? "Someone",
+          // No actor = ShortWorks itself (auto-approval, dispute decision, reminders).
+          displayName: r.actor_id ? r.display_name ?? "Someone" : "ShortWorks",
           avatarUrl: r.actor_id
             ? avatarUrlOf({ id: r.actor_id, avatar_updated_at: r.avatar_updated_at })
             : null,

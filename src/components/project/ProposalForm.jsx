@@ -1,5 +1,10 @@
 "use client";
-import { COVER_LETTER_MAX } from "@/data/projectOptions";
+import {
+  COVER_LETTER_MAX,
+  MAX_DELIVERY_DAYS,
+  PLATFORM_FEE_PERCENT,
+  estimateEarnings,
+} from "@/data/projectOptions";
 import { parseVideoUrl } from "@/lib/videoUrl";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -29,6 +34,9 @@ export default function ProposalForm({ project, username, existing, onDone, onCa
   const price = Number(form.pricePerVideo) || 0;
   const total = Math.round(price * project.videoCount * 100) / 100;
   const diff = price - project.budgetPerVideo;
+  const earnings = estimateEarnings(total);
+  // The earlier of the project deadline and today + MAX_DELIVERY_DAYS.
+  const lastDay = [project.deadline, toDateInput(new Date(Date.parse(today) + MAX_DELIVERY_DAYS * 86400000))].sort()[0];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -92,6 +100,22 @@ export default function ProposalForm({ project, username, existing, onDone, onCa
             )}
           </div>
         </div>
+        {/* What the freelancer actually gets: fees come out of their side (docs/payments.md Q1). */}
+        {total > 0 && (
+          <div className="col-md-12">
+            <div className="bdrs8 p15 mb20 fz14" style={{ background: "#f0faf3" }}>
+              <div className="d-flex flex-wrap gap-3 align-items-center">
+                <span className="text">Client pays ${earnings.amount.toFixed(2)}</span>
+                <span className="text">Platform fee ({PLATFORM_FEE_PERCENT}%) −${earnings.platformFee.toFixed(2)}</span>
+                <span className="text">PayPal fee ≈ −${earnings.paypalFee.toFixed(2)}</span>
+                <span className="dark-color fw600 ms-auto">You receive ≈ ${earnings.net.toFixed(2)}</span>
+              </div>
+              <p className="fz13 text mt5 mb-0">
+                Estimate: PayPal&apos;s exact fee is known when the client approves your work.
+              </p>
+            </div>
+          </div>
+        )}
         <div className="col-md-6">
           <div className="mb20">
             <label className="fw500 ff-heading dark-color mb-2">
@@ -101,12 +125,15 @@ export default function ProposalForm({ project, username, existing, onDone, onCa
               type="date"
               className="form-control"
               min={today}
-              max={project.deadline}
+              max={lastDay}
               value={form.deliveryDate}
               onChange={update("deliveryDate")}
               required
             />
-            <p className="fz13 text-muted mt5 mb0">On or before the deadline.</p>
+            <p className="fz13 text-muted mt5 mb0">
+              On or before the deadline, and within {MAX_DELIVERY_DAYS} days (PayPal holds the
+              client&apos;s payment for up to 29 days).
+            </p>
           </div>
         </div>
         <div className="col-md-12">

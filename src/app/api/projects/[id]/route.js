@@ -5,6 +5,7 @@ import {
   updateProject,
   validateProject,
 } from "@/lib/projects";
+import { clearDeadPayments, hasLivePayment } from "@/lib/payments";
 import { getViewer } from "@/lib/viewer";
 
 const todayUtc = () => new Date().toISOString().slice(0, 10);
@@ -56,6 +57,14 @@ export async function PATCH(request, { params }) {
 export async function DELETE(_request, { params }) {
   const { project, response } = await ownProject(params);
   if (response) return response;
+  // Keep the money trail: a project where someone was paid (or money is held) can only be closed.
+  if (await hasLivePayment({ projectId: project.id })) {
+    return Response.json(
+      { error: "You hired a freelancer on this project, so it can't be deleted. Close it instead." },
+      { status: 409 },
+    );
+  }
+  await clearDeadPayments({ projectId: project.id });
   await deleteProject(project.id);
   return Response.json({ ok: true });
 }

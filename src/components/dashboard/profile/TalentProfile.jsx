@@ -17,7 +17,7 @@ import {
   TOOLS,
   TURNAROUND,
 } from "@/data/talentOptions";
-import authStore from "@/store/authStore";
+import authStore, { useCurrentUser } from "@/store/authStore";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -143,6 +143,7 @@ async function request(url, options) {
 
 export default function TalentProfile() {
   const updateUser = authStore((state) => state.updateUser);
+  const isFreelancer = useCurrentUser()?.accountType === "freelancer";
   const [profile, setProfile] = useState(initialProfile);
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -564,20 +565,17 @@ export default function TalentProfile() {
                 />
               </div>
             </div>
-            <div className="col-sm-6">
-              <div className="mb20">
-                <Label hint="(needed before your first job)">
-                  PayPal email
-                </Label>
-                <input
-                  type="email"
-                  className="form-control"
-                  value={profile.paypalEmail}
-                  onChange={setFromInput("paypalEmail")}
-                />
-              </div>
-            </div>
           </div>
+          {/* The old "PayPal email" field: payments now go through the connected account on /paypal. */}
+          {isFreelancer && (
+            <p className="fz14 text mb20">
+              Getting paid: connect your PayPal account on the{" "}
+              <Link href="/paypal" className="text-thm">
+                PayPal
+              </Link>{" "}
+              page.
+            </p>
+          )}
         </div>
       </Card>
 

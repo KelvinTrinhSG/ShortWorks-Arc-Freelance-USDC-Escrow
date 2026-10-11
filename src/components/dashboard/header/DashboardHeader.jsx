@@ -1,11 +1,12 @@
 "use client";
-import { dasboardNavigation, visibleFor } from "@/data/dashboard";
+import { dashboardGroups } from "@/data/dashboard";
 import authStore, { useCurrentUser } from "@/store/authStore";
 import toggleStore from "@/store/toggleStore";
 import NotificationBell from "../../header/NotificationBell";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Fragment } from "react";
 
 export default function DashboardHeader() {
   const toggle = toggleStore((state) => state.dashboardSlidebarToggleHandler);
@@ -222,53 +223,23 @@ export default function DashboardHeader() {
                         </a>
                         <div className="dropdown-menu">
                           <div className="user_setting_content">
-                            <p className="fz15 fw400 ff-heading mb10 pl30">
-                              Start
-                            </p>
-                            {dasboardNavigation.slice(0, 8).map((item,i) => (
-                              <Link
-                                key={i}
-                                className={`dropdown-item ${
-                                  path === item.path ? "active" : ""
-                                }`}
-                                href={item.path}
-                              >
-                                <i className={`${item.icon} mr10`} />
-                                {item.name}
-                              </Link>
-                            ))}
-                            <p className="fz15 fw400 ff-heading mt30 pl30">
-                              Organize and Manage
-                            </p>
-                            {dasboardNavigation.slice(8, 14).filter(visibleFor(user?.accountType)).map((item,i) => (
-                              <Link
-                                key={i}
-                                className={`dropdown-item ${
-                                  path === item.path ? "active" : ""
-                                }`}
-                                href={item.path}
-                              >
-                                <i className={`${item.icon} mr10`} />
-                                {item.name}
-                              </Link>
-                            ))}
-                            <p className="fz15 fw400 ff-heading mt30 pl30">
-                              Account
-                            </p>
-                            {dasboardNavigation.slice(14, 16).map((item,i) => (
-                              <Link
-                                key={i}
-                                className={`dropdown-item ${
-                                  path === item.path ? "active" : ""
-                                }`}
-                                href={item.path}
-                                onClick={
-                                  item.name === "Logout" ? logout : undefined
-                                }
-                              >
-                                <i className={`${item.icon} mr10`} />
-                                {item.name}
-                              </Link>
+                            {dashboardGroups(user?.accountType).map((group, g) => (
+                              <Fragment key={group.key}>
+                                <p className={`fz15 fw400 ff-heading pl30 ${g > 0 ? "mt30" : "mb10"}`}>
+                                  {group.title}
+                                </p>
+                                {group.items.map((item) => (
+                                  <Link
+                                    key={item.id}
+                                    className={`dropdown-item ${path === item.path ? "active" : ""}`}
+                                    href={item.path}
+                                    onClick={item.name === "Logout" ? logout : undefined}
+                                  >
+                                    <i className={`${item.icon} mr10`} />
+                                    {item.name}
+                                  </Link>
+                                ))}
+                              </Fragment>
                             ))}
                           </div>
                         </div>

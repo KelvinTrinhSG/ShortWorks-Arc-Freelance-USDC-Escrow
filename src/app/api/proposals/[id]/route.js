@@ -6,6 +6,7 @@ import {
   validateProposal,
 } from "@/lib/projects";
 import { canUndoAcceptance } from "@/lib/jobs";
+import { PaymentError, clearDeadPayments, releasePayment } from "@/lib/payments";
 import { getViewer } from "@/lib/viewer";
 
 const error = (message, status) => Response.json({ error: message }, { status });
@@ -31,9 +32,22 @@ export async function PATCH(request, { params }) {
     if (!["accepted", "declined", "pending"].includes(body.status)) {
       return error("Invalid status.", 400);
     }
-    // Once work was handed in (or disputed), the job can't be undone from here.
-    if (proposal.status === "accepted" && body.status !== "accepted" && !(await canUndoAcceptance(proposal.id))) {
-      return error("Work on this job has already started, so the hire can't be undone.", 409);
+    // Hiring goes through PayPal: /api/proposals/{id}/checkout holds the money first.
+    if (body.status === "accepted" && proposal.status !== "accepted") {
+      return error("Use Hire & pay to hire this freelancer.", 400);
+    }
+    if (proposal.status === "accepted" && body.status !== "accepted") {
+      // Once work was handed in (or disputed), the job can't be undone from here.
+      if (!(await canUndoAcceptance(proposal.id))) {
+        return error("Work on this job has already started, so the hire can't be undone.", 409);
+      }
+      // Undoing a hire releases the held money; nobody is charged.
+      try {
+        await releasePayment(proposal.id);
+      } catch (err) {
+        if (err instanceof PaymentError) return error(err.message, err.code);
+        throw err;
+      }
     }
     await setProposalStatus(proposal.id, body.status);
     return Response.json({ ok: true, status: body.status });
@@ -63,6 +77,8 @@ export async function DELETE(_request, { params }) {
   if (proposal.status !== "pending") {
     return error("The client already responded, so this proposal can no longer be withdrawn.", 409);
   }
+  // A checkout the client started but never finished doesn't block withdrawing.
+  await clearDeadPayments({ proposalId: proposal.id });
   await deleteProposal(proposal.id);
   return Response.json({ ok: true });
 }

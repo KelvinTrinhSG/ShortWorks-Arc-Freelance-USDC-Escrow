@@ -33,6 +33,7 @@ export const JOB_STATUSES = [
   { value: "submitted", label: "Submitted" },
   { value: "completed", label: "Completed" },
   { value: "disputed", label: "Disputed" },
+  { value: "cancelled", label: "Cancelled" },
 ];
 
 export const DISPUTE_REASONS = [
@@ -45,6 +46,32 @@ export const DISPUTE_REASONS = [
 ];
 
 export const JOB_NOTE_MAX = 1000;
+
+// ---- Payments (docs/payments.md §11) -------------------------------------------
+
+// Delivery at most this many days after hiring: a PayPal authorization lasts 29 days,
+// which leaves room for the 3-day review and auto-approval.
+export const MAX_DELIVERY_DAYS = 25;
+// A submitted job is approved automatically after this many days without an answer.
+export const AUTO_APPROVE_DAYS = 3;
+// ShortWorks decides a dispute within this many hours (every day counts).
+export const DISPUTE_DECISION_HOURS = 48;
+
+// The platform fee comes out of the freelancer's side, so does PayPal's fee.
+export const PLATFORM_FEE_PERCENT = 10;
+// Only for the "You receive ≈" estimate: the real PayPal fee is known after capture.
+// Sandbox charged $0.64 on $10; re-check against PayPal's live rates (docs/payments.md §11).
+const PAYPAL_FEE_ESTIMATE = { percent: 3.49, fixed: 0.29 };
+
+const cents = (n) => Math.round(n * 100) / 100;
+export const platformFeeFor = (amount) => cents((amount * PLATFORM_FEE_PERCENT) / 100);
+
+// What a freelancer gets for a job of `amount` (what the client pays).
+export function estimateEarnings(amount) {
+  const platformFee = platformFeeFor(amount);
+  const paypalFee = amount > 0 ? cents((amount * PAYPAL_FEE_ESTIMATE.percent) / 100 + PAYPAL_FEE_ESTIMATE.fixed) : 0;
+  return { amount: cents(amount), platformFee, paypalFee, net: Math.max(0, cents(amount - platformFee - paypalFee)) };
+}
 
 export const PROJECT_TITLE_MAX = 70;
 export const BRIEF_MAX = 1000;

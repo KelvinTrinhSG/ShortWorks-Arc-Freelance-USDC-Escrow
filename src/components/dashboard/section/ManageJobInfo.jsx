@@ -13,7 +13,7 @@ export default function ManageJobInfo({ jobs, accountType, today }) {
   const tabs = [
     { key: "active", label: "Active", test: (j) => ["in_progress", "submitted", "disputed"].includes(stage(j)) },
     { key: "overdue", label: "Overdue", test: (j) => stage(j) === "overdue" },
-    { key: "completed", label: "Completed", test: (j) => stage(j) === "completed" },
+    { key: "completed", label: "Completed", test: (j) => stage(j) === "completed" || stage(j) === "cancelled" },
   ];
   const [tab, setTab] = useState("active");
   const visible = jobs.filter(tabs.find((t) => t.key === tab).test);

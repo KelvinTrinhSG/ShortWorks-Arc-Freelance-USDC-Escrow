@@ -1,5 +1,7 @@
 import "server-only";
 import {
+  AUTO_APPROVE_DAYS,
+  DISPUTE_DECISION_HOURS,
   DISPUTE_REASONS,
   JOB_NOTE_MAX,
   JOB_STATUSES,
@@ -10,6 +12,7 @@ import {
 import { COUNTRIES, PLATFORMS } from "@/data/talentOptions";
 import pool from "@/lib/db";
 import { notifyJobEvent } from "@/lib/notifications";
+import { PaymentError, capturePayment, getJobPayment, releasePayment } from "@/lib/payments";
 import { avatarUrlOf } from "@/lib/profile";
 import { getProject } from "@/lib/projects";
 import { parseVideoUrl } from "@/lib/videoUrl";
@@ -22,8 +25,9 @@ const known = (options, list) => list.filter((v) => options.some((o) => o.value 
 const todayUtc = () => new Date().toISOString().slice(0, 10);
 const money = (n) => Math.round(n * 100) / 100;
 
-// `today()` returns the SQL for UTC today. Every sort puts completed jobs last.
-// Priority (default): what needs attention first, then the nearest delivery date.
+// `today()` returns the SQL for UTC today. Every sort puts finished jobs (completed,
+// cancelled) last. Priority (default): what needs attention first, then the nearest delivery date.
+const FINISHED = "pr.job_status IN ('completed', 'cancelled')";
 export const JOB_SORTS = {
   priority: (today) => `
     CASE
@@ -33,10 +37,10 @@ export const JOB_SORTS = {
       WHEN pr.job_status = 'in_progress' THEN 3
       ELSE 4
     END,
-    CASE WHEN pr.job_status = 'completed' THEN NULL ELSE pr.delivery_date END ASC,
-    pr.completed_at DESC, pr.id`,
-  newest: () => "pr.job_status = 'completed', pr.accepted_at DESC NULLS LAST, pr.id DESC",
-  "total-desc": () => "pr.job_status = 'completed', (pr.price_per_video * p.video_count) DESC, pr.id",
+    CASE WHEN ${FINISHED} THEN NULL ELSE pr.delivery_date END ASC,
+    pr.completed_at DESC NULLS LAST, pr.id`,
+  newest: () => `${FINISHED}, pr.accepted_at DESC NULLS LAST, pr.id DESC`,
+  "total-desc": () => `${FINISHED}, (pr.price_per_video * p.video_count) DESC, pr.id`,
 };
 
 export function parseJobFilters(params) {
@@ -208,11 +212,24 @@ export async function getJob(id, viewer) {
   ]);
   const r = pr[0];
   const lastDispute = events.findLast((e) => e.type === "dispute_opened");
+  const lastSubmitted = events.findLast((e) => e.type === "submitted");
+  const payment = await getJobPayment(ctx.id);
+  const hours = (iso, h) => new Date(new Date(iso).getTime() + h * 3600000);
 
   return {
     role,
     project,
+    payment,
     job: {
+      // When ShortWorks will decide an open dispute: 48 hours after it was opened,
+      // or before the held payment expires if that comes first.
+      disputeDecideBy:
+        ctx.job_status === "disputed" && lastDispute
+          ? new Date(Math.min(hours(lastDispute.created_at, DISPUTE_DECISION_HOURS), payment?.expiresAt ? new Date(payment.expiresAt) : Infinity))
+          : null,
+      // When a submitted job approves itself if the client doesn't answer.
+      autoApproveAt:
+        ctx.job_status === "submitted" && lastSubmitted ? hours(lastSubmitted.created_at, AUTO_APPROVE_DAYS * 24) : null,
       id: ctx.id,
       status: ctx.job_status,
       statusBeforeDispute: ctx.status_before_dispute,
@@ -333,39 +350,160 @@ export async function runJobAction(id, viewer, body) {
   if (error) return { error, code: 400 };
 
   const to = typeof action.to === "function" ? action.to(ctx) : action.to;
+  if (body.action === "approve") {
+    // Take the money first; the job only completes once the freelancer is paid.
+    try {
+      await capturePayment(ctx.id);
+    } catch (err) {
+      if (err instanceof PaymentError) return { error: err.message, code: err.code };
+      throw err;
+    }
+  }
+  const ok = await applyTransition(ctx, {
+    from: ctx.job_status,
+    to,
+    event: action.event,
+    actorId: viewer.id,
+    ...data,
+    // Money already moved: the job completes even if something else changed meanwhile.
+    force: body.action === "approve",
+  });
+  if (!ok) return { error: "The job has moved on since you opened this page. Refresh and try again.", code: 409 };
+
+  // Tell the other side.
+  const recipient = role === "client" ? ctx.freelancer_id : ctx.client_id;
+  await notifyJobEvent(ctx, recipient, viewer.id, action.event);
+  return { status: to };
+}
+
+// Moves a job to `to` and logs the event, in one transaction. The `from` check in WHERE
+// makes two clicks at once (or both sides at once) safe; `force` skips it.
+// Returns false when the job was no longer in `from`.
+async function applyTransition(ctx, { from, to, event, actorId, note, links, reason, force = false }) {
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
-    // The status check in WHERE makes two clicks at once (or both sides at once) safe.
     const { rowCount } = await client.query(
       `UPDATE proposals
        SET job_status = $2::varchar,
            status_before_dispute = CASE WHEN $2::varchar = 'disputed' THEN job_status ELSE NULL END,
            completed_at = CASE WHEN $2::varchar = 'completed' THEN NOW() ELSE completed_at END
-       WHERE id = $1 AND job_status = $3 AND status = 'accepted'`,
-      [ctx.id, to, ctx.job_status],
+       WHERE id = $1 AND status = 'accepted' AND ($4::boolean OR job_status = $3)`,
+      [ctx.id, to, from, force],
     );
     if (!rowCount) {
       await client.query("ROLLBACK");
-      return { error: "The job has moved on since you opened this page. Refresh and try again.", code: 409 };
+      return false;
     }
     await client.query(
       `INSERT INTO job_events (proposal_id, actor_id, type, note, links, reason)
        VALUES ($1, $2, $3, $4, $5, $6)`,
-      [ctx.id, viewer.id, action.event, data.note || null, data.links ?? null, data.reason ?? null],
+      [ctx.id, actorId, event, note || null, links ?? null, reason ?? null],
     );
     await client.query("COMMIT");
+    return true;
   } catch (err) {
     await client.query("ROLLBACK");
     throw err;
   } finally {
     client.release();
   }
+}
 
-  // Tell the other side.
-  const recipient = role === "client" ? ctx.freelancer_id : ctx.client_id;
-  await notifyJobEvent(ctx, recipient, viewer.id, action.event);
-  return { status: to };
+// ---- ShortWorks' own steps (cron, admin) --------------------------------------
+
+// Submitted jobs the client left unanswered for AUTO_APPROVE_DAYS since the last delivery:
+// approve them (and pay the freelancer). Disputed jobs are never in 'submitted'.
+// Returns what happened to each, for the cron log.
+export async function autoApproveDueJobs() {
+  const { rows } = await pool.query(
+    `SELECT pr.id FROM proposals pr
+     WHERE pr.status = 'accepted' AND pr.job_status = 'submitted'
+       AND (SELECT MAX(e.created_at) FROM job_events e WHERE e.proposal_id = pr.id AND e.type = 'submitted')
+           < NOW() - make_interval(days => $1)`,
+    [AUTO_APPROVE_DAYS],
+  );
+  const results = [];
+  for (const { id } of rows) {
+    const ctx = await getJobContext(id);
+    try {
+      await capturePayment(id);
+      await applyTransition(ctx, { from: "submitted", to: "completed", event: "auto_approved", actorId: null, force: true });
+      await notifyJobEvent(ctx, ctx.freelancer_id, null, "auto_approved");
+      await notifyJobEvent(ctx, ctx.client_id, null, "auto_approved");
+      results.push({ id, ok: true });
+    } catch (err) {
+      results.push({ id, ok: false, error: err.message });
+    }
+  }
+  return results;
+}
+
+// An admin settles a dispute: pay the freelancer everything, or release everything
+// to the client. No split (docs/payments.md §12).
+export async function resolveDispute(id, adminId, decision, note) {
+  const ctx = await getJobContext(id);
+  if (!ctx) return { error: "Job not found.", code: 404 };
+  if (ctx.job_status !== "disputed") return { error: "This job is not in dispute.", code: 409 };
+  if (!["pay", "release"].includes(decision)) return { error: "Pick a decision.", code: 400 };
+  const text = cleanNote(note);
+  if (!text || text.length > JOB_NOTE_MAX) return { error: "Explain the decision to both sides.", code: 400 };
+
+  try {
+    if (decision === "pay") await capturePayment(ctx.id);
+    else await releasePayment(ctx.id);
+  } catch (err) {
+    if (err instanceof PaymentError) return { error: err.message, code: err.code };
+    throw err;
+  }
+  await applyTransition(ctx, {
+    from: "disputed",
+    to: decision === "pay" ? "completed" : "cancelled",
+    event: "dispute_resolved",
+    actorId: adminId,
+    note: text,
+    reason: decision,
+    force: true,
+  });
+  await notifyJobEvent(ctx, ctx.freelancer_id, null, "dispute_resolved");
+  await notifyJobEvent(ctx, ctx.client_id, null, "dispute_resolved");
+  return { status: decision === "pay" ? "completed" : "cancelled" };
+}
+
+// Open disputes for the admin page, the most urgent decision first: 48 hours after
+// opening, or sooner when the held payment expires first.
+export async function getOpenDisputes() {
+  const { rows } = await pool.query(
+    `SELECT pr.id, p.title, c.display_name AS client_name, f.display_name AS freelancer_name,
+            jp.amount, jp.expires_at, jp.status AS payment_status,
+            e.created_at AS opened_at, e.reason, e.note, a.display_name AS opened_by,
+            LEAST(e.created_at + make_interval(hours => $1), COALESCE(jp.expires_at, 'infinity')) AS decide_by
+     FROM proposals pr
+     JOIN projects p ON p.id = pr.project_id
+     JOIN users c ON c.id = p.client_id
+     JOIN users f ON f.id = pr.freelancer_id
+     LEFT JOIN job_payments jp ON jp.proposal_id = pr.id
+     JOIN LATERAL (SELECT * FROM job_events x WHERE x.proposal_id = pr.id AND x.type = 'dispute_opened'
+                   ORDER BY x.created_at DESC, x.id DESC LIMIT 1) e ON TRUE
+     LEFT JOIN users a ON a.id = e.actor_id
+     WHERE pr.status = 'accepted' AND pr.job_status = 'disputed'
+     ORDER BY decide_by`,
+    [DISPUTE_DECISION_HOURS],
+  );
+  return rows.map((r) => ({
+    id: r.id,
+    title: r.title,
+    clientName: r.client_name,
+    freelancerName: r.freelancer_name,
+    amount: Number(r.amount ?? 0),
+    paymentStatus: r.payment_status,
+    expiresAt: r.expires_at,
+    openedAt: r.opened_at,
+    openedBy: r.opened_by,
+    reason: r.reason,
+    note: r.note,
+    decideBy: r.decide_by,
+  }));
 }
 
 // The client may only undo an acceptance before any work was handed in.

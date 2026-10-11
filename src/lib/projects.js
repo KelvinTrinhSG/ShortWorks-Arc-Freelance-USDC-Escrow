@@ -2,6 +2,7 @@ import "server-only";
 import {
   BRIEF_MAX,
   COVER_LETTER_MAX,
+  MAX_DELIVERY_DAYS,
   MAX_REFERENCES,
   MAX_VIDEO_COUNT,
   MIN_VIDEO_COUNT,
@@ -14,6 +15,7 @@ import {
 import { COUNTRIES, PLATFORMS } from "@/data/talentOptions";
 import pool from "@/lib/db";
 import { notifyProposalDecision, notifyProposalReceived } from "@/lib/notifications";
+import { hireBlocker } from "@/lib/payments";
 import { avatarUrlOf } from "@/lib/profile";
 import { parseVideoUrl } from "@/lib/videoUrl";
 
@@ -66,6 +68,9 @@ export function validateProposal(body, project) {
   if (!(price > 0) || price > 100000) return { error: "Price per video must be between 1 and 100000." };
   if (!isDate(b.deliveryDate) || b.deliveryDate < todayUtc()) return { error: "Pick a delivery date from today onward." };
   if (b.deliveryDate > project.deadline) return { error: "The delivery date must be on or before the project deadline." };
+  // A PayPal hold lasts 29 days: leave room for review (docs/payments.md Q2).
+  const lastDay = new Date(Date.now() + MAX_DELIVERY_DAYS * 86400000).toISOString().slice(0, 10);
+  if (b.deliveryDate > lastDay) return { error: `The delivery date must be within ${MAX_DELIVERY_DAYS} days from today.` };
   if (!coverLetter || coverLetter.length > COVER_LETTER_MAX) return { error: `Cover letter is required (max ${COVER_LETTER_MAX} characters).` };
   let sampleUrl = null;
   if (b.sampleUrl) {
@@ -254,7 +259,8 @@ export async function getProject(id, viewer) {
   const proposalQuery = `
     SELECT pr.id, pr.price_per_video, to_char(pr.delivery_date, 'YYYY-MM-DD') AS delivery_date,
            pr.cover_letter, pr.sample_url, pr.status, pr.created_at, pr.accepted_at,
-           u.id AS freelancer_id, u.username, u.display_name, u.headline, u.country, u.avatar_updated_at
+           u.id AS freelancer_id, u.username, u.display_name, u.headline, u.country, u.avatar_updated_at,
+           u.paypal_status, u.paypal_merchant_id
     FROM proposals pr JOIN users u ON u.id = pr.freelancer_id
     WHERE pr.project_id = $1`;
   const toProposal = (r) => ({
@@ -280,7 +286,15 @@ export async function getProject(id, viewer) {
   let myProposal = null;
   if (isOwner) {
     const res = await pool.query(`${proposalQuery} ORDER BY pr.created_at`, [id]);
-    proposals = res.rows.map(toProposal);
+    // What the owner needs for Hire & pay: the PayPal button pays this merchant.
+    proposals = res.rows.map((r) => ({
+      ...toProposal(r),
+      hire: {
+        amount: money(Number(r.price_per_video) * project.videoCount),
+        merchantId: r.paypal_status === "ready" ? r.paypal_merchant_id : null,
+        blocker: hireBlocker({ status: r.status, deliveryDate: r.delivery_date, paypalStatus: r.paypal_status }),
+      },
+    }));
   } else if (viewer?.accountType === "freelancer") {
     const res = await pool.query(`${proposalQuery} AND pr.freelancer_id = $2`, [id, viewer.id]);
     myProposal = res.rows[0] ? toProposal(res.rows[0]) : null;
