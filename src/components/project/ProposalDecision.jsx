@@ -50,7 +50,7 @@ export default function ProposalDecision({ proposal }) {
                 : "You declined this proposal."}
             </span>
             {proposal.status === "accepted" && (
-              <Link href={`/job-single/${proposal.id}`} className="btn btn-sm btn-dark">
+              <Link href={`/jobs/${proposal.id}`} className="btn btn-sm btn-dark">
                 Manage Job →
               </Link>
             )}

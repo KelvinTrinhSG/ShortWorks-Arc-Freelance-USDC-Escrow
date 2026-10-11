@@ -41,7 +41,7 @@ export default function Hero1() {
   const router = useRouter();
   // search handler
   const searchHandler = () => {
-    router.push("/freelancer-1");
+    router.push("/freelancers");
   };
 
   return (

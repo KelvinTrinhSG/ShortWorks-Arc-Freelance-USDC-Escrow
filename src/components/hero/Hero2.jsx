@@ -32,7 +32,7 @@ export default function Hero2() {
       params.set("q", getKeyword.trim());
     }
     const query = params.toString();
-    router.push(query ? `/service-4?${query}` : "/service-4");
+    router.push(query ? `/services?${query}` : "/services");
   };
 
   return (

@@ -31,7 +31,7 @@ export default function InvitationsInfo({ invitations, accountType, now }) {
           <p className="text mb20">
             Your account is a client account. Invite freelancers from one of your projects.
           </p>
-          <Link href="/manage-projects" className="ud-btn btn-thm">
+          <Link href="/my-projects" className="ud-btn btn-thm">
             Manage Projects <i className="fal fa-arrow-right-long" />
           </Link>
         </div>
@@ -59,7 +59,7 @@ export default function InvitationsInfo({ invitations, accountType, now }) {
               </thead>
               <tbody className="t-body">
                 {invitations.map((i) => {
-                  const href = `/project-single/${i.projectId}`;
+                  const href = `/projects/${i.projectId}`;
                   return (
                     <tr key={i.projectId}>
                       <th scope="row">

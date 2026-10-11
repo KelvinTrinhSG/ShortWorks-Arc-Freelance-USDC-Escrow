@@ -14,7 +14,7 @@ export default function EmployeeCard1({ data }) {
             alt="icon"
           />
           <h6 className="mb-0 ml20">
-            <Link href={`/employee-single/${data.id}`}>{data.server}</Link>
+            <Link href={`/employers/${data.id}`}>{data.server}</Link>
           </h6>
           <span className="fav-icon flaticon-star" />
         </div>

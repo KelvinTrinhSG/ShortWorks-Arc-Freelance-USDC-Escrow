@@ -16,7 +16,7 @@ export const VIDEO_LENGTHS = [
 ];
 
 // Where a freelancer stands on a project (project.myStatus). "none" = no proposal,
-// no invitation. Used by the Status filter on /project-1; badge colours live in ProjectCard.
+// no invitation. Used by the Status filter on /projects; badge colours live in ProjectCard.
 export const MY_STATUSES = [
   { value: "none", label: "Not applied" },
   { value: "invited", label: "Invited" },
@@ -26,7 +26,7 @@ export const MY_STATUSES = [
 ];
 
 // Where a job stands (proposals.job_status, docs/jobs.md). "overdue" is not stored:
-// it is an in-progress job past the freelancer's delivery date. Status filter on /job-1.
+// it is an in-progress job past the freelancer's delivery date. Status filter on /jobs.
 export const JOB_STATUSES = [
   { value: "in_progress", label: "In progress" },
   { value: "overdue", label: "Overdue" },

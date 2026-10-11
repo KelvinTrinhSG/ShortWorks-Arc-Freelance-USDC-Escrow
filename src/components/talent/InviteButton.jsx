@@ -51,7 +51,7 @@ export default function InviteButton({
       return;
     }
     if (method === "POST" && redirectAfterInvite) {
-      router.push(`/project-single/${projectId}`);
+      router.push(`/projects/${projectId}`);
       return;
     }
     const next = method === "POST" ? "invited" : null;

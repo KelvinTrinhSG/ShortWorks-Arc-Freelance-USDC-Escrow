@@ -29,7 +29,7 @@ export default function DeclineInviteButton({ projectId, clientName }) {
       return;
     }
     // Done with this project: back to the list of open projects.
-    router.push("/project-1");
+    router.push("/projects");
   };
 
   return (

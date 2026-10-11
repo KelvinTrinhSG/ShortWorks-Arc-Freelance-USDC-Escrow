@@ -20,7 +20,7 @@ const AVAILABILITY_DOT = {
 // `inviteId`: in invite mode, passed on so the profile page puts that project first.
 export default function TalentCard({ talent, action, inviteId }) {
   const dot = AVAILABILITY_DOT[talent.availability] ?? AVAILABILITY_DOT.away;
-  const href = `/talents/${encodeURIComponent(talent.username)}${inviteId ? `?invite=${inviteId}` : ""}`;
+  const href = `/freelancers/${encodeURIComponent(talent.username)}${inviteId ? `?invite=${inviteId}` : ""}`;
 
   const meta = [
     talent.country && { label: "Location", value: labelOf(COUNTRIES, talent.country) },

@@ -1,6 +1,6 @@
 # Dự án & Proposal
 
-Luồng: **người thuê đăng dự án** (`/create-projects`) → **freelancer tìm dự án** (`/project-1`) → **xem chi tiết và gửi proposal** (`/project-single/{id}`) → **người thuê xem các proposal** trên cùng trang chi tiết.
+Luồng: **người thuê đăng dự án** (`/projects/new`) → **freelancer tìm dự án** (`/projects`) → **xem chi tiết và gửi proposal** (`/projects/{id}`) → **người thuê xem các proposal** trên cùng trang chi tiết.
 
 ## Database — `db/004_projects.sql`
 
@@ -26,7 +26,7 @@ Các bảng con dùng `ON DELETE CASCADE`: xoá tài khoản là xoá luôn dự
 
 Toàn bộ logic nằm trong `src/lib/projects.js`. `src/lib/viewer.js` dùng để lấy người đang xem kèm loại tài khoản; file này tách riêng khỏi `session.js` vì `proxy.js` không được phép tải thư viện `pg`.
 
-## Trang danh sách `/project-1`
+## Trang danh sách `/projects`
 
 - Banner và ô tìm kiếm theo tiêu đề hoặc mô tả.
 - Bộ lọc: **Platform · Type of work · Video length · Budget** (từ $25/$50/$100/$200 mỗi video). Có nút Clear all.
@@ -46,7 +46,7 @@ Toàn bộ logic nằm trong `src/lib/projects.js`. `src/lib/viewer.js` dùng đ
 
   Dự án đã thuê người thì không nằm trong danh sách này, nên nhãn "Hired" hiếm khi xuất hiện ở đây.
 
-## Trang chi tiết `/project-single/{id}`
+## Trang chi tiết `/projects/{id}`
 
 **Phần chung:** tiêu đề, người đăng, 6 ô thông tin (Platforms · Type of work · Videos × length · Budget · Deadline · Proposals), Brief, video tham khảo dạng khung dọc 9:16. Cột phải có tổng ngân sách, hạn chót, số ngày còn lại, và thông tin người thuê.
 
@@ -70,7 +70,7 @@ Toàn bộ logic nằm trong `src/lib/projects.js`. `src/lib/viewer.js` dùng đ
 | Thư giới thiệu | ✅ | Tối đa 1500 ký tự. Gợi ý: vì sao phù hợp · cách làm · cần gì từ người thuê |
 | Video mẫu liên quan nhất | — | 1 link TikTok/Reels/Shorts/Facebook |
 
-Profile công khai và portfolio của freelancer được **tự gắn kèm** qua link tới `/talents/{username}`.
+Profile công khai và portfolio của freelancer được **tự gắn kèm** qua link tới `/freelancers/{username}`.
 
 Thay cho form cũ của template (Your hourly price · Estimated Hours · Cover Letter): đơn hàng video ngắn tính theo video và theo hạn giao, không tính theo giờ.
 
@@ -85,7 +85,7 @@ Thay cho form cũ của template (Your hourly price · Estimated Hours · Cover 
 - Bấm **Undo** để bỏ chấp nhận (hoặc chỉ Decline mà không Accept ai), dự án quay lại **Open** và hiện lại trên trang Projects.
 - Logic này nằm trong `src/lib/projects.js`: biến `hired` / `isOpen` trong `toProject()`, điều kiện `NOT EXISTS … 'accepted'` trong `searchProjects()`, và `getProposalContext()`.
 
-## Trang quản lý `/manage-projects` (người thuê)
+## Trang quản lý `/my-projects` (người thuê)
 
 - 3 tab **Open**, **Hired** và **Closed**. Mỗi dự án nằm trong đúng 1 tab. Tab Closed gồm dự án người thuê tự đóng và dự án đã quá hạn chót mà chưa chọn ai. Số trong ngoặc là số dự án.
 - Bảng gồm các cột:
@@ -95,9 +95,9 @@ Thay cho form cũ của template (Your hourly price · Estimated Hours · Cover 
   - **Proposals:** tổng số (bấm vào mở trang chi tiết), kèm số "new" là chưa xử lý và số "accepted".
   - **Actions:** Edit · Close/Reopen · Delete.
 - Delete hỏi xác nhận trước, và báo rõ sẽ xoá bao nhiêu proposal.
-- Tài khoản freelancer mở trang này thì thấy thông báo kèm link sang `/project-1`.
+- Tài khoản freelancer mở trang này thì thấy thông báo kèm link sang `/projects`.
 
-## Sửa dự án `/edit-project/{id}`
+## Sửa dự án `/projects/{id}/edit`
 
 - Dùng lại form Create Project với dữ liệu điền sẵn. Nút đổi thành **Save Changes**, lưu xong chuyển về trang chi tiết.
 - Chỉ chủ dự án mở được. Người khác nhận 404. Khách chưa đăng nhập bị `proxy.js` chuyển về trang login.
@@ -106,7 +106,7 @@ Thay cho form cũ của template (Your hourly price · Estimated Hours · Cover 
 ## Quản lý ngay trên trang chi tiết
 
 - **Chủ dự án:**
-  - Dưới tiêu đề có Edit · Close/Reopen · Delete. Xoá xong chuyển về trang danh sách dự án `/project-1`.
+  - Dưới tiêu đề có Edit · Close/Reopen · Delete. Xoá xong chuyển về trang danh sách dự án `/projects`.
   - Mỗi proposal có **Accept** · **Decline**. Sau khi chọn hiện "You accepted/declined this proposal" kèm nút **Undo**.
   - Có thể chấp nhận nhiều proposal, vì dự án nhiều video có thể chia cho nhiều freelancer.
 - **Freelancer:**
@@ -132,7 +132,7 @@ Thay cho form cũ của template (Your hourly price · Estimated Hours · Cover 
   - Freelancer khác và người thuê khác không đụng được vào proposal (403). Trạng thái lạ bị từ chối.
   - Proposal đã được chấp nhận thì không sửa hay rút được (409). Hoàn tác xong thì rút được và gửi lại được.
   - Xoá dự án thì xoá luôn proposal. Trang chi tiết sau đó trả 404.
-- **Quản lý (trình duyệt Edge):** bảng 2 tab, Close chuyển dự án sang tab Closed, Delete từ bảng, bấm tên dự án mở trang chi tiết, Accept/Undo, freelancer Edit (dữ liệu điền sẵn) và Withdraw, sửa dự án qua `/edit-project`, người thuê khác nhận 404, Delete từ trang chi tiết quay về `/manage-projects`.
+- **Quản lý (trình duyệt Edge):** bảng 2 tab, Close chuyển dự án sang tab Closed, Delete từ bảng, bấm tên dự án mở trang chi tiết, Accept/Undo, freelancer Edit (dữ liệu điền sẵn) và Withdraw, sửa dự án qua `/projects/{id}/edit`, người thuê khác nhận 404, Delete từ trang chi tiết quay về `/my-projects`.
 - **API (curl):**
   - Khách và freelancer không đăng được dự án.
   - Hạn chót trong quá khứ và link lạ bị từ chối.
@@ -150,5 +150,5 @@ Thay cho form cũ của template (Your hourly price · Estimated Hours · Cover 
 
 - Nhắn tin giữa hai bên, thanh toán qua PayPal.
 - Thông báo cho freelancer khi proposal được chấp nhận hoặc từ chối. Hiện freelancer chỉ thấy khi mở lại trang dự án.
-- Trang "My Proposals" (`/proposal`) liệt kê mọi proposal của một freelancer. Hiện freelancer quản lý proposal trên từng trang dự án.
+- Trang "My Proposals" (`/my-proposals`) liệt kê mọi proposal của một freelancer. Hiện freelancer quản lý proposal trên từng trang dự án.
 - Các trang mẫu `/project-2`, `/project-3`, `/project-4`, `/project-single-v2`, `/project-single-v3` vẫn dùng dữ liệu mẫu.

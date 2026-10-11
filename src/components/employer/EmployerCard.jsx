@@ -3,9 +3,9 @@ import Link from "next/link";
 
 const since = (iso) => new Date(iso).toLocaleDateString("en-US", { month: "short", year: "numeric" });
 
-// One employer on /employee-1: who they are and whether they're hiring now.
+// One employer on /employers: who they are and whether they're hiring now.
 export default function EmployerCard({ employer: e }) {
-  const href = `/employee-single/${encodeURIComponent(e.username)}`;
+  const href = `/employers/${encodeURIComponent(e.username)}`;
   const stats = [
     { label: "Open projects", value: e.openProjects },
     { label: "Hires", value: e.hires },

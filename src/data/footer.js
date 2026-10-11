@@ -32,19 +32,19 @@ export const lan = ["English", "Frenc", "Italian", "Spanish", "Turkey"];
 
 export const footer = [
   "/dashboard",
-  "/proposal",
+  "/my-proposals",
   "/saved",
   "/message",
   "/reviews",
   "/invoice",
   "/payouts",
   "/statements",
-  "/manage-services",
-  "/manage-jobs",
-  "/manage-projects",
+  "/my-services",
+  "/my-jobs",
+  "/my-projects",
   "/my-profile",
-  "/add-services",
-  "/create-projects",
+  "/services/new",
+  "/projects/new",
 ];
 
 // ---- ShortWorks footer (components/footer/SiteFooter.jsx) ----
@@ -66,20 +66,20 @@ export const footerColumns = [
   {
     title: "Explore",
     links: [
-      { name: "Video editing", path: "/service-4?workType=editing" },
-      { name: "UGC filming", path: "/service-4?workType=ugc" },
-      { name: "Motion graphics", path: "/service-4?workType=motion" },
-      { name: "Browse Services", path: "/service-4" },
-      { name: "Find Projects", path: "/project-1" },
-      { name: "Find Freelancers", path: "/freelancer-1" },
+      { name: "Video editing", path: "/services?workType=editing" },
+      { name: "UGC filming", path: "/services?workType=ugc" },
+      { name: "Motion graphics", path: "/services?workType=motion" },
+      { name: "Browse Services", path: "/services" },
+      { name: "Find Projects", path: "/projects" },
+      { name: "Find Freelancers", path: "/freelancers" },
     ],
   },
   {
     title: "Support",
     links: [
       { name: "Trust & Safety", path: "/terms#payments" },
-      { name: "Selling on ShortWorks", path: "/add-services" },
-      { name: "Buying on ShortWorks", path: "/create-projects" },
+      { name: "Selling on ShortWorks", path: "/services/new" },
+      { name: "Buying on ShortWorks", path: "/projects/new" },
       { name: "Contact", path: "/contact" },
     ],
   },

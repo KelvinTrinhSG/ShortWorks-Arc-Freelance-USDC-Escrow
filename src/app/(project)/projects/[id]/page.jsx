@@ -35,7 +35,7 @@ async function load(params) {
 }
 
 // Talent directory in invite mode, with no filters: every freelancer is shown.
-const inviteHref = (p) => `/freelancer-1?invite=${p.id}`;
+const inviteHref = (p) => `/freelancers?invite=${p.id}`;
 
 export async function generateMetadata({ params }) {
   const data = await load(params);
@@ -79,7 +79,7 @@ export default async function ProjectPage({ params }) {
   );
   const total = Math.round(p.budgetPerVideo * p.videoCount * 100) / 100;
   const daysLeft = Math.ceil((new Date(`${p.deadline}T23:59:59Z`).getTime() - now) / 86400000);
-  const backToProject = `/login?next=${encodeURIComponent(`/project-single/${p.id}`)}`;
+  const backToProject = `/login?next=${encodeURIComponent(`/projects/${p.id}`)}`;
 
   // What the bottom of the page offers depends on who is looking.
   let action;
@@ -102,7 +102,7 @@ export default async function ProjectPage({ params }) {
                 />
                 <div className="flex-grow-1" style={{ minWidth: 0 }}>
                   <Link
-                    href={`/talents/${encodeURIComponent(inv.username)}`}
+                    href={`/freelancers/${encodeURIComponent(inv.username)}`}
                     className="fw500 dark-color"
                   >
                     {inv.displayName}
@@ -219,7 +219,7 @@ export default async function ProjectPage({ params }) {
       <Header20 />
       <section className="pt30 pb90">
         <div className="container">
-          <Link href="/project-1" className="fz14 text-thm">
+          <Link href="/projects" className="fz14 text-thm">
             ← All projects
           </Link>
 
@@ -237,7 +237,7 @@ export default async function ProjectPage({ params }) {
             </p>
             {isOwner && (
               <div className="mt15">
-                <ProjectOwnerActions project={p} afterDelete="/project-1" />
+                <ProjectOwnerActions project={p} afterDelete="/projects" />
               </div>
             )}
           </div>
@@ -343,7 +343,7 @@ export default async function ProjectPage({ params }) {
                   />
                   <div>
                     <Link
-                      href={`/employee-single/${encodeURIComponent(p.client.username)}`}
+                      href={`/employers/${encodeURIComponent(p.client.username)}`}
                       className="fw500 dark-color d-block"
                     >
                       {p.client.displayName}

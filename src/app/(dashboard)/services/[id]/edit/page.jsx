@@ -28,7 +28,7 @@ export default async function page({ params }) {
               <DashboardNavigation />
             </div>
             <div className="col-lg-9">
-              <Link href="/manage-services" className="fz14 text-thm">
+              <Link href="/my-services" className="fz14 text-thm">
                 ← Manage Services
               </Link>
               <div className="dashboard_title_area mt10">

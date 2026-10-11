@@ -52,7 +52,7 @@ export default function ProjectCard1({ data }) {
             </div>
             <div className="d-grid mt15">
               <Link
-                href={`/project-single/${data.id}`}
+                href={`/projects/${data.id}`}
                 className="ud-btn btn-light-thm"
               >
                 Send Proposal

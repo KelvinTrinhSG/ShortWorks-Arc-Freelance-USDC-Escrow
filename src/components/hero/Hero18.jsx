@@ -20,13 +20,13 @@ export default function Hero18() {
               </p>
               <div className="d-sm-flex align-items-center mt30 animate-up-3">
                 <Link
-                  href="/job-1"
+                  href="/jobs"
                   className="ud-btn btn-thm4 me-3 bdrs120 btn-1"
                 >
                   Find Work
                 </Link>
                 <Link
-                  href="/freelancer-1"
+                  href="/freelancers"
                   className="ud-btn btn-white bdr1 bdrs120 btn-2"
                 >
                   Find Talent

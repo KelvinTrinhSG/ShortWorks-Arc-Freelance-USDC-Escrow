@@ -35,7 +35,7 @@ function useIsTaken(field, value) {
 }
 
 // Freelancers go straight to filling in their profile; clients go browse talent.
-const AFTER_SIGNUP = { freelancer: "/my-profile", client: "/freelancer-1" };
+const AFTER_SIGNUP = { freelancer: "/my-profile", client: "/freelancers" };
 
 export default function RegisterForm({ accountType }) {
   const login = authStore((state) => state.login);

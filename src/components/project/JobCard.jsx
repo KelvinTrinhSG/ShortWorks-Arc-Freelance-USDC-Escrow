@@ -28,10 +28,10 @@ export function JobStatusBadge({ status, deliveryDate, today }) {
   );
 }
 
-// One job on /job-1. Both sides manage it on /job-single/{id}.
+// One job on /jobs. Both sides manage it on /jobs/{id}.
 export default function JobCard({ job, isClient, today }) {
   const due = dueLabel(job.deliveryDate, today);
-  const href = `/job-single/${job.id}`;
+  const href = `/jobs/${job.id}`;
   const open = job.jobStatus === "in_progress" || job.jobStatus === "submitted";
 
   const scope = [
@@ -54,7 +54,7 @@ export default function JobCard({ job, isClient, today }) {
         {isClient ? (
           <>
             Freelancer:{" "}
-            <Link href={`/talents/${job.freelancer.username}`} className="text-thm">
+            <Link href={`/freelancers/${job.freelancer.username}`} className="text-thm">
               {job.freelancer.displayName}
             </Link>
           </>

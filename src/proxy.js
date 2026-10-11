@@ -12,26 +12,27 @@ export async function proxy(request) {
   return NextResponse.redirect(loginUrl);
 }
 
-// Every route under src/app/(dashboard).
+// Every route under src/app/(dashboard), plus job pages and the admin area.
+// Old URLs (/manage-jobs, /create-projects…) redirect to these first (next.config.js).
 export const config = {
   matcher: [
     "/dashboard/:path*",
-    "/edit-project/:path*",
-    "/edit-service/:path*",
-    "/add-services/:path*",
-    "/create-projects/:path*",
+    "/projects/new",
+    "/projects/:id/edit",
+    "/services/new",
+    "/services/:id/edit",
+    "/my-projects/:path*",
+    "/my-services/:path*",
+    "/my-jobs/:path*",
+    "/my-proposals/:path*",
+    "/jobs/:id", // not a dashboard page, but only for the two sides of a job (/jobs itself is public)
     "/invitations/:path*",
     "/invoice/:path*",
-    "/manage-jobs/:path*",
-    "/job-single/:path*", // not a dashboard page, but only for the two sides of a job
     "/admin/:path*",
-    "/manage-projects/:path*",
-    "/manage-services/:path*",
     "/message/:path*",
     "/my-profile/:path*",
     "/payouts/:path*",
     "/paypal", // not /paypal-connected: that page only closes the PayPal popup
-    "/proposal/:path*",
     "/reviews/:path*",
     "/saved/:path*",
     "/statements/:path*",

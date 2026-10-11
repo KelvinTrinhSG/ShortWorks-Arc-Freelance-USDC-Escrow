@@ -35,7 +35,7 @@ export const dasboardNavigation = [
     group: "start",
     name: "My Proposals",
     icon: "flaticon-document",
-    path: "/proposal",
+    path: "/my-proposals",
   },
   {
     id: 3,
@@ -85,7 +85,7 @@ export const dasboardNavigation = [
     name: "Manage Services",
     hideFor: ["client"],
     icon: "flaticon-presentation",
-    path: "/manage-services",
+    path: "/my-services",
   },
   {
     id: 10,
@@ -93,7 +93,7 @@ export const dasboardNavigation = [
     name: "Manage Jobs",
     hideFor: ["client"],
     icon: "flaticon-briefcase",
-    path: "/manage-jobs",
+    path: "/my-jobs",
   },
   {
     id: 16,
@@ -108,7 +108,7 @@ export const dasboardNavigation = [
     group: "manage",
     name: "Manage Project",
     icon: "flaticon-content",
-    path: "/manage-projects",
+    path: "/my-projects",
   },
   {
     id: 12,
@@ -116,14 +116,14 @@ export const dasboardNavigation = [
     name: "Add Services",
     hideFor: ["client"],
     icon: "flaticon-document",
-    path: "/add-services",
+    path: "/services/new",
   },
   {
     id: 13,
     group: "manage",
     name: "Create Project",
     icon: "flaticon-content",
-    path: "/create-projects",
+    path: "/projects/new",
   },
 ];
 

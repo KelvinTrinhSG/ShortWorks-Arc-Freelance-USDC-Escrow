@@ -24,7 +24,7 @@ export default function PayoutInfo() {
           <div className="col-lg-6">
             <div className="text-lg-end">
               <Link
-                href="/freelancer-1"
+                href="/freelancers"
                 className="ud-btn btn-dark default-box-shadow2"
               >
                 Create Payout

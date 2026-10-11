@@ -93,7 +93,7 @@ export async function notifyPaymentExpiring(proposalId) {
   );
 }
 
-const jobHref = (r) => `/job-single/${r.proposal_id}`;
+const jobHref = (r) => `/jobs/${r.proposal_id}`;
 
 // What each type says and where it leads.
 const MESSAGES = {
@@ -108,15 +108,15 @@ const MESSAGES = {
   payment_expiring: (r) => ({ text: `reminds you: the payment held for "${r.title}" expires in less than 3 days`, href: jobHref(r) }),
   invited: (r) => ({
     text: `invited you to send a proposal for "${r.title}"`,
-    href: `/project-single/${r.project_id}`,
+    href: `/projects/${r.project_id}`,
   }),
   invitation_declined: (r) => ({
     text: `declined your invitation to "${r.title}"`,
-    href: `/project-single/${r.project_id}`,
+    href: `/projects/${r.project_id}`,
   }),
   proposal_received: (r) => ({
     text: `sent a proposal for "${r.title}"`,
-    href: `/project-single/${r.project_id}`,
+    href: `/projects/${r.project_id}`,
   }),
   // A hire. When the project came from a service order (projects.service_id), the
   // client ordered the service: there was no proposal from the freelancer's side.
@@ -128,7 +128,7 @@ const MESSAGES = {
   }),
   proposal_declined: (r) => ({
     text: `declined your proposal for "${r.title}"`,
-    href: `/project-single/${r.project_id}`,
+    href: `/projects/${r.project_id}`,
   }),
 };
 

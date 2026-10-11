@@ -92,7 +92,7 @@ export default function PopularServiceSlideCard1({
         <div className={`list-content ${isContentExpanded ? "px-0" : ""}`}>
           <p className="list-text body-color fz14 mb-1">{data.category}</p>
           <h5 className="list-title">
-            <Link href={`/service-single/${data.id}`}>{data.title}</Link>
+            <Link href={`/services/${data.id}`}>{data.title}</Link>
           </h5>
           <div className="review-meta d-flex align-items-center">
             <i className="fas fa-star fz10 review-color me-2" />

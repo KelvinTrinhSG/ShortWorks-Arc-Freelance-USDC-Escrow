@@ -174,7 +174,7 @@ export default function ProposalForm({ project, username, existing, onDone, onCa
             <p className="fz13 text-muted mt5 mb0">
               A TikTok, Reels, Shorts or Facebook link closest to this project.
               Your{" "}
-              <Link href={`/talents/${encodeURIComponent(username)}`} className="text-thm">
+              <Link href={`/freelancers/${encodeURIComponent(username)}`} className="text-thm">
                 public profile and portfolio
               </Link>{" "}
               are attached automatically.

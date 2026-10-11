@@ -26,7 +26,7 @@ export default function HighestRated1() {
               <div className="text-start text-lg-end mb-4">
                 <Link
                   className="ud-btn btn-light-thm bdrs90"
-                  href="/freelancer-1"
+                  href="/freelancers"
                 >
                   All Freelancers
                   <i className="fal fa-arrow-right-long" />

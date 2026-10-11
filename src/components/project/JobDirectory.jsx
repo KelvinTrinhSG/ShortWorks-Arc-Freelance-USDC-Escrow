@@ -71,7 +71,7 @@ function toQuery(f) {
   return params.toString();
 }
 
-// /job-1: the logged-in user's jobs (accepted proposals). `accountType` comes from
+// /jobs: the logged-in user's jobs (accepted proposals). `accountType` comes from
 // the server page; guests get a log-in prompt instead of the list.
 export default function JobDirectory({ initialQuery = "", accountType = null, today }) {
   const [filters, setFilters] = useState(() => parseQuery(initialQuery));
@@ -179,7 +179,7 @@ export default function JobDirectory({ initialQuery = "", accountType = null, to
                 Freelancers see the jobs they were hired for. Clients see the
                 freelancers they hired.
               </p>
-              <Link href="/login?next=%2Fjob-1" className="ud-btn btn-thm">
+              <Link href="/login?next=%2Fjobs" className="ud-btn btn-thm">
                 Log in <i className="fal fa-arrow-right-long" />
               </Link>
             </div>
@@ -285,7 +285,7 @@ export default function JobDirectory({ initialQuery = "", accountType = null, to
                         : "When a client accepts your proposal, the job shows up here."}
                   </p>
                   {!activeCount && (
-                    <Link href={isClient ? "/manage-projects" : "/project-1"} className="ud-btn btn-thm">
+                    <Link href={isClient ? "/my-projects" : "/projects"} className="ud-btn btn-thm">
                       {isClient ? "Manage Projects" : "Browse projects"}{" "}
                       <i className="fal fa-arrow-right-long" />
                     </Link>

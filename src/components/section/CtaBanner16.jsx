@@ -28,11 +28,11 @@ export default function CtaBanner16() {
                 <br className="d-none d-lg-block" />
                 get things done—from quick turnarounds.
               </p>
-              <Link href="/project-1" className="ud-btn btn-thm bdrs12 mr20">
+              <Link href="/projects" className="ud-btn btn-thm bdrs12 mr20">
                 View Project <i className="fal fa-arrow-right-long"></i>
               </Link>
               <Link
-                href="/add-services"
+                href="/services/new"
                 className="ud-btn btn-thm-border bdrs12"
               >
                 Post a Service <i className="fal fa-arrow-right-long"></i>

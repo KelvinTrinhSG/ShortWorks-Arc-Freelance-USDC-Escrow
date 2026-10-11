@@ -36,7 +36,7 @@ function toQuery(f) {
   return params.toString();
 }
 
-// /employee-1: brands and creators who post projects, those hiring now first.
+// /employers: brands and creators who post projects, those hiring now first.
 export default function EmployerDirectory({ initialQuery = "" }) {
   const [filters, setFilters] = useState(() => parseQuery(initialQuery));
   const [search, setSearch] = useState(filters.q);

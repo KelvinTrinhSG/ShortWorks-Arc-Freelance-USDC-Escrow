@@ -4,7 +4,7 @@ import { confirmDialog } from "@/store/confirmStore";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-// The "next step" box on /job-single/{id}: what the viewer can do now, by role and status.
+// The "next step" box on /jobs/{id}: what the viewer can do now, by role and status.
 // Every action goes to POST /api/jobs/{id}; the page re-renders with the new status.
 export default function JobActions({
   jobId,

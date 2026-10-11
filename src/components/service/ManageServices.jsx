@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-// The freelancer's services on /manage-services: Edit · Pause/Resume · Delete.
+// The freelancer's services on /my-services: Edit · Pause/Resume · Delete.
 export default function ManageServices({ services }) {
   const router = useRouter();
   const [busy, setBusy] = useState(null); // service id
@@ -47,7 +47,7 @@ export default function ManageServices({ services }) {
     return (
       <div className="text-center py-4">
         <p className="text mb20">You don&apos;t offer any services yet.</p>
-        <Link href="/add-services" className="ud-btn btn-thm">
+        <Link href="/services/new" className="ud-btn btn-thm">
           Add your first service <i className="fal fa-arrow-right-long" />
         </Link>
       </div>
@@ -72,7 +72,7 @@ export default function ManageServices({ services }) {
             {services.map((s) => (
               <tr key={s.id}>
                 <th scope="row">
-                  <Link href={`/service-single/${s.id}`} className="dark-color fw500">
+                  <Link href={`/services/${s.id}`} className="dark-color fw500">
                     {s.title}
                   </Link>
                   <p className="fz14 text mb-0">
@@ -88,7 +88,7 @@ export default function ManageServices({ services }) {
                 </td>
                 <td className="vam">
                   <div className="d-flex flex-wrap gap-2">
-                    <Link href={`/edit-service/${s.id}`} className="btn btn-sm btn-outline-dark">
+                    <Link href={`/services/${s.id}/edit`} className="btn btn-sm btn-outline-dark">
                       Edit
                     </Link>
                     <button type="button" className="btn btn-sm btn-outline-secondary" disabled={busy === s.id} onClick={() => setStatus(s)}>

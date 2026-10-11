@@ -57,7 +57,7 @@ function toQuery(f) {
   return params.toString();
 }
 
-// /service-4: services freelancers offer, with search, filters, sort and pages.
+// /services: services freelancers offer, with search, filters, sort and pages.
 export default function ServiceDirectory({ initialQuery = "" }) {
   const [filters, setFilters] = useState(() => parseQuery(initialQuery));
   const [search, setSearch] = useState(filters.q);
@@ -145,7 +145,7 @@ export default function ServiceDirectory({ initialQuery = "" }) {
                 {isFreelancer && (
                   <p className="text mt15 mb-0">
                     <span className="dark-color fw500">Offer your own?</span>{" "}
-                    <Link href="/add-services" className="text-thm">
+                    <Link href="/services/new" className="text-thm">
                       Add a service →
                     </Link>
                   </p>

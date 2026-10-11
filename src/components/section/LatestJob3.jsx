@@ -19,7 +19,7 @@ export default function LatestJob3() {
             </div>
             <div className="col-lg-3">
               <div className="text-start text-lg-end mb-4 mb-lg-2">
-                <Link className="ud-btn2" href="/job-1">
+                <Link className="ud-btn2" href="/jobs">
                   Browse All
                   <i className="fal fa-arrow-right-long" />
                 </Link>

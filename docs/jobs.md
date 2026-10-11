@@ -1,6 +1,6 @@
-# Job (`/job-1`, `/job-single/{id}`, `/manage-jobs`)
+# Job (`/jobs`, `/jobs/{id}`, `/my-jobs`)
 
-**Job** = proposal đã được người thuê **chấp nhận**. Id của job chính là id của proposal. Dự án được Accept thì rời trang Projects (`/project-1`) và được quản lý dưới dạng job.
+**Job** = proposal đã được người thuê **chấp nhận**. Id của job chính là id của proposal. Dự án được Accept thì rời trang Projects (`/projects`) và được quản lý dưới dạng job.
 
 ## Trạng thái job
 
@@ -18,19 +18,19 @@ Hired → IN PROGRESS ──Submit──▶ SUBMITTED ──Approve & Complete�
 | **Completed** | Người thuê đã duyệt. Số tiền thành "Due to the freelancer". | — |
 | **Disputed** | Một bên mở khiếu nại (chọn lý do + mô tả). Job tạm dừng. | Chỉ bên mở khiếu nại được **Withdraw**; job quay lại trạng thái trước khi khiếu nại |
 
-- Mỗi bước gửi thông báo (chuông) cho bên còn lại, dẫn tới `/job-single/{id}`.
+- Mỗi bước gửi thông báo (chuông) cho bên còn lại, dẫn tới `/jobs/{id}`.
 - Sau khi freelancer đã giao lần đầu (hoặc có khiếu nại), người thuê **không Undo** việc Accept được nữa (API trả 409).
 - Hai người bấm cùng lúc: điều kiện `job_status` trong câu `UPDATE` đảm bảo chỉ một bước được ghi, bên kia nhận 409.
 
-## Trang Jobs `/job-1` (menu **Jobs**)
+## Trang Jobs `/jobs` (menu **Jobs**)
 
 | Người xem | Thấy gì |
 |---|---|
 | Freelancer | Job mình được thuê |
 | Người thuê | Các freelancer mình đã thuê (dự án thuê 2 người thì có 2 job) |
-| Khách | Nút **Log in** (quay lại `/job-1` sau khi đăng nhập) |
+| Khách | Nút **Log in** (quay lại `/jobs` sau khi đăng nhập) |
 
-- Mỗi thẻ có nhãn trạng thái và nút **Manage Job** → `/job-single/{id}`.
+- Mỗi thẻ có nhãn trạng thái và nút **Manage Job** → `/jobs/{id}`.
 - Banner cùng kiểu với trang Services, ô tìm kiếm theo tiêu đề hoặc brief.
 - Bộ lọc: **Status** (In progress · Overdue · Submitted · Completed · Disputed) · **Platform** · **Type of work** · **Video length** · **Price** (từ $25/$50/$100/$200 mỗi video, theo giá đã chốt). Có nút Clear all.
 - Sắp xếp:
@@ -39,9 +39,9 @@ Hired → IN PROGRESS ──Submit──▶ SUBMITTED ──Approve & Complete�
 - Phân trang 10 job/trang, bộ lọc giữ trên URL.
 - API: `GET /api/jobs` (khách nhận 401).
 
-## Trang job `/job-single/{id}`
+## Trang job `/jobs/{id}`
 
-Chỉ **người thuê** và **freelancer được thuê** mở được; người khác nhận 404, khách bị `proxy.js` chuyển sang trang login. `/manage-jobs/{id}` cũ chuyển hướng sang đây.
+Chỉ **người thuê** và **freelancer được thuê** mở được; người khác nhận 404, khách bị `proxy.js` chuyển sang trang login. `/my-jobs/{id}` cũ chuyển hướng sang đây.
 
 | Khối | Nội dung |
 |---|---|
@@ -58,9 +58,9 @@ Chỉ **người thuê** và **freelancer được thuê** mở được; ngư�
 
 **Khiếu nại:** chưa có trang admin để xử lý. Khiếu nại chỉ dừng job lại; người mở có thể rút lại.
 
-## Danh sách `/manage-jobs` (dashboard freelancer)
+## Danh sách `/my-jobs` (dashboard freelancer)
 
-- 3 tab: **Active** (In progress chưa trễ, Submitted, Disputed), **Overdue**, **Completed**. Bấm vào job mở `/job-single/{id}`.
+- 3 tab: **Active** (In progress chưa trễ, Submitted, Disputed), **Overdue**, **Completed**. Bấm vào job mở `/jobs/{id}`.
 
 ## Database
 
@@ -82,8 +82,8 @@ Chỉ **người thuê** và **freelancer được thuê** mở được; ngư�
 | `src/app/(job)/job-single/[id]/page.jsx` | Trang job |
 | `src/components/project/JobActions.jsx` | Khối Next step và các form |
 | `src/components/project/JobCard.jsx` | Thẻ job, `JobStatusBadge`, `jobStage()` |
-| `src/components/project/JobDirectory.jsx` | Trang `/job-1` |
-| `src/components/dashboard/section/ManageJobInfo.jsx` | Bảng `/manage-jobs` |
+| `src/components/project/JobDirectory.jsx` | Trang `/jobs` |
+| `src/components/dashboard/section/ManageJobInfo.jsx` | Bảng `/my-jobs` |
 
 ---
 

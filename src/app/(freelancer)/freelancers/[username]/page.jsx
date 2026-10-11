@@ -84,8 +84,8 @@ export default async function TalentPage({ params, searchParams }) {
   // Came from the invite list: go back there instead of the plain talent list.
   const backHref =
     inviteId && inviteOptions?.some((p) => String(p.id) === inviteId)
-      ? `/freelancer-1?invite=${inviteId}`
-      : "/freelancer-1";
+      ? `/freelancers?invite=${inviteId}`
+      : "/freelancers";
 
   // Any of these may still be empty; only filled-in groups are shown.
   const expertise = [
@@ -217,7 +217,7 @@ export default async function TalentPage({ params, searchParams }) {
                         You have no open projects. Post one, then invite{" "}
                         {talent.displayName} to send a proposal.
                       </p>
-                      <Link href="/create-projects" className="ud-btn btn-thm w-100">
+                      <Link href="/projects/new" className="ud-btn btn-thm w-100">
                         Create Project
                         <i className="fal fa-arrow-right-long" />
                       </Link>
@@ -232,7 +232,7 @@ export default async function TalentPage({ params, searchParams }) {
                       {inviteOptions.map((p) => (
                         <div key={p.id} className="py-3 bdrt1">
                           <Link
-                            href={`/project-single/${p.id}`}
+                            href={`/projects/${p.id}`}
                             className="d-block fw500 dark-color mb10 text-truncate"
                             title={p.title}
                           >
@@ -292,7 +292,7 @@ export default async function TalentPage({ params, searchParams }) {
               )}
 
               <Link href={backHref} className="ud-btn btn-light-thm w-100">
-                {backHref === "/freelancer-1" ? "Back to all talents" : "Back to invite list"}
+                {backHref === "/freelancers" ? "Back to all talents" : "Back to invite list"}
               </Link>
             </div>
           </div>

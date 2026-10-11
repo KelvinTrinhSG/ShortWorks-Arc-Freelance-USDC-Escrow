@@ -23,11 +23,11 @@ export default function Hero11() {
               </p>
             </div>
             <div className="d-flex align-items-center mt30 animate-up-4">
-              <Link href="/job-1" className="ud-btn btn-thm4 me-3 bdrs12">
+              <Link href="/jobs" className="ud-btn btn-thm4 me-3 bdrs12">
                 Find Work
               </Link>
               <Link
-                href="/freelancer-1"
+                href="/freelancers"
                 className="ud-btn btn-white bdr1 bdrs12"
               >
                 Find Talent

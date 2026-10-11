@@ -31,7 +31,7 @@ export default function ProposalCard({ proposal, videoCount, now, actions }) {
             unoptimized
           />
           <div>
-            <Link href={`/talents/${encodeURIComponent(f.username)}`} className="fw500 dark-color">
+            <Link href={`/freelancers/${encodeURIComponent(f.username)}`} className="fw500 dark-color">
               {f.displayName}
             </Link>
             {f.headline && <p className="fz14 text mb-0">{f.headline}</p>}

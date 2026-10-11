@@ -19,7 +19,7 @@ export default function Hero8() {
 
   // search handler
   const searchHandler = () => {
-    router.push("/project-1");
+    router.push("/projects");
   };
 
   return (

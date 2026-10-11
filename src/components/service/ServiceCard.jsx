@@ -5,12 +5,12 @@ import Link from "next/link";
 
 const days = (n) => (n === 1 ? "1-day delivery" : `${n}-day delivery`);
 
-// One service on /service-4. Also the live preview in the Add Service form, where
+// One service on /services. Also the live preview in the Add Service form, where
 // the draft has no id, freelancer or samples yet.
 export default function ServiceCard({ service, freelancer }) {
   const s = service;
   const owner = s.freelancer ?? freelancer;
-  const href = s.id ? `/service-single/${s.id}` : null;
+  const href = s.id ? `/services/${s.id}` : null;
   const price = Number(s.pricePerVideo) || 0;
   const scope = [
     s.workType && labelOf(WORK_TYPES, s.workType),

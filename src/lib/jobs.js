@@ -59,7 +59,7 @@ export function parseJobFilters(params) {
   };
 }
 
-// The viewer's jobs for /job-1: a freelancer sees the jobs they were hired for,
+// The viewer's jobs for /jobs: a freelancer sees the jobs they were hired for,
 // a client sees the freelancers they hired on their projects (one entry per accepted proposal).
 export async function searchJobs(f, viewer) {
   const where = ["pr.status = 'accepted'"];
@@ -136,7 +136,7 @@ export async function searchJobs(f, viewer) {
   };
 }
 
-// The freelancer's jobs for /manage-jobs, soonest delivery first.
+// The freelancer's jobs for /my-jobs, soonest delivery first.
 export async function getFreelancerJobs(freelancerId) {
   const { rows } = await pool.query(
     `SELECT pr.id, pr.price_per_video, to_char(pr.delivery_date, 'YYYY-MM-DD') AS delivery_date,
@@ -184,7 +184,7 @@ async function getJobContext(id) {
 const roleOf = (ctx, viewer) =>
   viewer?.id === ctx.client_id ? "client" : viewer?.id === ctx.freelancer_id ? "freelancer" : null;
 
-// /job-single/{id}: the project, the accepted proposal, the freelancer and the activity log.
+// /jobs/{id}: the project, the accepted proposal, the freelancer and the activity log.
 // Only the client who hired and the hired freelancer may see it; null for everyone else.
 export async function getJob(id, viewer) {
   const ctx = await getJobContext(id);

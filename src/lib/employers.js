@@ -4,8 +4,8 @@ import pool from "@/lib/db";
 import { avatarUrlOf } from "@/lib/profile";
 import { getClientOpenProjects } from "@/lib/projects";
 
-// Employers = client accounts, for freelancers looking for work (/employee-1,
-// /employee-single/{username}). Only public fields: no email, phone or PayPal.
+// Employers = client accounts, for freelancers looking for work (/employers,
+// /employers/{username}). Only public fields: no email, phone or PayPal.
 
 export const EMPLOYERS_PAGE_SIZE = 12;
 

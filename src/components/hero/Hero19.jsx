@@ -9,7 +9,7 @@ const popular = ["Designer", "Developer", "Web", "IOS", "PHP", "Senior"];
 export default function Hero19() {
   const router = useRouter();
   const searchHandler = () => {
-    router.push("/project-1");
+    router.push("/projects");
   };
   return (
     <section className="hero-home19">

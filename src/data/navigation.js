@@ -2,29 +2,29 @@ const menus = [
   {
     id: 2,
     name: "Services",
-    path: "/service-4",
+    path: "/services",
   },
   {
     id: 6,
     name: "Projects",
-    path: "/project-1",
+    path: "/projects",
   },
   {
     id: 5,
     name: "Jobs",
-    path: "/job-1",
+    path: "/jobs",
   },
   // `showFor`: only shown to logged-in accounts of that type.
   {
     id: 3,
     name: "Find Employer",
-    path: "/employee-1",
+    path: "/employers",
     showFor: "freelancer",
   },
   {
     id: 7,
     name: "Find Freelancer",
-    path: "/freelancer-1",
+    path: "/freelancers",
     showFor: "client",
   },
   {

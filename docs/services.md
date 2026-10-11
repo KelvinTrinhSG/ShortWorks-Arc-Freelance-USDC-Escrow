@@ -1,4 +1,4 @@
-# Services (`/service-4`, `/service-single/{id}`)
+# Services (`/services`, `/services/{id}`)
 
 **Service** = gói làm sẵn của freelancer: **một giá cho mỗi video**, thời gian giao cho cả đơn. Client đặt và trả tiền ngay trên trang service; đơn hàng trở thành **job** như mọi job khác (Submit → Approve → thanh toán, khiếu nại…, xem `docs/jobs.md`, `docs/payments.md`).
 
@@ -27,11 +27,11 @@ Client chọn số video + viết brief ──POST /api/services/{id}/order─�
 
 | Trang | Nội dung |
 |---|---|
-| `/service-4` | Banner + tìm kiếm (tiêu đề, mô tả, tên freelancer). Bộ lọc: **Type of work · Platform · Video length · Price** (tối đa $25/$50/$100/$200 mỗi video) **· Delivery** (24 giờ / 3 / 7 / 14 ngày). Sắp xếp: Newest · Lowest price · Highest price · Fastest delivery. 12 service/trang, bộ lọc giữ trên URL. Ô tìm kiếm ở trang chủ (`?category=&q=`) được chuyển thành bộ lọc Type of work |
-| `/service-single/{id}` | 6 ô thông tin, mô tả, video mẫu, "How ordering works", hộp **đặt hàng** (số video, brief, ngày giao, tổng tiền → Continue → nút PayPal), thẻ freelancer. Service tạm dừng chỉ chủ của nó thấy |
-| `/add-services` | Form tạo service, xem trước thẻ, ước tính "You receive ≈" |
-| `/edit-service/{id}` | Sửa (chỉ chủ). Đơn đã đặt giữ nguyên giá và ngày giao |
-| `/manage-services` | Bảng service: Edit · Pause/Resume · Delete (hỏi xác nhận). Xoá service không xoá đơn đã đặt |
+| `/services` | Banner + tìm kiếm (tiêu đề, mô tả, tên freelancer). Bộ lọc: **Type of work · Platform · Video length · Price** (tối đa $25/$50/$100/$200 mỗi video) **· Delivery** (24 giờ / 3 / 7 / 14 ngày). Sắp xếp: Newest · Lowest price · Highest price · Fastest delivery. 12 service/trang, bộ lọc giữ trên URL. Ô tìm kiếm ở trang chủ (`?category=&q=`) được chuyển thành bộ lọc Type of work |
+| `/services/{id}` | 6 ô thông tin, mô tả, video mẫu, "How ordering works", hộp **đặt hàng** (số video, brief, ngày giao, tổng tiền → Continue → nút PayPal), thẻ freelancer. Service tạm dừng chỉ chủ của nó thấy |
+| `/services/new` | Form tạo service, xem trước thẻ, ước tính "You receive ≈" |
+| `/services/{id}/edit` | Sửa (chỉ chủ). Đơn đã đặt giữ nguyên giá và ngày giao |
+| `/my-services` | Bảng service: Edit · Pause/Resume · Delete (hỏi xác nhận). Xoá service không xoá đơn đã đặt |
 
 | Hộp đặt hàng theo người xem | Thấy gì |
 |---|---|
@@ -62,5 +62,5 @@ Client chọn số video + viết brief ──POST /api/services/{id}/order─�
 
 ## Chưa làm
 
-- Trang chủ `/` đã có **Popular Services** thật (`components/service/PopularServices.jsx`): 8 service, sắp xếp `popular` (nhiều đơn đã trả tiền nhất, rồi mới nhất), tab All · Video editing · UGC filming · Motion graphics, nút All Services → `/service-4` (giữ tab đang chọn). Các trang home mẫu (`/home-2`, `/home-9`, `/home-16`…), `/service-1…7`, `/service-single-v2/v3` vẫn dùng dữ liệu mẫu.
+- Trang chủ `/` đã có **Popular Services** thật (`components/service/PopularServices.jsx`): 8 service, sắp xếp `popular` (nhiều đơn đã trả tiền nhất, rồi mới nhất), tab All · Video editing · UGC filming · Motion graphics, nút All Services → `/services` (giữ tab đang chọn). Các trang home mẫu (`/home-2`, `/home-9`, `/home-16`…), `/service-1…7`, `/service-single-v2/v3` vẫn dùng dữ liệu mẫu.
 - Đánh giá (rating) cho service.

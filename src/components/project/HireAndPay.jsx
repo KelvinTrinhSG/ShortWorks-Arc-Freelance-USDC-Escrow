@@ -61,7 +61,7 @@ export default function HireAndPay({ proposal, autoOpen = false, label }) {
             });
             const data = await res.json().catch(() => ({}));
             if (!res.ok) return fail(data.error || "Couldn't hold the payment.");
-            router.push(`/job-single/${proposal.id}`);
+            router.push(`/jobs/${proposal.id}`);
           },
           onCancel: () => fail("Payment cancelled. Nothing was charged."),
           onError: (err) => fail(err?.message || "PayPal reported an error. Nothing was charged."),

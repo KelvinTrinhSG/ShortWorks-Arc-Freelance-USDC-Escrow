@@ -42,7 +42,7 @@ export default function ManageProjectInfo({ projects, accountType }) {
         {accountType === "client" && (
           <div className="col-lg-3">
             <div className="text-lg-end">
-              <Link href="/create-projects" className="ud-btn btn-dark default-box-shadow2">
+              <Link href="/projects/new" className="ud-btn btn-dark default-box-shadow2">
                 Create Project
                 <i className="fal fa-arrow-right-long" />
               </Link>
@@ -58,7 +58,7 @@ export default function ManageProjectInfo({ projects, accountType }) {
             Your account is a freelancer account. Find work on the projects
             page, and edit or withdraw a proposal from the project&apos;s page.
           </p>
-          <Link href="/project-1" className="ud-btn btn-thm">
+          <Link href="/projects" className="ud-btn btn-thm">
             Browse projects <i className="fal fa-arrow-right-long" />
           </Link>
         </div>
@@ -86,7 +86,7 @@ export default function ManageProjectInfo({ projects, accountType }) {
                   {TABS.find((t) => t.key === tab).empty}
                 </p>
                 {tab === "open" && (
-                  <Link href="/create-projects" className="ud-btn btn-thm">
+                  <Link href="/projects/new" className="ud-btn btn-thm">
                     Post a project <i className="fal fa-arrow-right-long" />
                   </Link>
                 )}
@@ -107,7 +107,7 @@ export default function ManageProjectInfo({ projects, accountType }) {
                     {visible.map((p) => (
                       <tr key={p.id}>
                         <th scope="row">
-                          <Link href={`/project-single/${p.id}`} className="dark-color fw500">
+                          <Link href={`/projects/${p.id}`} className="dark-color fw500">
                             {p.title}
                           </Link>
                           <p className="fz14 text mb-0">
@@ -125,7 +125,7 @@ export default function ManageProjectInfo({ projects, accountType }) {
                         </td>
                         <td className="vam">{formatDate(p.deadline)}</td>
                         <td className="vam">
-                          <Link href={`/project-single/${p.id}`} className="text-thm fw500">
+                          <Link href={`/projects/${p.id}`} className="text-thm fw500">
                             {p.proposalCount}
                           </Link>
                           <p className="fz13 text mb-0">

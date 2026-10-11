@@ -34,7 +34,7 @@ export default async function page() {
             {isFreelancer && (
               <div className="col-lg-3">
                 <div className="text-lg-end">
-                  <Link href="/add-services" className="ud-btn btn-dark default-box-shadow2">
+                  <Link href="/services/new" className="ud-btn btn-dark default-box-shadow2">
                     Add Service <i className="fal fa-arrow-right-long" />
                   </Link>
                 </div>
@@ -48,7 +48,7 @@ export default async function page() {
               <>
                 <h5 className="mb10">Services are offered by freelancers</h5>
                 <p className="text mb20">Your account is a client account. Browse services and order the one you need.</p>
-                <Link href="/service-4" className="ud-btn btn-thm">
+                <Link href="/services" className="ud-btn btn-thm">
                   Browse services <i className="fal fa-arrow-right-long" />
                 </Link>
               </>

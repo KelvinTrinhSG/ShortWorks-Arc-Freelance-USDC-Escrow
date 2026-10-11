@@ -18,7 +18,7 @@ export default function JobCard3({ data }) {
           </div>
           <div className="details ml20 ml0-xl">
             <h5>
-              <Link href={`/job-single/${data.id}`}>{data.title}</Link>
+              <Link href={`/jobs/${data.id}`}>{data.title}</Link>
             </h5>
             <h6 className="mb-3 text-thm">{data.server}</h6>
           </div>

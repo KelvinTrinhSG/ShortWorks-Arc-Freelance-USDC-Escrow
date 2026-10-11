@@ -18,7 +18,7 @@ export default function JobCard2({ data }) {
         </div>
         <div className="details">
           <h5 className="mb20">
-            <Link href={`/job-single/${data.id}`}>{data.title}</Link>
+            <Link href={`/jobs/${data.id}`}>{data.title}</Link>
           </h5>
           {data.benefits.map((item, index) => (
             <p

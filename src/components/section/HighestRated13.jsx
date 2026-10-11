@@ -26,7 +26,7 @@ export default function HighestRated13() {
           </div>
           <div className="col-lg-3">
             <div className="text-lg-end mb-2">
-              <Link href="/freelancer-1" className="ud-btn2">
+              <Link href="/freelancers" className="ud-btn2">
                 All Freelancers <i className="fal fa-arrow-right-long"></i>
               </Link>
             </div>

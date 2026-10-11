@@ -7,7 +7,7 @@ export const metadata = {
     title: "ShortWorks - Jobs",
 };
 
-// Projects move here from /project-1 once the client accepts a proposal (docs/jobs.md).
+// Projects move here from /projects once the client accepts a proposal (docs/jobs.md).
 export default async function page({ searchParams }) {
     const params = new URLSearchParams();
     for (const [key, value] of Object.entries(await searchParams)) {

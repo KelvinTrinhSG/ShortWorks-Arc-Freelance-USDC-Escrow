@@ -70,7 +70,7 @@ export default function TopFreelancers() {
           {!loading && result?.error && <p className="col-lg-12 text-center text-danger">Could not load freelancers.</p>}
           <div className="col-lg-12">
             <div className="text-center mt30">
-              <Link className="ud-btn bdrs60 btn-light-thm" href={tab ? `/freelancer-1?role=${tab}` : "/freelancer-1"}>
+              <Link className="ud-btn bdrs60 btn-light-thm" href={tab ? `/freelancers?role=${tab}` : "/freelancers"}>
                 All Freelancers
                 <i className="fal fa-arrow-right-long" />
               </Link>

@@ -54,7 +54,7 @@ So với đề xuất: video dùng **một** endpoint `PUT` thay cho thêm/sửa
 
 - Cookie JWT không thu hồi được: đổi mật khẩu không đăng xuất các thiết bị khác.
 - Form Join chưa yêu cầu mật khẩu tối thiểu 8 ký tự như form đổi mật khẩu.
-- Profile công khai `/talents/{username}` và danh sách `/freelancer-1` đã làm, xem [talent-directory.md](./talent-directory.md). Mọi tài khoản đều được hiện, profile hoàn chỉnh chỉ được xếp lên đầu.
+- Profile công khai `/freelancers/{username}` và danh sách `/freelancers` đã làm, xem [talent-directory.md](./talent-directory.md). Mọi tài khoản đều được hiện, profile hoàn chỉnh chỉ được xếp lên đầu.
 
 - Route: `src/app/(dashboard)/my-profile/page.jsx` (đã được `src/proxy.js` chặn, phải đăng nhập mới vào được)
 - Nội dung trang: `src/components/dashboard/section/MyProfileInfo.jsx`, gồm 7 khối:
@@ -345,7 +345,7 @@ Vercel không lưu file lâu dài: file ghi lên server sẽ mất sau mỗi l�
 2. **Portfolio**: bảng `portfolio_videos`, API, giao diện thêm/sửa/xoá và xem trước video dạng 9:16.
 3. **Ảnh đại diện**: chọn Vercel Blob hoặc Cloudinary trước.
 4. **Trang Settings**: chuyển Change password và Close account sang đây, rồi làm backend cho hai chức năng này.
-5. **Profile công khai** `/talents/:username` và thanh tiến độ "Profile hoàn chỉnh".
+5. **Profile công khai** `/freelancers/:username` và thanh tiến độ "Profile hoàn chỉnh".
 6. Xoá các khối không dùng nữa: Skills, Education, Work & Experience, Awards.
 
 Sửa kèm trong lúc làm: ô mật khẩu dùng `type="password"`, bỏ `id` trùng, bỏ `console.log`.

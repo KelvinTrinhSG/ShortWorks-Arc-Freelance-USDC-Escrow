@@ -195,7 +195,7 @@ export function parseServiceFilters(params) {
   };
 }
 
-// Active services for /service-4, newest first by default.
+// Active services for /services, newest first by default.
 export async function searchServices(f) {
   const where = ["s.status = 'active'"];
   const args = [];
@@ -246,7 +246,7 @@ export async function getService(id, viewer) {
   return { service, isOwner };
 }
 
-// Every service a freelancer offers, for /manage-services.
+// Every service a freelancer offers, for /my-services.
 export async function getOwnedServices(freelancerId) {
   const { rows } = await pool.query(
     `SELECT ${SERVICE_COLUMNS} FROM services s JOIN users u ON u.id = s.freelancer_id

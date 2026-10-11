@@ -30,7 +30,7 @@ export default function PopularServiceCard2({ data, text1 = false }) {
           <p className="list-text body-color fz14 mb-1">{data.category}</p>
 
           <h5 className="list-title">
-            <Link href={`/service-single/${data.id}`}>{data.title}</Link>
+            <Link href={`/services/${data.id}`}>{data.title}</Link>
           </h5>
           {text1 && (
             <p className="list-text body-color fz15 mb-1">

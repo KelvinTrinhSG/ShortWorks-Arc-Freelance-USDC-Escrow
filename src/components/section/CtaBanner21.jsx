@@ -18,11 +18,11 @@ export default function CtaBanner21() {
                 <br className="d-none d-lg-block" /> get things done—from quick
                 turnarounds.
               </p>
-              <Link href="/job-1" className="ud-btn btn-white bdrs16 mr20">
+              <Link href="/jobs" className="ud-btn btn-white bdrs16 mr20">
                 Find Work <i className="fal fa-arrow-right-long"></i>
               </Link>
               <Link
-                href="/freelancer-1"
+                href="/freelancers"
                 className="ud-btn btn-transparent2 bdrs16"
               >
                 Find Talent <i className="fal fa-arrow-right-long"></i>

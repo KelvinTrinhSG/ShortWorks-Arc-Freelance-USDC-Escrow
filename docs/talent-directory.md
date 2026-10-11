@@ -1,6 +1,6 @@
-# Danh sách talent (`/freelancer-1`) & profile công khai (`/talents/{username}`)
+# Danh sách talent (`/freelancers`) & profile công khai (`/freelancers/{username}`)
 
-Trang `/freelancer-1` trước đây hiển thị 12 freelancer mẫu viết cứng trong `src/data/product.js`. Giờ trang lấy **talent thật từ database**.
+Trang `/freelancers` trước đây hiển thị 12 freelancer mẫu viết cứng trong `src/data/product.js`. Giờ trang lấy **talent thật từ database**.
 
 ## Ai được hiển thị?
 
@@ -14,7 +14,7 @@ Profile **hoàn chỉnh** (đủ 10 mục bắt buộc của My Profile) chỉ �
 
 Khi sắp xếp theo giá hoặc thời gian giao, người chưa điền trường đó luôn nằm **cuối danh sách**. Khi lọc theo giá, thời gian giao, ngách…, người chưa điền trường đó sẽ không khớp nên không hiện.
 
-## Trang danh sách `/freelancer-1`
+## Trang danh sách `/freelancers`
 
 | Phần | Hoạt động |
 |---|---|
@@ -32,7 +32,7 @@ Mỗi thẻ có thể hiện: avatar, chấm trạng thái (🟢 đang nhận vi
 
 Khi không có kết quả, trang hiện "No talents found".
 
-## Trang profile công khai `/talents/{username}`
+## Trang profile công khai `/freelancers/{username}`
 
 - Hiện: avatar, tên, vai trò, headline, trạng thái nhận việc, quốc gia, múi giờ, giá khởi điểm, portfolio (video nhúng dạng 9:16), giới thiệu, giá và thời gian giao, số lần sửa, ngày tham gia, nền tảng, ngách, phần mềm, ngôn ngữ.
 - **Không bao giờ** hiện email, số điện thoại hay email PayPal.
@@ -65,7 +65,7 @@ Trả về `{ talents, total, page, pageSize }`. Giá trị không hợp lệ b�
 | `src/components/talent/TalentDirectory.jsx` | Banner, tìm kiếm, bộ lọc, danh sách, phân trang |
 | `src/components/talent/TalentCard.jsx` | Thẻ talent |
 | `src/app/talents/[username]/page.jsx` | Trang profile công khai |
-| `src/app/(freelancer)/freelancer-1/page.jsx` | Gắn `TalentDirectory` |
+| `src/app/(freelancer)/freelancers/page.jsx` | Gắn `TalentDirectory` |
 
 `Listing13.jsx` (danh sách mẫu cũ) đã bị xoá. Các trang mẫu khác như `/freelancer-2`, `/freelancer-single/...` vẫn dùng dữ liệu mẫu và không thay đổi.
 
@@ -81,4 +81,4 @@ Dữ liệu test đã được xoá sau khi kiểm tra.
 
 - Nút liên hệ hoặc thuê talent trên trang profile công khai.
 - Rating, số review, số job đã hoàn thành (cần làm tính năng đơn hàng và đánh giá trước).
-- Các link trong menu và trang chủ vẫn trỏ tới `/freelancer-1`. Có thể đổi thành `/talents` cho dễ nhớ.
+- Các link trong menu và trang chủ vẫn trỏ tới `/freelancers`. Có thể đổi thành `/talents` cho dễ nhớ.

@@ -31,7 +31,7 @@ export default function Hero9() {
 
   // search handler
   const searchHandler = () => {
-    router.push("/employee-1");
+    router.push("/employers");
   };
 
   return (

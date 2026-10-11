@@ -5,7 +5,7 @@ export default function BrowserCategoryCard2({ data }) {
   return (
     <>
       {" "}
-      <Link href="/project-1">
+      <Link href="/projects">
         <div className="feature-style1 mb30 bdrs16">
           <div className="feature-img bdrs16 overflow-hidden">
             <Image

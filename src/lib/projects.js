@@ -308,7 +308,7 @@ export async function getProject(id, viewer) {
   return { project, isOwner, proposals, myProposal };
 }
 
-// A client's open projects for their employer page (/employee-single/{username}),
+// A client's open projects for their employer page (/employers/{username}),
 // newest first. Service orders are private and never listed.
 export async function getClientOpenProjects(clientId) {
   const { rows } = await pool.query(
@@ -324,7 +324,7 @@ export async function getClientOpenProjects(clientId) {
 
 // ---- Owner & proposal management -------------------------------------------
 
-// Every project a client posted, with proposal counts, for /manage-projects.
+// Every project a client posted, with proposal counts, for /my-projects.
 export async function getOwnedProjects(clientId) {
   const { rows } = await pool.query(
     `SELECT ${PROJECT_COLUMNS},

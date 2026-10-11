@@ -166,7 +166,7 @@ export default function TalentDirectory({ initialQuery = "", inviteProject = nul
               <div className="col-xl-7">
                 {inviteProject ? (
                   <>
-                    <Link href={`/project-single/${inviteProject.id}`} className="fz14 text-thm">
+                    <Link href={`/projects/${inviteProject.id}`} className="fz14 text-thm">
                       ← Back to project
                     </Link>
                     <h2 className="mt10">Invite freelancers</h2>

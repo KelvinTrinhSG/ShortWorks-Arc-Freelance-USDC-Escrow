@@ -26,7 +26,7 @@ export default function InspireingWork20() {
                 <br className="d-none d-lg-block" /> get things done—from quick
                 turnaround.
               </p>
-              <Link className="ud-btn btn-dark bdrs60" href="/job-1">
+              <Link className="ud-btn btn-dark bdrs60" href="/jobs">
                 Get Started <i className="fal fa-arrow-right-long"></i>
               </Link>
             </div>
@@ -46,7 +46,7 @@ export default function InspireingWork20() {
                 <br className="d-none d-lg-block" /> get things done—from quick
                 turnaround.
               </p>
-              <Link className="ud-btn btn-dark bdrs60" href="/freelancer-1">
+              <Link className="ud-btn btn-dark bdrs60" href="/freelancers">
                 Get Started <i className="fal fa-arrow-right-long"></i>
               </Link>
             </div>

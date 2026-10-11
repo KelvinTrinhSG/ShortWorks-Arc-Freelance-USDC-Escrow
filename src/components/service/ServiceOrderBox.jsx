@@ -6,7 +6,7 @@ import HireAndPay from "../project/HireAndPay";
 
 const formatDate = (d) => d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
-// Order box on /service-single/{id}. A client picks how many videos and writes a brief;
+// Order box on /services/{id}. A client picks how many videos and writes a brief;
 // the order is created (a private project + the freelancer's proposal), then PayPal
 // holds the money and the order becomes a job (same flow as Hire & pay).
 // `viewer`: "owner" | "client" | "freelancer" | "guest".
@@ -61,7 +61,7 @@ export default function ServiceOrderBox({ service, viewer }) {
       <div className="bgc-white bdrs12 p30 mb30 default-box-shadow1">
         {summary}
         <p className="dark-color fw500 mb10">This is your service{s.status !== "active" && " (paused)"}.</p>
-        <Link href={`/edit-service/${s.id}`} className="ud-btn btn-thm w-100">
+        <Link href={`/services/${s.id}/edit`} className="ud-btn btn-thm w-100">
           Edit service
         </Link>
       </div>
@@ -72,7 +72,7 @@ export default function ServiceOrderBox({ service, viewer }) {
   if (viewer === "guest") {
     body = (
       <>
-        <Link href={`/login?next=${encodeURIComponent(`/service-single/${s.id}`)}`} className="ud-btn btn-thm w-100 mb10">
+        <Link href={`/login?next=${encodeURIComponent(`/services/${s.id}`)}`} className="ud-btn btn-thm w-100 mb10">
           Log in to order
         </Link>
         <Link href="/register?as=client" className="ud-btn btn-light-thm w-100">

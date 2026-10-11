@@ -107,7 +107,7 @@ export default function ServiceForm({ serviceId, initial }) {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || "Something went wrong.");
-      router.push(`/service-single/${serviceId ?? data.id}`);
+      router.push(`/services/${serviceId ?? data.id}`);
       router.refresh();
     } catch (err) {
       setNotice({ ok: false, text: err.message });
@@ -120,7 +120,7 @@ export default function ServiceForm({ serviceId, initial }) {
       <div className="ps-widget bgc-white bdrs4 p30 mb30">
         <h5 className="mb10">Services are offered by freelancers</h5>
         <p className="text mb20">Your account is a client account. Browse services and order the one you need.</p>
-        <Link href="/service-4" className="ud-btn btn-thm">
+        <Link href="/services" className="ud-btn btn-thm">
           Browse services <i className="fal fa-arrow-right-long" />
         </Link>
       </div>

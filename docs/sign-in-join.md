@@ -103,11 +103,11 @@ Dùng trong `MobileNavigation1` và `MobileNavigation2`.
 
 | Lựa chọn | Lưu vào `users.account_type` | Sau khi đăng ký chuyển tới |
 |---|---|---|
-| Hire A Freelancer | `client` | `/freelancer-1` (xem danh sách talent) |
+| Hire A Freelancer | `client` | `/freelancers` (xem danh sách talent) |
 | Become a Freelancer | `freelancer` | `/my-profile` (điền profile) |
 
 - Link `/register?as=freelancer` hoặc `/register?as=client` sẽ chọn sẵn loại tài khoản.
-- **Chỉ tài khoản `freelancer`** mới hiện trong danh sách talent và có trang `/talents/{username}`. Tài khoản `client` mở trang này sẽ nhận 404.
+- **Chỉ tài khoản `freelancer`** mới hiện trong danh sách talent và có trang `/freelancers/{username}`. Tài khoản `client` mở trang này sẽ nhận 404.
 - Các tài khoản tạo trước khi có tính năng này được tính là `freelancer` (xem `db/003_account_type.sql`).
 - Phần giao diện nằm ở `src/components/auth/RegisterSection.jsx`, form ở `RegisterForm.jsx`.
 

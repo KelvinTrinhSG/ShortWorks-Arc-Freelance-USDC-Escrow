@@ -9,7 +9,7 @@ import Image from "next/image";
 export default function Hero15() {
   const router = useRouter();
   const searchHandler = () => {
-    router.push("/project-1");
+    router.push("/projects");
   };
   return (
     <section className="hero-home15 bgc-light-yellow pt60 pb60 mx30">

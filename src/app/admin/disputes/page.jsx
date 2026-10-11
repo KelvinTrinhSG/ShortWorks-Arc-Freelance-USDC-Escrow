@@ -39,7 +39,7 @@ export default async function page() {
               <div key={d.id} className="bgc-white bdrs12 p30 mb30 default-box-shadow1" style={late ? { borderLeft: "4px solid #b91c1c" } : undefined}>
                 <div className="d-flex flex-wrap justify-content-between gap-2 mb10">
                   <h5 className="mb-0">
-                    <Link href={`/job-single/${d.id}`} className="dark-color">
+                    <Link href={`/jobs/${d.id}`} className="dark-color">
                       {d.title}
                     </Link>
                   </h5>
@@ -61,7 +61,7 @@ export default async function page() {
                 <p className="fz14 text mb-0" style={{ whiteSpace: "pre-line" }}>
                   “{d.note}”
                 </p>
-                <Link href={`/job-single/${d.id}`} className="fz14 text-thm d-inline-block mt10">
+                <Link href={`/jobs/${d.id}`} className="fz14 text-thm d-inline-block mt10">
                   See the brief, deliveries and activity ↗
                 </Link>
                 <DisputeDecision

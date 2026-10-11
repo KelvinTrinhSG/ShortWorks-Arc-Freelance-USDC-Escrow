@@ -19,7 +19,7 @@ export const SERVICE_STATUSES = [
   { value: "paused", label: "Paused" },
 ];
 
-// Filters on /service-4
+// Filters on /services
 export const MAX_PRICE_FILTERS = [
   { value: "25", label: "Up to $25 per video" },
   { value: "50", label: "Up to $50 per video" },

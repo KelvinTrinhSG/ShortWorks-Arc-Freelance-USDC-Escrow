@@ -73,7 +73,7 @@ export default function ProjectCard({ project, now, ctaLabel = "View & Send Prop
   ].filter(Boolean);
 
   const title = project.title || "Untitled project";
-  const href = project.id ? `/project-single/${project.id}` : null;
+  const href = project.id ? `/projects/${project.id}` : null;
   const status = MY_STATUS[project.myStatus];
 
   return (

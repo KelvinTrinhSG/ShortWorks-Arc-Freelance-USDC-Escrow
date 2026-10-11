@@ -55,7 +55,7 @@ export default async function ServicePage({ params }) {
       <Header20 />
       <section className="pt30 pb90">
         <div className="container">
-          <Link href="/service-4" className="fz14 text-thm">
+          <Link href="/services" className="fz14 text-thm">
             ← All services
           </Link>
 
@@ -63,7 +63,7 @@ export default async function ServicePage({ params }) {
             <h2 className="mb10">{s.title}</h2>
             <p className="text mb-0">
               By{" "}
-              <Link href={`/talents/${encodeURIComponent(f.username)}`} className="text-thm">
+              <Link href={`/freelancers/${encodeURIComponent(f.username)}`} className="text-thm">
                 {f.displayName}
               </Link>
               {s.orderCount > 0 && ` · ${s.orderCount} ${s.orderCount === 1 ? "order" : "orders"}`}
@@ -156,7 +156,7 @@ export default async function ServicePage({ params }) {
                       unoptimized
                     />
                     <div style={{ minWidth: 0 }}>
-                      <Link href={`/talents/${encodeURIComponent(f.username)}`} className="fw500 dark-color">
+                      <Link href={`/freelancers/${encodeURIComponent(f.username)}`} className="fw500 dark-color">
                         {f.displayName}
                       </Link>
                       <p className="fz14 text mb-0">
@@ -165,7 +165,7 @@ export default async function ServicePage({ params }) {
                       </p>
                     </div>
                   </div>
-                  <Link href={`/talents/${encodeURIComponent(f.username)}`} className="ud-btn btn-light-thm w-100 mt20">
+                  <Link href={`/freelancers/${encodeURIComponent(f.username)}`} className="ud-btn btn-light-thm w-100 mt20">
                     View profile & portfolio
                   </Link>
                 </div>

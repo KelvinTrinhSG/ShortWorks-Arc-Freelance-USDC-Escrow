@@ -29,7 +29,7 @@ export default function Hero13() {
 
   // search handler
   const searchHandler = () => {
-    router.push("/project-1");
+    router.push("/projects");
   };
   return (
     <section className="hero-home13 overflow-hidden">

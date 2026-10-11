@@ -57,7 +57,7 @@ export default function About14() {
                   ))}
                 </ul>
               </div>
-              <Link href="/freelancer-1" className="ud-btn btn-white">
+              <Link href="/freelancers" className="ud-btn btn-white">
                 Find Talent<i className="fal fa-arrow-right-long"></i>
               </Link>
             </div>

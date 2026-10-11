@@ -33,7 +33,7 @@ export default function Hero3() {
 
   // search handler
   const searchHandler = () => {
-    router.push("/job-1");
+    router.push("/jobs");
   };
 
   return (

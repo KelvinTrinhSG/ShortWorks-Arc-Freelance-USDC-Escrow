@@ -25,7 +25,7 @@ export default function Hero7() {
 
   // search handler
   const searchHandler = () => {
-    router.push("/freelancer-1");
+    router.push("/freelancers");
   };
 
   return (

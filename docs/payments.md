@@ -216,7 +216,7 @@ Thay đổi so với demo:
 | `PATCH /api/proposals/{id}` `{status: "accepted"}` | **Không cho** Accept trực tiếp nữa: phải đi qua checkout. Decline vẫn giữ nguyên |
 | `PATCH /api/proposals/{id}` Undo một proposal đã thuê | Void trước, thành công mới đổi về `pending` |
 | `runJobAction("approve")` trong `lib/jobs.js` | Capture **trước**, thành công mới chuyển job sang `completed`. Capture lỗi thì job vẫn `submitted`, báo lỗi kèm `debug_id` |
-| `getJob()` | Trả thêm `payment` cho khối Payment trên `/job-single/{id}` |
+| `getJob()` | Trả thêm `payment` cho khối Payment trên `/jobs/{id}` |
 
 ---
 

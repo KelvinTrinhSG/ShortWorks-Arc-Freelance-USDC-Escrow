@@ -14,14 +14,14 @@ export default function OurCta5() {
                 </h2>
                 <div className="d-sm-flex align-items-center mt30">
                   <Link
-                    href="/project-1"
+                    href="/projects"
                     className="ud-btn btn-dark bdrs60 me-sm-3"
                   >
                     Find Work
                     <i className="fal fa-arrow-right-long" />
                   </Link>
                   <Link
-                    href="/freelancer-1"
+                    href="/freelancers"
                     className="ud-btn btn-transparent double-border bdrs60"
                   >
                     Find Talent

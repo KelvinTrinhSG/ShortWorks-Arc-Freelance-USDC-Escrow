@@ -58,7 +58,7 @@ export default function ProjectOwnerActions({ project, afterDelete, size = "sm" 
   return (
     <div>
       <div className="d-flex flex-wrap gap-2">
-        <Link href={`/edit-project/${project.id}`} className={`${btn} btn-outline-dark`}>
+        <Link href={`/projects/${project.id}/edit`} className={`${btn} btn-outline-dark`}>
           Edit
         </Link>
         <button type="button" className={`${btn} btn-outline-secondary`} onClick={toggleStatus} disabled={busy}>

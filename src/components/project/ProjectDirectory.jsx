@@ -155,7 +155,7 @@ export default function ProjectDirectory({ initialQuery = "" }) {
                 </form>
                 {isClient && (
                   <div className="d-flex flex-wrap align-items-center gap-3 mt15">
-                    <Link href="/create-projects" className="ud-btn btn-thm">
+                    <Link href="/projects/new" className="ud-btn btn-thm">
                       Create Project
                       <i className="fal fa-arrow-right-long" />
                     </Link>

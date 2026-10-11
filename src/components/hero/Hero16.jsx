@@ -26,7 +26,7 @@ export default function Hero16() {
   const router = useRouter();
   // search handler
   const searchHandler = () => {
-    router.push("/freelancer-1");
+    router.push("/freelancers");
   };
   return (
     <section className="hero-home16">

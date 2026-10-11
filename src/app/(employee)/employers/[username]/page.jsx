@@ -7,10 +7,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-// `id` is the employer's username (links from /employee-1 and project pages).
+// The employer's username (links from /employers and project pages).
 async function load(params) {
-  const { id } = await params;
-  const data = await getEmployer(decodeURIComponent(id));
+  const { username } = await params;
+  const data = await getEmployer(decodeURIComponent(username));
   // Read the clock here, once per request, rather than during render.
   return data && { ...data, viewer: await getViewer(), now: Date.now() };
 }
@@ -49,7 +49,7 @@ export default async function EmployerPage({ params }) {
       <Header20 />
       <section className="pt30 pb90">
         <div className="container">
-          <Link href="/employee-1" className="fz14 text-thm">
+          <Link href="/employers" className="fz14 text-thm">
             ← All employers
           </Link>
 
@@ -111,7 +111,7 @@ export default async function EmployerPage({ params }) {
           {projects.length === 0 ? (
             <div className="bdr1 bdrs8 p30 text-center">
               <p className="text mb15">{e.displayName} has no open projects right now.</p>
-              <Link href="/project-1" className="ud-btn btn-light-thm">
+              <Link href="/projects" className="ud-btn btn-light-thm">
                 Browse all projects <i className="fal fa-arrow-right-long" />
               </Link>
             </div>

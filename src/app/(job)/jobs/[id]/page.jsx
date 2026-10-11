@@ -185,7 +185,7 @@ export default async function JobPage({ params }) {
   const diff = Math.round((job.total - budgetTotal) * 100) / 100;
   // The other side of the job.
   const other = isClient
-    ? { title: "Freelancer", name: f.displayName, avatarUrl: f.avatarUrl, href: `/talents/${encodeURIComponent(f.username)}`, sub: [f.headline, f.country].filter(Boolean).join(" · ") }
+    ? { title: "Freelancer", name: f.displayName, avatarUrl: f.avatarUrl, href: `/freelancers/${encodeURIComponent(f.username)}`, sub: [f.headline, f.country].filter(Boolean).join(" · ") }
     : {
         title: "Client",
         name: p.client.displayName,
@@ -203,7 +203,7 @@ export default async function JobPage({ params }) {
       <Header20 />
       <section className="pt30 pb90">
         <div className="container">
-          <Link href="/job-1" className="fz14 text-thm">
+          <Link href="/jobs" className="fz14 text-thm">
             ← All jobs
           </Link>
 
@@ -305,11 +305,11 @@ export default async function JobPage({ params }) {
                   </>
                 )}
                 {isOrder ? (
-                  <Link href={`/service-single/${p.serviceId}`} className="fz14 text-thm d-inline-block mt10">
+                  <Link href={`/services/${p.serviceId}`} className="fz14 text-thm d-inline-block mt10">
                     View the service ↗
                   </Link>
                 ) : (
-                  <Link href={`/project-single/${p.id}`} className="fz14 text-thm d-inline-block mt10">
+                  <Link href={`/projects/${p.id}`} className="fz14 text-thm d-inline-block mt10">
                     View the original project ↗
                   </Link>
                 )}

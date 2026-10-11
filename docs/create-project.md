@@ -1,6 +1,6 @@
-# Trang Create Project (`/create-projects`)
+# Trang Create Project (`/projects/new`)
 
-> **Trạng thái:** ✅ Frontend + backend xong. **Publish Project** lưu dự án và chuyển sang trang chi tiết `/project-single/{id}`. Xem [projects.md](./projects.md) cho danh sách dự án, trang chi tiết và proposal.
+> **Trạng thái:** ✅ Frontend + backend xong. **Publish Project** lưu dự án và chuyển sang trang chi tiết `/projects/{id}`. Xem [projects.md](./projects.md) cho danh sách dự án, trang chi tiết và proposal.
 
 Form 8 trường, đủ để freelancer đọc là hiểu ngay **scope · time · cost · quality**.
 

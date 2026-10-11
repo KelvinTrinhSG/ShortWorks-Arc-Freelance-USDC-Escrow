@@ -27,7 +27,7 @@ export default function PopularProjects() {
   }, [tab]);
 
   const projects = result?.projects ?? [];
-  const allHref = tab ? `/project-1?workType=${tab}` : "/project-1";
+  const allHref = tab ? `/projects?workType=${tab}` : "/projects";
 
   return (
     <section className="pt-0 pb100">

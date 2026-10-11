@@ -71,7 +71,7 @@ export default function PopularServices() {
           )}
           <div className="col-lg-12">
             <div className="text-center mt30">
-              <Link className="ud-btn bdrs60 btn-light-thm" href={tab ? `/service-4?workType=${tab}` : "/service-4"}>
+              <Link className="ud-btn bdrs60 btn-light-thm" href={tab ? `/services?workType=${tab}` : "/services"}>
                 All Services
                 <i className="fal fa-arrow-right-long" />
               </Link>

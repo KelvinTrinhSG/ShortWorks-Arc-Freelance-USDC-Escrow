@@ -88,13 +88,13 @@ export default function Hero10() {
                                 </p>
                                 <div className="d-sm-flex justify-content-center banner-btn">
                                   <Link
-                                    href="/project-1"
+                                    href="/projects"
                                     className="ud-btn btn-white me-0 me-sm-3"
                                   >
                                     Find Work
                                   </Link>
                                   <Link
-                                    href="/freelancer-1"
+                                    href="/freelancers"
                                     className="ud-btn btn-dark"
                                   >
                                     Find Talent

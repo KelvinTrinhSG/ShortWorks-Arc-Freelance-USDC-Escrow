@@ -9,11 +9,11 @@ Nút chuông xuất hiện ở 2 nơi, cả hai dùng chung component `src/compo
 
 | Sự kiện | Ai nhận | Nội dung | Bấm vào mở |
 |---|---|---|---|
-| Người thuê mời freelancer | Freelancer | "{Client} invited you to send a proposal for "{project}"" | `/project-single/{id}` |
-| Freelancer từ chối lời mời | Người thuê | "{Freelancer} declined your invitation to "{project}"" | `/project-single/{id}` |
-| Freelancer gửi proposal | Người thuê | "{Freelancer} sent a proposal for "{project}"" | `/project-single/{id}` |
-| Người thuê Accept | Freelancer | "{Client} accepted your proposal for "{project}"" | `/manage-jobs/{proposalId}` |
-| Người thuê Decline | Freelancer | "{Client} declined your proposal for "{project}"" | `/project-single/{id}` |
+| Người thuê mời freelancer | Freelancer | "{Client} invited you to send a proposal for "{project}"" | `/projects/{id}` |
+| Freelancer từ chối lời mời | Người thuê | "{Freelancer} declined your invitation to "{project}"" | `/projects/{id}` |
+| Freelancer gửi proposal | Người thuê | "{Freelancer} sent a proposal for "{project}"" | `/projects/{id}` |
+| Người thuê Accept | Freelancer | "{Client} accepted your proposal for "{project}"" | `/my-jobs/{proposalId}` |
+| Người thuê Decline | Freelancer | "{Client} declined your proposal for "{project}"" | `/projects/{id}` |
 
 **Khi sự kiện bị hoàn tác, thông báo cũng bị xoá**, để chuông không báo điều không còn đúng:
 

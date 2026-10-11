@@ -131,7 +131,7 @@ export default function CreateProjectForm({ projectId, initial }) {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || "Something went wrong.");
-      router.push(`/project-single/${projectId ?? data.id}`);
+      router.push(`/projects/${projectId ?? data.id}`);
       router.refresh();
     } catch (err) {
       setNotice({ ok: false, text: err.message });

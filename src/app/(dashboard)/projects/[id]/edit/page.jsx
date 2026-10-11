@@ -48,7 +48,7 @@ export default async function page({ params }) {
                   Changes show up right away for freelancers.{" "}
                   {p.proposalCount > 0 &&
                     `${p.proposalCount} ${p.proposalCount === 1 ? "freelancer has" : "freelancers have"} already sent a proposal based on the current version.`}{" "}
-                  <Link href={`/project-single/${p.id}`} className="text-thm">
+                  <Link href={`/projects/${p.id}`} className="text-thm">
                     View project
                   </Link>
                 </p>

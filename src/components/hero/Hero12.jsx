@@ -25,7 +25,7 @@ export default function Hero12() {
 
   // search handler
   const searchHandler = () => {
-    router.push("/project-1");
+    router.push("/projects");
   };
   return (
     <section className="hero-home12 p-0 overflow-hidden">

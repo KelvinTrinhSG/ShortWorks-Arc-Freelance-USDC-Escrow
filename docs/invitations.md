@@ -1,6 +1,6 @@
 # Mời freelancer gửi proposal
 
-Luồng: **chủ dự án** bấm **Find & invite freelancers** trên `/project-single/{id}` → danh sách talent ở **chế độ mời** (`/freelancer-1?invite={id}`) → bấm **Invite to project** trên từng thẻ → **freelancer** thấy lời mời ở `/invitations` và trên trang dự án → gửi proposal như bình thường.
+Luồng: **chủ dự án** bấm **Find & invite freelancers** trên `/projects/{id}` → danh sách talent ở **chế độ mời** (`/freelancers?invite={id}`) → bấm **Invite to project** trên từng thẻ → **freelancer** thấy lời mời ở `/invitations` và trên trang dự án → gửi proposal như bình thường.
 
 ## Database — `db/006_project_invitations.sql`
 
@@ -26,7 +26,7 @@ Luồng: **chủ dự án** bấm **Find & invite freelancers** trên `/project-
 
 - **Trang dự án, cột phải** (chỉ khi dự án đang Open): nút **Find & invite freelancers**. Dưới nút là dòng "n invited · m sent a proposal".
 - Khi chưa có proposal, câu "No proposals yet…" cũng có link mời.
-- **Chế độ mời** `/freelancer-1?invite={id}`:
+- **Chế độ mời** `/freelancers?invite={id}`:
   - Mở ra là thấy **toàn bộ freelancer**, không lọc sẵn. Người thuê tự dùng bộ lọc nếu cần.
   - Banner đổi thành "Invite freelancers to {tên dự án}", có link **← Back to project** và số người đã mời.
   - Mỗi thẻ có nút **Invite to project**. Mời xong nút đổi thành **Invited ✓** kèm **Cancel invite**. Người đã gửi proposal hiện **Proposal received ✓**.
@@ -35,7 +35,7 @@ Luồng: **chủ dự án** bấm **Find & invite freelancers** trên `/project-
   - Người chưa gửi proposal có nút **Cancel invite**. Nút hỏi xác nhận trước, rồi xoá lời mời cùng thông báo của freelancer (`components/project/CancelInviteButton.jsx`).
   - Người đã gửi proposal thì không huỷ được nữa.
 
-- **Trang profile `/talents/{username}`** (chỉ khi người xem là người thuê): cột phải có khung **Invite to a project**.
+- **Trang profile `/freelancers/{username}`** (chỉ khi người xem là người thuê): cột phải có khung **Invite to a project**.
   - Khung liệt kê các dự án đang mở của người thuê, mỗi dự án có nút Invite riêng (Invited ✓ / Cancel invite / Proposal received ✓ / Declined your invite).
   - Mời xong thì chuyển sang trang dự án đó.
   - Nếu người thuê vào từ chế độ mời (`?invite={id}`, do link View Profile trên thẻ gắn thêm), dự án đó được xếp lên đầu và nút cuối trang thành **Back to invite list**.
@@ -49,7 +49,7 @@ Luồng: **chủ dự án** bấm **Find & invite freelancers** trên `/project-
 
 - **Trang dự án:** nếu được mời mà chưa gửi proposal:
   - Phía trên form hiện khung "{Client} invited you to this project".
-  - Dưới nút Send Proposal có nút **Decline invitation**. Nút hỏi xác nhận trước, từ chối xong thì chuyển về `/project-1`. Khi rê chuột vào, nút chuyển sang màu đỏ (class `btn-decline` trong `globals.css`).
+  - Dưới nút Send Proposal có nút **Decline invitation**. Nút hỏi xác nhận trước, từ chối xong thì chuyển về `/projects`. Khi rê chuột vào, nút chuyển sang màu đỏ (class `btn-decline` trong `globals.css`).
   - Người không được mời thì không thấy nút này.
 - **Khi Decline** (`POST /api/projects/{id}/invitations/decline`, cột `project_invitations.declined_at`, file `db/008_invitation_declined.sql`):
   - Người thuê nhận thông báo "{Freelancer} declined your invitation to "{project}"".
@@ -72,7 +72,7 @@ Luồng: **chủ dự án** bấm **Find & invite freelancers** trên `/project-
 |---|---|
 | `src/lib/invitations.js` | Truy vấn và ghi lời mời |
 | `src/app/api/projects/[id]/invitations/route.js` | API mời và huỷ |
-| `src/app/(freelancer)/freelancer-1/page.jsx` | Đọc `?invite=` và kiểm tra quyền chủ dự án |
+| `src/app/(freelancer)/freelancers/page.jsx` | Đọc `?invite=` và kiểm tra quyền chủ dự án |
 | `src/components/talent/TalentDirectory.jsx` | Banner chế độ mời, giữ `invite` trên URL |
 | `src/components/talent/InviteButton.jsx` | Nút Invite, Invited, Cancel |
 | `src/components/talent/TalentCard.jsx` | Prop `action` (ô điều khiển phụ dưới View Profile) |
@@ -95,4 +95,4 @@ Luồng: **chủ dự án** bấm **Find & invite freelancers** trên `/project-
 
 - Email cho freelancer khi được mời. Thông báo trong web đã có ở nút chuông (xem notifications.md).
 - Lời nhắn riêng kèm lời mời.
-- Nút mời trên trang profile công khai `/talents/{username}`.
+- Nút mời trên trang profile công khai `/freelancers/{username}`.

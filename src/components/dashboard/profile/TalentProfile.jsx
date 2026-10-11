@@ -277,7 +277,7 @@ export default function TalentProfile() {
           <span className="d-flex align-items-center gap-3">
             {profile.username && (
               <Link
-                href={`/talents/${encodeURIComponent(profile.username)}`}
+                href={`/freelancers/${encodeURIComponent(profile.username)}`}
                 className="fz14 text-thm"
               >
                 View public profile ↗

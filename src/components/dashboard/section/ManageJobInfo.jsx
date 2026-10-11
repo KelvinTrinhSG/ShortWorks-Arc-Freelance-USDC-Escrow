@@ -36,7 +36,7 @@ export default function ManageJobInfo({ jobs, accountType, today }) {
         {accountType === "freelancer" && (
           <div className="col-lg-3">
             <div className="text-lg-end">
-              <Link href="/project-1" className="ud-btn btn-dark default-box-shadow2">
+              <Link href="/projects" className="ud-btn btn-dark default-box-shadow2">
                 Find more work
                 <i className="fal fa-arrow-right-long" />
               </Link>
@@ -52,7 +52,7 @@ export default function ManageJobInfo({ jobs, accountType, today }) {
             Your account is a client account. Follow the freelancers you hired
             from your projects.
           </p>
-          <Link href="/manage-projects" className="ud-btn btn-thm">
+          <Link href="/my-projects" className="ud-btn btn-thm">
             Manage Projects <i className="fal fa-arrow-right-long" />
           </Link>
         </div>
@@ -84,7 +84,7 @@ export default function ManageJobInfo({ jobs, accountType, today }) {
                       : "No completed jobs yet."}
                 </p>
                 {tab === "active" && (
-                  <Link href="/project-1" className="ud-btn btn-thm">
+                  <Link href="/projects" className="ud-btn btn-thm">
                     Browse projects <i className="fal fa-arrow-right-long" />
                   </Link>
                 )}
@@ -106,7 +106,7 @@ export default function ManageJobInfo({ jobs, accountType, today }) {
                       return (
                         <tr key={j.id}>
                           <th scope="row">
-                            <Link href={`/job-single/${j.id}`} className="dark-color fw500">
+                            <Link href={`/jobs/${j.id}`} className="dark-color fw500">
                               {j.title}
                             </Link>
                             <p className="fz14 text mb-0">
@@ -128,7 +128,7 @@ export default function ManageJobInfo({ jobs, accountType, today }) {
                             )}
                           </td>
                           <td className="vam">
-                            <Link href={`/job-single/${j.id}`} className="btn btn-sm btn-outline-dark">
+                            <Link href={`/jobs/${j.id}`} className="btn btn-sm btn-outline-dark">
                               Open
                             </Link>
                           </td>

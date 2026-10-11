@@ -10,7 +10,7 @@ export default function BrowserCategoryCard3({ data }) {
         <div className="details ml40">
           <p className="mb-0 text">{data.skill} skills</p>
           <h5 className="title">
-            <Link href="/project-1">{data.title}</Link>
+            <Link href="/projects">{data.title}</Link>
           </h5>
         </div>
       </div>
