@@ -48,6 +48,11 @@ export default function TalentCard({ talent, action, inviteId }) {
       </div>
       <div className="details d-flex flex-column flex-grow-1">
         <h5 className="title mb-1">{talent.displayName}</h5>
+        {talent.completedJobs > 0 && (
+          <p className="fz13 dark-color fw500 mb5">
+            ✓ {talent.completedJobs} {talent.completedJobs === 1 ? "job" : "jobs"} completed
+          </p>
+        )}
         {talent.roles.length > 0 && (
           <p className="mb-0 text-thm fz14">
             {talent.roles.map((r) => labelOf(ROLES, r)).join(" · ")}

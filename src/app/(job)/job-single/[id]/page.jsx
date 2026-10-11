@@ -171,6 +171,8 @@ export default async function JobPage({ params }) {
   if (!data) notFound();
   const { role, project: p, job, freelancer: f, events, payment, today } = data;
   const isClient = role === "client";
+  // Ordered from a service page rather than hired from a proposal (docs/services.md).
+  const isOrder = Boolean(p.serviceId);
   const due = dueLabel(job.deliveryDate, today);
   const stage = jobStage(job.status, job.deliveryDate, today);
   const deliveries = events.filter((e) => e.type === "submitted");
@@ -212,7 +214,13 @@ export default async function JobPage({ params }) {
               <JobStatusBadge status={job.status} deliveryDate={job.deliveryDate} today={today} />
             </div>
             <p className="text mb-0">
-              {isClient ? `You hired ${f.displayName}` : `Hired by ${p.client.displayName}`}
+              {isOrder
+                ? isClient
+                  ? `You ordered from ${f.displayName}`
+                  : `Ordered by ${p.client.displayName}`
+                : isClient
+                  ? `You hired ${f.displayName}`
+                  : `Hired by ${p.client.displayName}`}
               {job.acceptedAt && ` on ${formatDay(job.acceptedAt)}`}
               {(stage === "in_progress" || stage === "overdue") && (
                 <>
@@ -296,22 +304,28 @@ export default async function JobPage({ params }) {
                     </div>
                   </>
                 )}
-                <Link href={`/project-single/${p.id}`} className="fz14 text-thm d-inline-block mt10">
-                  View the original project ↗
-                </Link>
+                {isOrder ? (
+                  <Link href={`/service-single/${p.serviceId}`} className="fz14 text-thm d-inline-block mt10">
+                    View the service ↗
+                  </Link>
+                ) : (
+                  <Link href={`/project-single/${p.id}`} className="fz14 text-thm d-inline-block mt10">
+                    View the original project ↗
+                  </Link>
+                )}
               </Section>
 
               {/* Time: the dates that matter */}
               <Section icon="flaticon-30-days" title="Time">
-                <Row label="Proposal sent">{formatDay(job.proposedAt)}</Row>
-                <Row label="Hired">{job.acceptedAt ? formatDay(job.acceptedAt) : "—"}</Row>
+                {!isOrder && <Row label="Proposal sent">{formatDay(job.proposedAt)}</Row>}
+                <Row label={isOrder ? "Ordered & paid" : "Hired"}>{job.acceptedAt ? formatDay(job.acceptedAt) : "—"}</Row>
                 <Row label="Delivery date (agreed)">
                   {formatDate(job.deliveryDate)}
                   {(stage === "in_progress" || stage === "overdue") && (
                     <span className={`fz14 ms-2 ${due.className}`}>({due.text})</span>
                   )}
                 </Row>
-                <Row label="Project deadline">{formatDate(p.deadline)}</Row>
+                {!isOrder && <Row label="Project deadline">{formatDate(p.deadline)}</Row>}
                 <Row label="Submitted">
                   {deliveries.length ? formatDay(deliveries.at(-1).createdAt) : "Not yet"}
                 </Row>
@@ -325,6 +339,7 @@ export default async function JobPage({ params }) {
                 <Row label="Total">
                   <span className="fz17">${job.total}</span>
                 </Row>
+                {!isOrder && (
                 <Row label="Client's budget">
                   ${p.budgetPerVideo} / video (total ${budgetTotal})
                   {diff !== 0 && (
@@ -333,6 +348,7 @@ export default async function JobPage({ params }) {
                     </span>
                   )}
                 </Row>
+                )}
               </Section>
 
               {/* Quality: what was delivered and how the review went */}
@@ -370,7 +386,9 @@ export default async function JobPage({ params }) {
                       ))}
                   </>
                 )}
-                <h6 className="mt20 mb10">{isClient ? "The freelancer's proposal" : "Your proposal"}</h6>
+                <h6 className="mt20 mb10">
+                  {isOrder ? "Order" : isClient ? "The freelancer's proposal" : "Your proposal"}
+                </h6>
                 <p className="text fz14 mb-0" style={{ whiteSpace: "pre-line" }}>
                   {job.coverLetter}
                 </p>
@@ -384,14 +402,17 @@ export default async function JobPage({ params }) {
               {/* Everything that happened, oldest first */}
               <Section icon="flaticon-notification-1" title="Activity">
                 <ul className="list-unstyled mb-0">
-                  <li className="py-2 bdrb1 fz14">
-                    <span className="text">{formatDay(job.proposedAt)}</span> ·{" "}
-                    {isClient ? f.displayName : "You"} sent the proposal
-                  </li>
+                  {!isOrder && (
+                    <li className="py-2 bdrb1 fz14">
+                      <span className="text">{formatDay(job.proposedAt)}</span> ·{" "}
+                      {isClient ? f.displayName : "You"} sent the proposal
+                    </li>
+                  )}
                   {job.acceptedAt && (
                     <li className="py-2 bdrb1 fz14">
                       <span className="text">{formatDay(job.acceptedAt)}</span> ·{" "}
-                      {isClient ? "You" : p.client.displayName} hired {isClient ? f.displayName : "you"}
+                      {isClient ? "You" : p.client.displayName}{" "}
+                      {isOrder ? "ordered the service and paid with PayPal" : `hired ${isClient ? f.displayName : "you"}`}
                     </li>
                   )}
                   {events.map((e) => (

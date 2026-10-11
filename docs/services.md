@@ -62,5 +62,5 @@ Client chọn số video + viết brief ──POST /api/services/{id}/order─�
 
 ## Chưa làm
 
-- Các khối "Popular services" ở trang chủ và các trang mẫu `/service-1…7`, `/service-single-v2/v3` vẫn dùng dữ liệu mẫu.
+- Trang chủ `/` đã có **Popular Services** thật (`components/service/PopularServices.jsx`): 8 service, sắp xếp `popular` (nhiều đơn đã trả tiền nhất, rồi mới nhất), tab All · Video editing · UGC filming · Motion graphics, nút All Services → `/service-4` (giữ tab đang chọn). Các trang home mẫu (`/home-2`, `/home-9`, `/home-16`…), `/service-1…7`, `/service-single-v2/v3` vẫn dùng dữ liệu mẫu.
 - Đánh giá (rating) cho service.

@@ -168,6 +168,9 @@ const toService = (r) => ({
 
 export const SERVICE_SORTS = {
   newest: "s.created_at DESC",
+  // Most paid orders first (home page "Popular Services").
+  popular: `(SELECT COUNT(*) FROM projects o JOIN proposals op ON op.project_id = o.id
+             WHERE o.service_id = s.id AND op.status = 'accepted') DESC, s.created_at DESC`,
   "price-asc": "s.price_per_video ASC, s.created_at DESC",
   "price-desc": "s.price_per_video DESC, s.created_at DESC",
   fastest: "s.delivery_days ASC, s.created_at DESC",

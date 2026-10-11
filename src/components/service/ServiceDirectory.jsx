@@ -3,7 +3,7 @@ import { VIDEO_LENGTHS, WORK_TYPES } from "@/data/projectOptions";
 import { DELIVERY_FILTERS, MAX_PRICE_FILTERS } from "@/data/serviceOptions";
 import { PLATFORMS } from "@/data/talentOptions";
 import { useCurrentUser } from "@/store/authStore";
-import Image from "next/image";
+import BannerDecor from "../breadcumb/BannerDecor";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { FilterCheck, FilterDropdown } from "../listing/FilterDropdown";
@@ -101,9 +101,7 @@ export default function ServiceDirectory({ initialQuery = "" }) {
       {/* Banner + search */}
       <section className="breadcumb-section pt-0">
         <div className="cta-service-v1 cta-banner mx-auto maxw1700 pt120 pb120 bdrs16 position-relative overflow-hidden d-flex align-items-center mx20-lg px30-lg">
-          <Image height={226} width={198} className="left-top-img wow zoomIn" src="/images/vector-img/left-top.png" alt="left-top" />
-          <Image height={181} width={255} className="right-bottom-img wow zoomIn" src="/images/vector-img/right-bottom.png" alt="right-bottom" />
-          <Image height={300} width={532} className="service-v1-vector bounce-y d-none d-xl-block" src="/images/vector-img/vector-service-v1.png" alt="vector-service" />
+          <BannerDecor />
           <div className="container">
             <div className="row wow fadeInUp">
               <div className="col-xl-7">

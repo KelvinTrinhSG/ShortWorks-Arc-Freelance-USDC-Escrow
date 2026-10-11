@@ -6,6 +6,7 @@ import {
   ROLES,
   TURNAROUND,
 } from "@/data/talentOptions";
+import BannerDecor from "../breadcumb/BannerDecor";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { FilterCheck, FilterDropdown } from "../listing/FilterDropdown";
@@ -159,8 +160,9 @@ export default function TalentDirectory({ initialQuery = "", inviteProject = nul
       {/* Banner + search */}
       <section className="breadcumb-section pt-0">
         <div className="cta-service-v1 cta-banner mx-auto maxw1700 pt80 pb80 bdrs16 position-relative overflow-hidden d-flex align-items-center mx20-lg px30-lg">
+          <BannerDecor />
           <div className="container">
-            <div className="row">
+            <div className="row wow fadeInUp">
               <div className="col-xl-7">
                 {inviteProject ? (
                   <>

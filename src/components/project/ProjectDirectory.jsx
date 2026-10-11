@@ -2,6 +2,7 @@
 import { MY_STATUSES, VIDEO_LENGTHS, WORK_TYPES } from "@/data/projectOptions";
 import { PLATFORMS } from "@/data/talentOptions";
 import { useCurrentUser } from "@/store/authStore";
+import BannerDecor from "../breadcumb/BannerDecor";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { FilterCheck, FilterDropdown } from "../listing/FilterDropdown";
@@ -112,8 +113,9 @@ export default function ProjectDirectory({ initialQuery = "" }) {
         <div
           style={isClient ? { height: "auto" } : undefined}
           className={`cta-service-v1 cta-banner mx-auto maxw1700 ${isClient ? "pt20 pb20" : "pt80 pb80"} bdrs16 position-relative overflow-hidden d-flex align-items-center mx20-lg px30-lg`}>
+          <BannerDecor />
           <div className="container">
-            <div className="row">
+            <div className="row wow fadeInUp">
               <div className="col-xl-7">
                 <h2>Find short-form video projects</h2>
                 <p className="text mb15">

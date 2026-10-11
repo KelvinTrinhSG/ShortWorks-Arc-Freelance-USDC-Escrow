@@ -46,3 +46,41 @@ export const footer = [
   "/add-services",
   "/create-projects",
 ];
+
+// ---- ShortWorks footer (components/footer/SiteFooter.jsx) ----
+// The template lists above stay for the demo home pages' footers.
+
+export const footerLegal = [
+  { name: "Terms of Service", path: "/terms" },
+  { name: "Privacy Policy", path: "/privacy" },
+];
+
+export const footerColumns = [
+  {
+    title: "ShortWorks",
+    links: [
+      { name: "How it works", path: "/terms#payments" },
+      { name: "Disputes", path: "/terms#disputes" },
+    ],
+  },
+  {
+    title: "Explore",
+    links: [
+      { name: "Video editing", path: "/service-4?workType=editing" },
+      { name: "UGC filming", path: "/service-4?workType=ugc" },
+      { name: "Motion graphics", path: "/service-4?workType=motion" },
+      { name: "Browse Services", path: "/service-4" },
+      { name: "Find Projects", path: "/project-1" },
+      { name: "Find Freelancers", path: "/freelancer-1" },
+    ],
+  },
+  {
+    title: "Support",
+    links: [
+      { name: "Trust & Safety", path: "/terms#payments" },
+      { name: "Selling on ShortWorks", path: "/add-services" },
+      { name: "Buying on ShortWorks", path: "/create-projects" },
+      { name: "Contact", path: "/contact" },
+    ],
+  },
+];

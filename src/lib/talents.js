@@ -35,13 +35,17 @@ export const SORTS = {
   "price-desc": "u.starting_price DESC NULLS LAST, u.id",
   fastest: "u.turnaround_hours ASC NULLS LAST, u.starting_price ASC NULLS LAST",
   newest: "u.created_at DESC",
+  // Most jobs completed on ShortWorks (home page "Top Freelancers"); there are no ratings yet.
+  top: `completed_jobs DESC, ${COMPLETE} DESC, (u.availability = 'available') DESC, u.updated_at DESC`,
 };
 
 const PUBLIC_COLUMNS = `
   u.id, u.username, u.display_name, u.headline, u.bio, u.roles, u.country,
   u.timezone, u.languages, u.availability, u.platforms, u.niches, u.tools,
   u.starting_price, u.turnaround_hours, u.free_revisions, u.avatar_updated_at,
-  u.created_at, u.account_type
+  u.created_at, u.account_type,
+  (SELECT COUNT(*) FROM proposals pr
+   WHERE pr.freelancer_id = u.id AND pr.status = 'accepted' AND pr.job_status = 'completed')::int AS completed_jobs
 `;
 
 // Only fields that are safe to show to anyone. No email, phone or PayPal.
@@ -63,6 +67,7 @@ const toPublicTalent = (row) => ({
   turnaroundHours: row.turnaround_hours,
   freeRevisions: row.free_revisions,
   memberSince: row.created_at,
+  completedJobs: row.completed_jobs ?? 0,
 });
 
 // Keep only values we know, so the query never sees arbitrary input.

@@ -1,13 +1,11 @@
 import Footer2 from "@/components/footer/Footer2";
 import Header2 from "@/components/header/Header2";
 import Hero2 from "@/components/hero/Hero2";
-import BrowserCategory2 from "@/components/section/BrowserCategory2";
-import CtaBanner2 from "@/components/section/CtaBanner2";
-import HighestRated1 from "@/components/section/HighestRated1";
-import LearnFreeio1 from "@/components/section/LearnFreeio1";
+import PopularProjects from "@/components/project/PopularProjects";
+import TopFreelancers from "@/components/talent/TopFreelancers";
+import WhyShortWorks from "@/components/section/WhyShortWorks";
 import NeedSomething2 from "@/components/section/NeedSomething2";
-import OurPartner1 from "@/components/section/OurPartner1";
-import PopularService1 from "@/components/section/PopularService1";
+import PopularServices from "@/components/service/PopularServices";
 
 export const metadata = {
     title: "ShortWorks - Freelance Marketplace",
@@ -20,12 +18,10 @@ export default function page() {
                 <Header2 />
                 <Hero2 />
                 <NeedSomething2 />
-                <PopularService1 />
-                <CtaBanner2 />
-                <OurPartner1 />
-                <BrowserCategory2 />
-                <HighestRated1 />
-                <LearnFreeio1 />
+                <PopularServices />
+                <PopularProjects />
+                <TopFreelancers />
+                <WhyShortWorks />
                 <Footer2 />
             </div>
         </>

@@ -118,8 +118,12 @@ const MESSAGES = {
     text: `sent a proposal for "${r.title}"`,
     href: `/project-single/${r.project_id}`,
   }),
+  // A hire. When the project came from a service order (projects.service_id), the
+  // client ordered the service: there was no proposal from the freelancer's side.
   proposal_accepted: (r) => ({
-    text: `accepted your proposal for "${r.title}"`,
+    text: r.service_id
+      ? `ordered ${r.video_count} ${r.video_count === 1 ? "video" : "videos"} from your service "${r.title}" and paid with PayPal. Time to start!`
+      : `accepted your proposal for "${r.title}"`,
     href: jobHref(r),
   }),
   proposal_declined: (r) => ({
@@ -133,7 +137,7 @@ export async function getNotifications(userId) {
   const [{ rows }, { rows: count }] = await Promise.all([
     pool.query(
       `SELECT n.id, n.type, n.project_id, n.proposal_id, n.created_at, n.read_at,
-              p.title, a.id AS actor_id, a.display_name, a.avatar_updated_at
+              p.title, p.service_id, p.video_count, a.id AS actor_id, a.display_name, a.avatar_updated_at
        FROM notifications n
        JOIN projects p ON p.id = n.project_id
        LEFT JOIN users a ON a.id = n.actor_id

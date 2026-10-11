@@ -121,7 +121,7 @@ export async function createProposal(projectId, freelancerId, d) {
 // ---- Reads ------------------------------------------------------------------
 
 const PROJECT_COLUMNS = `
-  p.id, p.title, p.platforms, p.work_type, p.video_count, p.video_length, p.brief,
+  p.id, p.title, p.platforms, p.work_type, p.video_count, p.video_length, p.brief, p.service_id,
   to_char(p.deadline, 'YYYY-MM-DD') AS deadline, p.budget_per_video, p.status, p.created_at,
   p.client_id, c.display_name AS client_name, c.username AS client_username,
   c.country AS client_country, c.avatar_updated_at, c.created_at AS client_since,
@@ -141,6 +141,8 @@ const toProject = (row) => ({
   deadline: row.deadline,
   budgetPerVideo: Number(row.budget_per_video),
   status: row.status,
+  // Set when the project is a service order (lib/services.js), not a posted project.
+  serviceId: row.service_id ?? null,
   // Hired = the client accepted a proposal. The project then leaves the public
   // list and stops taking proposals (until the client undoes the acceptance).
   hired: row.accepted_count > 0,
@@ -162,6 +164,8 @@ export const SORTS = {
   "budget-desc": "p.budget_per_video DESC, p.created_at DESC",
   "total-desc": "(p.budget_per_video * p.video_count) DESC, p.created_at DESC",
   "deadline-asc": "p.deadline ASC, p.created_at DESC",
+  // Most proposals first (home page "Popular Projects").
+  popular: "(SELECT COUNT(*) FROM proposals pr WHERE pr.project_id = p.id) DESC, p.created_at DESC",
 };
 
 const known = (options, list) => list.filter((v) => values(options).includes(v));
