@@ -1,23 +1,21 @@
-import { employerBanner } from "@/data/categoryBanner";
-import Breadcumb9 from "@/components/breadcumb/Breadcumb9";
+import EmployerDirectory from "@/components/employer/EmployerDirectory";
 import Footer from "@/components/footer/Footer";
 import Header20 from "@/components/header/Header20";
 
-import Listing11 from "@/components/section/Listing11";
-import TabSection1 from "@/components/section/TabSection1";
-
 export const metadata = {
-    title: "ShortWorks - Freelance Marketplace | Employee 1",
+  title: "ShortWorks - Find Employers",
 };
 
-export default function page() {
-    return (
-        <>
-            <Header20 />
-            <TabSection1 />
-            <Breadcumb9 content={employerBanner} />
-            <Listing11 />
-            <Footer />
-        </>
-    );
+export default async function page({ searchParams }) {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(await searchParams)) {
+    if (typeof value === "string") params.set(key, value);
+  }
+  return (
+    <>
+      <Header20 />
+      <EmployerDirectory initialQuery={params.toString()} />
+      <Footer />
+    </>
+  );
 }

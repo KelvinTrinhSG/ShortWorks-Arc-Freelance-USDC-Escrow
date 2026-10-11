@@ -153,6 +153,7 @@ const toProject = (row) => ({
   referenceCount: row.reference_count,
   client: {
     displayName: row.client_name,
+    username: row.client_username,
     avatarUrl: avatarUrlOf({ id: row.client_id, avatar_updated_at: row.avatar_updated_at }),
     country: row.client_country,
     memberSince: row.client_since,
@@ -305,6 +306,20 @@ export async function getProject(id, viewer) {
   }
 
   return { project, isOwner, proposals, myProposal };
+}
+
+// A client's open projects for their employer page (/employee-single/{username}),
+// newest first. Service orders are private and never listed.
+export async function getClientOpenProjects(clientId) {
+  const { rows } = await pool.query(
+    `SELECT ${PROJECT_COLUMNS}
+     FROM projects p JOIN users c ON c.id = p.client_id
+     WHERE p.client_id = $1 AND p.service_id IS NULL AND p.status = 'open' AND p.deadline >= CURRENT_DATE
+       AND NOT EXISTS (SELECT 1 FROM proposals pr WHERE pr.project_id = p.id AND pr.status = 'accepted')
+     ORDER BY p.created_at DESC`,
+    [clientId],
+  );
+  return rows.map(toProject);
 }
 
 // ---- Owner & proposal management -------------------------------------------

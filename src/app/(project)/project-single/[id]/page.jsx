@@ -342,7 +342,12 @@ export default async function ProjectPage({ params }) {
                     unoptimized
                   />
                   <div>
-                    <p className="fw500 dark-color mb-0">{p.client.displayName}</p>
+                    <Link
+                      href={`/employee-single/${encodeURIComponent(p.client.username)}`}
+                      className="fw500 dark-color d-block"
+                    >
+                      {p.client.displayName}
+                    </Link>
                     <p className="fz14 text mb-0">
                       {[
                         p.client.country && labelOf(COUNTRIES, p.client.country),
