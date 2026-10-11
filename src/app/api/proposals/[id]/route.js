@@ -5,6 +5,7 @@ import {
   updateProposal,
   validateProposal,
 } from "@/lib/projects";
+import { canUndoAcceptance } from "@/lib/jobs";
 import { getViewer } from "@/lib/viewer";
 
 const error = (message, status) => Response.json({ error: message }, { status });
@@ -29,6 +30,10 @@ export async function PATCH(request, { params }) {
   if (viewer.id === proposal.project.clientId) {
     if (!["accepted", "declined", "pending"].includes(body.status)) {
       return error("Invalid status.", 400);
+    }
+    // Once work was handed in (or disputed), the job can't be undone from here.
+    if (proposal.status === "accepted" && body.status !== "accepted" && !(await canUndoAcceptance(proposal.id))) {
+      return error("Work on this job has already started, so the hire can't be undone.", 409);
     }
     await setProposalStatus(proposal.id, body.status);
     return Response.json({ ok: true, status: body.status });

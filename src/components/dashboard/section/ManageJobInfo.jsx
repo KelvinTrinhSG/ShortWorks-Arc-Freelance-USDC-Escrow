@@ -4,13 +4,16 @@ import { useState } from "react";
 import { VIDEO_LENGTHS } from "@/data/projectOptions";
 import { labelOf } from "@/data/talentOptions";
 import DashboardNavigation from "../header/DashboardNavigation";
+import { JobStatusBadge, jobStage } from "../../project/JobCard";
 import { dueLabel, formatDate } from "../../project/ProjectCard";
 
 // Freelancer's jobs = accepted proposals. `jobs` and `today` come from the server page.
 export default function ManageJobInfo({ jobs, accountType, today }) {
+  const stage = (j) => jobStage(j.jobStatus, j.deliveryDate, today);
   const tabs = [
-    { key: "active", label: "Active", test: (j) => j.deliveryDate >= today },
-    { key: "overdue", label: "Overdue", test: (j) => j.deliveryDate < today },
+    { key: "active", label: "Active", test: (j) => ["in_progress", "submitted", "disputed"].includes(stage(j)) },
+    { key: "overdue", label: "Overdue", test: (j) => stage(j) === "overdue" },
+    { key: "completed", label: "Completed", test: (j) => stage(j) === "completed" },
   ];
   const [tab, setTab] = useState("active");
   const visible = jobs.filter(tabs.find((t) => t.key === tab).test);
@@ -76,7 +79,9 @@ export default function ManageJobInfo({ jobs, accountType, today }) {
                 <p className="text mb20">
                   {tab === "active"
                     ? "No active jobs yet. When a client accepts your proposal, the job shows up here."
-                    : "Nothing overdue."}
+                    : tab === "overdue"
+                      ? "Nothing overdue."
+                      : "No completed jobs yet."}
                 </p>
                 {tab === "active" && (
                   <Link href="/project-1" className="ud-btn btn-thm">
@@ -101,7 +106,7 @@ export default function ManageJobInfo({ jobs, accountType, today }) {
                       return (
                         <tr key={j.id}>
                           <th scope="row">
-                            <Link href={`/manage-jobs/${j.id}`} className="dark-color fw500">
+                            <Link href={`/job-single/${j.id}`} className="dark-color fw500">
                               {j.title}
                             </Link>
                             <p className="fz14 text mb-0">
@@ -114,10 +119,16 @@ export default function ManageJobInfo({ jobs, accountType, today }) {
                           </td>
                           <td className="vam">
                             {formatDate(j.deliveryDate)}
-                            <p className={`fz14 mb-0 ${due.className}`}>{due.text}</p>
+                            {j.jobStatus === "in_progress" ? (
+                              <p className={`fz14 mb-0 ${due.className}`}>{due.text}</p>
+                            ) : (
+                              <div className="mt5">
+                                <JobStatusBadge status={j.jobStatus} deliveryDate={j.deliveryDate} today={today} />
+                              </div>
+                            )}
                           </td>
                           <td className="vam">
-                            <Link href={`/manage-jobs/${j.id}`} className="btn btn-sm btn-outline-dark">
+                            <Link href={`/job-single/${j.id}`} className="btn btn-sm btn-outline-dark">
                               Open
                             </Link>
                           </td>

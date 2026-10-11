@@ -9,6 +9,11 @@ const menus = [
     name: "Projects",
     path: "/project-1",
   },
+  {
+    id: 5,
+    name: "Jobs",
+    path: "/job-1",
+  },
   // `showFor`: only shown to logged-in accounts of that type.
   {
     id: 3,

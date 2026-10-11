@@ -1,47 +1,95 @@
-# Job của freelancer (`/manage-jobs`)
+# Job (`/job-1`, `/job-single/{id}`, `/manage-jobs`)
 
-**Job** = proposal đã được người thuê **chấp nhận**. Id của job chính là id của proposal.
+**Job** = proposal đã được người thuê **chấp nhận**. Id của job chính là id của proposal. Dự án được Accept thì rời trang Projects (`/project-1`) và được quản lý dưới dạng job.
 
-## Đã làm
+## Trạng thái job
 
-### Danh sách `/manage-jobs`
+```
+Hired → IN PROGRESS ──Submit──▶ SUBMITTED ──Approve & Complete──▶ COMPLETED
+             ▲                     │
+             └── Request changes ──┘
+  IN PROGRESS / SUBMITTED ──Open dispute──▶ DISPUTED ──Withdraw──▶ quay lại trạng thái trước đó
+```
 
-- 2 tab: **Active** (chưa tới ngày giao) và **Overdue** (đã quá ngày giao mà freelancer cam kết trong proposal).
-- Mỗi dòng gồm: tên dự án (bấm vào mở trang job), người thuê, số video × độ dài, **số tiền nhận** (tổng và /video), ngày giao kèm trạng thái "6 days left" / "Due tomorrow" / "Due today" / "2 days overdue", và nút **Open**.
-- Sắp xếp theo ngày giao gần nhất lên trước.
-- Tài khoản người thuê mở trang này thì thấy thông báo kèm link sang Manage Projects.
+| Trạng thái | Ý nghĩa | Ai làm gì |
+|---|---|---|
+| **In progress** | Freelancer đang làm. Quá ngày giao thì hiện nhãn **Overdue** (không lưu riêng). | Freelancer: **Submit** link video (1 link/video, tối đa bằng số video) + ghi chú |
+| **Submitted** | Đã giao, chờ người thuê duyệt | Người thuê: **Approve & Complete**, hoặc **Request changes** (bắt buộc ghi rõ cần sửa gì) → quay lại In progress |
+| **Completed** | Người thuê đã duyệt. Số tiền thành "Due to the freelancer". | — |
+| **Disputed** | Một bên mở khiếu nại (chọn lý do + mô tả). Job tạm dừng. | Chỉ bên mở khiếu nại được **Withdraw**; job quay lại trạng thái trước khi khiếu nại |
 
-### Trang job `/manage-jobs/{id}`
+- Mỗi bước gửi thông báo (chuông) cho bên còn lại, dẫn tới `/job-single/{id}`.
+- Sau khi freelancer đã giao lần đầu (hoặc có khiếu nại), người thuê **không Undo** việc Accept được nữa (API trả 409).
+- Hai người bấm cùng lúc: điều kiện `job_status` trong câu `UPDATE` đảm bảo chỉ một bước được ghi, bên kia nhận 409.
 
-Chỉ freelancer sở hữu job mới mở được. Người khác, người thuê, hoặc khi người thuê đã bấm Undo, đều nhận 404.
+## Trang Jobs `/job-1` (menu **Jobs**)
+
+| Người xem | Thấy gì |
+|---|---|
+| Freelancer | Job mình được thuê |
+| Người thuê | Các freelancer mình đã thuê (dự án thuê 2 người thì có 2 job) |
+| Khách | Nút **Log in** (quay lại `/job-1` sau khi đăng nhập) |
+
+- Mỗi thẻ có nhãn trạng thái và nút **Manage Job** → `/job-single/{id}`.
+- Banner cùng kiểu với trang Services, ô tìm kiếm theo tiêu đề hoặc brief.
+- Bộ lọc: **Status** (In progress · Overdue · Submitted · Completed · Disputed) · **Platform** · **Type of work** · **Video length** · **Price** (từ $25/$50/$100/$200 mỗi video, theo giá đã chốt). Có nút Clear all.
+- Sắp xếp:
+  - **Priority** (mặc định): Disputed → Overdue → Submitted → In progress → Completed. Trong mỗi nhóm, ngày giao gần hơn nằm trên; nhóm Completed thì job vừa hoàn thành nằm trên.
+  - Mới thuê gần đây · Tổng tiền cao nhất. Với mọi kiểu sắp xếp, job **Completed luôn nằm dưới cùng**.
+- Phân trang 10 job/trang, bộ lọc giữ trên URL.
+- API: `GET /api/jobs` (khách nhận 401).
+
+## Trang job `/job-single/{id}`
+
+Chỉ **người thuê** và **freelancer được thuê** mở được; người khác nhận 404, khách bị `proxy.js` chuyển sang trang login. `/manage-jobs/{id}` cũ chuyển hướng sang đây.
 
 | Khối | Nội dung |
 |---|---|
-| Đầu trang | Tên dự án, người thuê, nhãn **In progress**, số ngày còn lại hoặc số ngày đã trễ |
-| What to deliver | Số video × độ dài, loại công việc, nền tảng, định dạng 9:16, Brief, video tham khảo |
-| Your proposal | Thư giới thiệu, video mẫu đã gửi, link sang trang dự án |
-| Progress | Dòng thời gian: Proposal sent ✓ → Proposal accepted ✓ → **In progress** → Delivered → Completed. Hai bước cuối thuộc luồng đề xuất bên dưới. |
-| Agreed terms | Số tiền nhận, giá/video, ngày giao, hạn chót dự án, ngân sách gốc của người thuê |
-| Client | Avatar, tên, quốc gia, ngày tham gia |
+| Đầu trang | Tên dự án, nhãn trạng thái, ai thuê ai và từ ngày nào, số ngày còn lại / đã trễ |
+| Next step | Nút hành động theo vai trò và trạng thái (bảng trên), link **Open a dispute** |
+| **Scope** | Số video × độ dài, loại công việc, nền tảng, 9:16, Brief, video tham khảo, link về dự án gốc |
+| **Time** | Ngày gửi proposal, ngày thuê, ngày giao đã chốt, hạn chót dự án, ngày giao bài, ngày hoàn thành |
+| **Cost** | Giá đã chốt × số video = tổng; so với ngân sách gốc của người thuê |
+| **Quality** | Số lần giao, số lần yêu cầu sửa, từng lần giao (link + ghi chú, mới nhất trên cùng), proposal và video mẫu |
+| Activity | Mọi sự kiện theo thời gian, kèm ghi chú |
+| Cột phải | **Status** (Hired → In progress → Submitted → Completed), **Payment** (số tiền, trạng thái thanh toán), thẻ của bên còn lại |
 
-Trên trang dự án, proposal đã được chấp nhận có thêm nút **Open your job →**.
+**Thanh toán:** chưa nối PayPal. Trang chỉ hiện số tiền và trạng thái (Due when the client approves → Due to the freelancer, hoặc On hold khi có khiếu nại), kèm dòng "Payment through PayPal is coming soon."
 
-### Database — `db/005_proposal_accepted_at.sql`
+**Khiếu nại:** chưa có trang admin để xử lý. Khiếu nại chỉ dừng job lại; người mở có thể rút lại.
 
-Thêm cột `proposals.accepted_at`: ghi lại thời điểm người thuê bấm Accept, và xoá về `NULL` khi người thuê Undo hoặc Decline. Cột này dùng cho mốc "Proposal accepted" trên dòng thời gian.
+## Danh sách `/manage-jobs` (dashboard freelancer)
 
-### File
+- 3 tab: **Active** (In progress chưa trễ, Submitted, Disputed), **Overdue**, **Completed**. Bấm vào job mở `/job-single/{id}`.
+
+## Database
+
+- `db/005_proposal_accepted_at.sql`: `proposals.accepted_at`, thời điểm Accept (xoá về `NULL` khi Undo hoặc Decline).
+- `db/009_job_workflow.sql`: `proposals.job_status` (mặc định `in_progress`), `proposals.status_before_dispute`, `proposals.completed_at`, và bảng `job_events` (`proposal_id`, `actor_id`, `type`, `note`, `links[]`, `reason`, `created_at`), là nguồn cho phần Quality và Activity.
+
+## API
+
+| Method | Endpoint | Việc làm |
+|---|---|---|
+| `GET` | `/api/jobs` | Danh sách job của người đang đăng nhập, kèm bộ lọc |
+| `POST` | `/api/jobs/{id}` | `{ action: "submit", links, note }` · `{ action: "revision", note }` · `{ action: "approve" }` · `{ action: "dispute", reason, note }` · `{ action: "withdraw_dispute" }` |
+
+## File
 
 | File | Vai trò |
 |---|---|
-| `src/lib/jobs.js` | `getFreelancerJobs()`, `getJob()` (dùng lại `getProject()`) |
-| `src/components/dashboard/section/ManageJobInfo.jsx` | Danh sách và 2 tab |
-| `src/app/(dashboard)/manage-jobs/[id]/page.jsx` | Trang job |
-| `src/components/project/ProjectCard.jsx` | Thêm `daysUntil()`, `dueLabel()` |
+| `src/lib/jobs.js` | `searchJobs()`, `getFreelancerJobs()`, `getJob()`, `runJobAction()`, `canUndoAcceptance()` |
+| `src/app/(job)/job-single/[id]/page.jsx` | Trang job |
+| `src/components/project/JobActions.jsx` | Khối Next step và các form |
+| `src/components/project/JobCard.jsx` | Thẻ job, `JobStatusBadge`, `jobStage()` |
+| `src/components/project/JobDirectory.jsx` | Trang `/job-1` |
+| `src/components/dashboard/section/ManageJobInfo.jsx` | Bảng `/manage-jobs` |
 
 ---
 
-## Đề xuất luồng tiếp theo (chưa làm)
+## Đề xuất ban đầu
+
+Submit, Request changes, Approve và khiếu nại đã làm theo luồng ở trên. Phần còn lại chưa làm: gia hạn, xin huỷ, tự động hoàn thành sau 3 ngày, đánh giá, thanh toán PayPal, nhắn tin.
 
 ```
                 ┌──────────── Xin gia hạn ─────────────┐

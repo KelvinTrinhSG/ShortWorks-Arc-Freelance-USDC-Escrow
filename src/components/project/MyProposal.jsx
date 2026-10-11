@@ -67,8 +67,8 @@ export default function MyProposal({ proposal, project, username, now }) {
           <>
             {note && <p className={`fz14 mb10 ${proposal.status === "accepted" ? "text-success" : "text-muted"}`}>{note}</p>}
             {proposal.status === "accepted" && (
-              <Link href={`/manage-jobs/${proposal.id}`} className="btn btn-sm btn-dark">
-                Open your job →
+              <Link href={`/job-single/${proposal.id}`} className="btn btn-sm btn-dark">
+                Manage Job →
               </Link>
             )}
             {canChange && (

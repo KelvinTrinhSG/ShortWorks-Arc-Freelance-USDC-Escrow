@@ -69,8 +69,25 @@ export async function notifyProposalDecision(proposalId, status) {
   );
 }
 
+// Something happened on a job (lib/jobs.js): tell the other side.
+// `event` is the job_events type; the notification type is "job_" + event.
+export async function notifyJobEvent(job, recipientId, actorId, event) {
+  await pool.query(
+    `INSERT INTO notifications (user_id, actor_id, type, project_id, proposal_id)
+     VALUES ($1, $2, $3, $4, $5)`,
+    [recipientId, actorId, `job_${event}`, job.project_id, job.id],
+  );
+}
+
+const jobHref = (r) => `/job-single/${r.proposal_id}`;
+
 // What each type says and where it leads.
 const MESSAGES = {
+  job_submitted: (r) => ({ text: `submitted the videos for "${r.title}"`, href: jobHref(r) }),
+  job_revision_requested: (r) => ({ text: `asked for changes on "${r.title}"`, href: jobHref(r) }),
+  job_approved: (r) => ({ text: `approved your work on "${r.title}"`, href: jobHref(r) }),
+  job_dispute_opened: (r) => ({ text: `opened a dispute on "${r.title}"`, href: jobHref(r) }),
+  job_dispute_withdrawn: (r) => ({ text: `withdrew the dispute on "${r.title}"`, href: jobHref(r) }),
   invited: (r) => ({
     text: `invited you to send a proposal for "${r.title}"`,
     href: `/project-single/${r.project_id}`,
@@ -85,7 +102,7 @@ const MESSAGES = {
   }),
   proposal_accepted: (r) => ({
     text: `accepted your proposal for "${r.title}"`,
-    href: `/manage-jobs/${r.proposal_id}`,
+    href: jobHref(r),
   }),
   proposal_declined: (r) => ({
     text: `declined your proposal for "${r.title}"`,

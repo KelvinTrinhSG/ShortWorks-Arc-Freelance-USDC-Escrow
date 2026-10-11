@@ -22,6 +22,7 @@ export const config = {
     "/invitations/:path*",
     "/invoice/:path*",
     "/manage-jobs/:path*",
+    "/job-single/:path*", // not a dashboard page, but only for the two sides of a job
     "/manage-projects/:path*",
     "/manage-services/:path*",
     "/message/:path*",

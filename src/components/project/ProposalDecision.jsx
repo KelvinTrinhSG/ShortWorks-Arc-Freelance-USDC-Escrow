@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -43,9 +44,15 @@ export default function ProposalDecision({ proposal }) {
           <>
             <span className="fz14 text">
               {proposal.status === "accepted"
-                ? "You accepted this proposal. The project is now hidden from the Projects page."
+                ? "You hired this freelancer. The project moved from Projects to Jobs."
                 : "You declined this proposal."}
             </span>
+            {proposal.status === "accepted" && (
+              <Link href={`/job-single/${proposal.id}`} className="btn btn-sm btn-dark">
+                Manage Job →
+              </Link>
+            )}
+            {/* The API refuses once work was handed in; it says so in the error below. */}
             <button type="button" className="btn btn-sm btn-link p-0" disabled={busy} onClick={() => decide("pending")}>
               Undo
             </button>

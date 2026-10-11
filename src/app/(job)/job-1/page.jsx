@@ -1,22 +1,30 @@
-import Breadcumb12 from "@/components/breadcumb/Breadcumb12";
-import Breadcumb3 from "@/components/breadcumb/Breadcumb3";
+import Footer from "@/components/footer/Footer";
 import Header20 from "@/components/header/Header20";
-
-import Listing9 from "@/components/section/Listing9";
-import TabSection1 from "@/components/section/TabSection1";
+import JobDirectory from "@/components/project/JobDirectory";
+import { getViewer } from "@/lib/viewer";
 
 export const metadata = {
-    title: "ShortWorks - Freelance Marketplace | Job 1",
+    title: "ShortWorks - Jobs",
 };
 
-export default function page() {
+// Projects move here from /project-1 once the client accepts a proposal (docs/jobs.md).
+export default async function page({ searchParams }) {
+    const params = new URLSearchParams();
+    for (const [key, value] of Object.entries(await searchParams)) {
+        if (typeof value === "string") params.set(key, value);
+    }
+    const viewer = await getViewer();
+
     return (
         <>
             <Header20 />
-            <TabSection1 />
-            <Breadcumb3 path={["Home", "Services", "Design & Creative"]} />
-            <Breadcumb12 />
-            <Listing9 />
+            <JobDirectory
+                initialQuery={params.toString()}
+                accountType={viewer?.accountType ?? null}
+                // UTC date, the same calendar the delivery dates are checked against on the server.
+                today={new Date().toISOString().slice(0, 10)}
+            />
+            <Footer />
         </>
     );
 }

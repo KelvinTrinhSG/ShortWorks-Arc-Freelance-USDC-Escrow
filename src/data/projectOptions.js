@@ -25,6 +25,27 @@ export const MY_STATUSES = [
   { value: "invite_declined", label: "Invite declined" },
 ];
 
+// Where a job stands (proposals.job_status, docs/jobs.md). "overdue" is not stored:
+// it is an in-progress job past the freelancer's delivery date. Status filter on /job-1.
+export const JOB_STATUSES = [
+  { value: "in_progress", label: "In progress" },
+  { value: "overdue", label: "Overdue" },
+  { value: "submitted", label: "Submitted" },
+  { value: "completed", label: "Completed" },
+  { value: "disputed", label: "Disputed" },
+];
+
+export const DISPUTE_REASONS = [
+  { value: "late", label: "Not delivered on time" },
+  { value: "quality", label: "Work doesn't match the brief" },
+  { value: "unresponsive", label: "The other side isn't responding" },
+  { value: "scope_change", label: "Scope changed after hiring" },
+  { value: "payment", label: "Payment problem" },
+  { value: "other", label: "Something else" },
+];
+
+export const JOB_NOTE_MAX = 1000;
+
 export const PROJECT_TITLE_MAX = 70;
 export const BRIEF_MAX = 1000;
 export const MIN_VIDEO_COUNT = 1;
