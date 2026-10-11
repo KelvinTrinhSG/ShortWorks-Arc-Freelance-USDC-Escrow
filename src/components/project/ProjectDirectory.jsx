@@ -114,7 +114,7 @@ export default function ProjectDirectory({ initialQuery = "" }) {
           style={isClient ? { height: "auto" } : undefined}
           className={`cta-service-v1 cta-banner mx-auto maxw1700 ${isClient ? "pt20 pb20" : "pt80 pb80"} bdrs16 position-relative overflow-hidden d-flex align-items-center mx20-lg px30-lg`}>
           <BannerDecor />
-          <div className="container">
+          <div className="container position-relative zi1">
             <div className="row wow fadeInUp">
               <div className="col-xl-7">
                 <h2>Find short-form video projects</h2>
