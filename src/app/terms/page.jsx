@@ -1,6 +1,7 @@
 import Footer from "@/components/footer/Footer";
 import Header20 from "@/components/header/Header20";
 import {
+  ARC_RECLAIM_BUFFER_DAYS,
   AUTO_APPROVE_DAYS,
   DISPUTE_DECISION_HOURS,
   MAX_DELIVERY_DAYS,
@@ -37,6 +38,19 @@ const SECTIONS = [
     ],
   },
   {
+    id: "arc",
+    title: "Paying with USDC on Arc",
+    body: [
+      "Clients can also pay in USDC on the Arc network, from a wallet such as MetaMask, if the freelancer has added an Arc wallet on the Pay With Arc page (by connecting MetaMask or entering the address). Freelancers are responsible for the address being correct: USDC sent to a wrong address can't be recovered.",
+      "When a client hires, the full amount goes from the client's wallet into the ShortWorks escrow smart contract. The contract, not ShortWorks, holds the USDC, and it can only send it to the freelancer's wallet, back to the client's wallet, or the platform fee to ShortWorks.",
+      `When the work is approved, the contract pays the freelancer and the ${PLATFORM_FEE_PERCENT}% platform fee in one transaction. There is no payment processor fee: on a 100 USDC job the freelancer receives ${100 - PLATFORM_FEE_PERCENT} USDC.`,
+      "Network fees on Arc are paid in USDC by whoever sends the transaction: the client when hiring and approving, ShortWorks for automatic approvals, undoing a hire and dispute decisions. They are very small but the client needs a little more USDC than the job price.",
+      "If the client undoes the hire before any work is delivered, or a dispute is decided for the client, all the USDC goes back to the client's wallet.",
+      `As a safety net, if a job is still not settled ${AUTO_APPROVE_DAYS + ARC_RECLAIM_BUFFER_DAYS} days after the delivery date, the client can take the USDC back directly from the contract, without ShortWorks. This is paused while a dispute is open.`,
+      "Transactions on a blockchain can't be reversed. Check you're on the right network and wallet before confirming in your wallet. On the Arc testnet, USDC has no real value.",
+    ],
+  },
+  {
     id: "timing",
     title: "Delivery and review times",
     body: [
@@ -58,7 +72,7 @@ const SECTIONS = [
     body: [
       "Either side can open a dispute while the job is in progress or waiting for review, by choosing a reason and describing the problem.",
       "Evidence is what is on the job page: the brief, the reference videos, every delivery, change requests and notes. Keep the conversation about the job there.",
-      `During a dispute the payment stays on hold and the job is not approved automatically. The ShortWorks team decides within ${DISPUTE_DECISION_HOURS} hours of the dispute being opened, every day of the week including holidays, and sooner if the PayPal hold is about to expire.`,
+      `During a dispute the payment stays on hold and the job is not approved automatically. The ShortWorks team decides within ${DISPUTE_DECISION_HOURS} hours of the dispute being opened, every day of the week including holidays, and sooner if the PayPal hold is about to expire. For USDC on Arc, the escrow is frozen during the dispute so neither side can move the money.`,
       "The decision is all or nothing: either the freelancer is paid in full, or the payment is released to the client and the job is cancelled. Payments are not split.",
       "The side that opened a dispute can withdraw it at any time before the decision; the job then continues where it was.",
     ],
@@ -67,7 +81,7 @@ const SECTIONS = [
     id: "limits",
     title: "ShortWorks' role",
     body: [
-      "ShortWorks connects clients and freelancers and runs the hiring and review process. Payments are processed by PayPal.",
+      "ShortWorks connects clients and freelancers and runs the hiring and review process. Payments are processed by PayPal, or held by the escrow contract on Arc.",
       "Payment disputes raised directly with PayPal (outside ShortWorks) follow PayPal's own policies.",
     ],
   },

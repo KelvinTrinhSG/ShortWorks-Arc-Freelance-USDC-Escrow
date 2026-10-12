@@ -107,6 +107,7 @@ const MESSAGES = {
   job_dispute_resolved: (r) => ({ text: `decided the dispute on "${r.title}"`, href: jobHref(r) }),
   job_payment_voided: (r) => ({ text: `cancelled "${r.title}": PayPal released the held payment`, href: jobHref(r) }),
   job_payment_expired: (r) => ({ text: `cancelled "${r.title}": the payment hold expired`, href: jobHref(r) }),
+  job_payment_refunded: (r) => ({ text: `cancelled "${r.title}": the USDC held on Arc went back to the client`, href: jobHref(r) }),
   payment_expiring: (r) => ({ text: `reminds you: the payment held for "${r.title}" expires in less than 3 days`, href: jobHref(r) }),
   invited: (r) => ({
     text: `invited you to send a proposal for "${r.title}"`,
@@ -124,7 +125,7 @@ const MESSAGES = {
   // client ordered the service: there was no proposal from the freelancer's side.
   proposal_accepted: (r) => ({
     text: r.service_id
-      ? `ordered ${r.video_count} ${r.video_count === 1 ? "video" : "videos"} from your service "${r.title}" and paid with PayPal. Time to start!`
+      ? `ordered ${r.video_count} ${r.video_count === 1 ? "video" : "videos"} from your service "${r.title}" and paid. Time to start!`
       : `accepted your proposal for "${r.title}"`,
     href: jobHref(r),
   }),

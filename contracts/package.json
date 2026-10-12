@@ -1,0 +1,16 @@
+{
+  "name": "shortworks-contracts",
+  "private": true,
+  "description": "ShortWorksEscrow: holds USDC on Arc for a job (docs/arc-payments.md)",
+  "scripts": {
+    "build": "forge build",
+    "test": "forge test -vv",
+    "export-abi": "forge build && node script/export-abi.mjs"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "5.6.1"
+  },
+  "devDependencies": {
+    "forge-std": "github:foundry-rs/forge-std#v1.17.0"
+  }
+}

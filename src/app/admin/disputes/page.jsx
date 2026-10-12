@@ -49,10 +49,13 @@ export default async function page() {
                   </span>
                 </div>
                 <p className="fz14 text mb10">
-                  Client {d.clientName} · Freelancer {d.freelancerName} · ${d.amount.toFixed(2)} ·{" "}
+                  Client {d.clientName} · Freelancer {d.freelancerName} ·{" "}
+                  {d.currency === "USDC" ? `${d.amount.toFixed(2)} USDC` : `$${d.amount.toFixed(2)}`} ·{" "}
                   {d.paymentStatus === "authorized"
                     ? `held by PayPal${d.expiresAt ? ` until ${formatDateTime(d.expiresAt)}` : ""}`
-                    : `payment ${d.paymentStatus ?? "missing"}`}
+                    : d.paymentStatus === "funded"
+                      ? "held in the Arc escrow (frozen during the dispute)"
+                      : `payment ${d.paymentStatus ?? "missing"}`}
                 </p>
                 <p className="fz14 dark-color mb5">
                   <strong>{d.openedBy}</strong> opened it {formatDateTime(d.openedAt)} ·{" "}
@@ -66,7 +69,8 @@ export default async function page() {
                 </Link>
                 <DisputeDecision
                   jobId={d.id}
-                  amount={d.amount.toFixed(2)}
+                  amount={d.currency === "USDC" ? `${d.amount.toFixed(2)} USDC` : `$${d.amount.toFixed(2)}`}
+                  isArc={d.currency === "USDC"}
                   freelancerName={d.freelancerName}
                   clientName={d.clientName}
                 />

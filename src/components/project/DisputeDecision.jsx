@@ -6,7 +6,8 @@ import { useState } from "react";
 
 // Admin's decision on one dispute: everything to the freelancer, or everything back
 // to the client. No split (docs/payments.md §12). The note is shown to both sides.
-export default function DisputeDecision({ jobId, amount, freelancerName, clientName }) {
+// `amount` is formatted ("$100.00" or "100.00 USDC"); `isArc`: the money is in the Arc escrow.
+export default function DisputeDecision({ jobId, amount, freelancerName, clientName, isArc }) {
   const router = useRouter();
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
@@ -20,13 +21,17 @@ export default function DisputeDecision({ jobId, amount, freelancerName, clientN
     const ok = await confirmDialog(
       decision === "pay"
         ? {
-            title: `Pay ${freelancerName} $${amount}?`,
-            message: "PayPal takes the held payment from the client and pays the freelancer (minus fees). This can't be undone.",
+            title: `Pay ${freelancerName} ${amount}?`,
+            message: isArc
+              ? "ShortWorks' operator wallet releases the escrow: the freelancer gets the USDC minus the platform fee. This can't be undone."
+              : "PayPal takes the held payment from the client and pays the freelancer (minus fees). This can't be undone.",
             confirmLabel: "Pay freelancer",
           }
         : {
-            title: `Release $${amount} to ${clientName}?`,
-            message: "The PayPal hold is cancelled, the client is not charged and the job is cancelled. This can't be undone.",
+            title: `Release ${amount} to ${clientName}?`,
+            message: isArc
+              ? "ShortWorks' operator wallet refunds the escrow: all the USDC goes back to the client's wallet and the job is cancelled. This can't be undone."
+              : "The PayPal hold is cancelled, the client is not charged and the job is cancelled. This can't be undone.",
             confirmLabel: "Release to client",
             danger: true,
           },

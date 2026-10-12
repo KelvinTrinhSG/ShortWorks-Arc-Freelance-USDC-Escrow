@@ -3,6 +3,7 @@ import { SERVICE_BRIEF_MAX } from "@/data/serviceOptions";
 import Link from "next/link";
 import { useState } from "react";
 import HireAndPay from "../project/HireAndPay";
+import HireWithArc from "../project/HireWithArc";
 
 const formatDate = (d) => d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
@@ -87,26 +88,31 @@ export default function ServiceOrderBox({ service, viewer }) {
       <p className="text fz14 mb-0">
         {s.status !== "active"
           ? "This service is paused and not taking orders."
-          : `${s.freelancer.displayName} hasn't connected PayPal yet, so this service can't be ordered right now.`}
+          : `${s.freelancer.displayName} hasn't connected PayPal or an Arc wallet yet, so this service can't be ordered right now.`}
       </p>
     );
   } else if (order) {
-    // Step 2: pay. The PayPal window opens right away; the button reopens it.
+    // Step 2: pay, with PayPal and/or USDC on Arc (whatever the freelancer accepts). With
+    // PayPal only, its window opens right away; the button reopens it.
+    const paypal = Boolean(s.freelancer.paypalMerchantId);
+    const pay = {
+      id: order.proposalId,
+      hire: { amount: order.amount, merchantId: s.freelancer.paypalMerchantId, blocker: null, arc: { blocker: null } },
+      freelancer: { displayName: s.freelancer.displayName },
+    };
     body = (
       <>
         <p className="dark-color fw500 mb5">
           Order ready: {count} {count === 1 ? "video" : "videos"} · ${order.amount}
         </p>
-        <p className="text fz14 mb15">PayPal holds the money now; you&apos;re only charged when you approve the videos.</p>
-        <HireAndPay
-          autoOpen
-          label={`Pay $${order.amount} with PayPal`}
-          proposal={{
-            id: order.proposalId,
-            hire: { amount: order.amount, merchantId: s.freelancer.paypalMerchantId, blocker: null },
-            freelancer: { displayName: s.freelancer.displayName },
-          }}
-        />
+        <p className="text fz14 mb15">
+          The money is held now ({paypal ? "by PayPal" : ""}{paypal && s.arcReady ? ", or " : ""}
+          {s.arcReady ? "in the escrow contract on Arc" : ""}); it&apos;s only paid out when you approve the videos.
+        </p>
+        <div className="d-flex flex-column gap-2">
+          {paypal && <HireAndPay autoOpen={!s.arcReady} label={`Pay $${order.amount} with PayPal`} proposal={pay} />}
+          {s.arcReady && <HireWithArc label={`Pay ${order.amount} USDC on Arc`} proposal={pay} />}
+        </div>
         <button type="button" className="btn btn-link p-0 fz14 mt10 d-block" onClick={() => setOrder(null)}>
           ← Change the order
         </button>
@@ -150,7 +156,8 @@ export default function ServiceOrderBox({ service, viewer }) {
           {busy ? "Creating order..." : `Continue ($${total})`} <i className="fal fa-arrow-right-long" />
         </button>
         <p className="fz13 text mt10 mb-0">
-          Next you pay with PayPal. The money is held and only taken when you approve the videos.{" "}
+          Next you pay with {[s.freelancer.paypalMerchantId && "PayPal", s.arcReady && "USDC on Arc"].filter(Boolean).join(" or ")}. The
+          money is held and only paid out when you approve the videos.{" "}
           <Link href="/terms#payments" className="text-thm">
             How it works
           </Link>

@@ -10,6 +10,7 @@ import {
   SERVICE_TITLE_MAX,
 } from "@/data/serviceOptions";
 import { COUNTRIES, PLATFORMS, REVISIONS } from "@/data/talentOptions";
+import { arcEnabled } from "@/lib/arc";
 import pool from "@/lib/db";
 import { hireBlocker } from "@/lib/payments";
 import { avatarUrlOf } from "@/lib/profile";
@@ -130,41 +131,47 @@ const SERVICE_COLUMNS = `
   s.id, s.title, s.work_type, s.platforms, s.video_length, s.description, s.price_per_video,
   s.delivery_days, s.revisions, s.max_videos, s.status, s.created_at, s.updated_at,
   u.id AS freelancer_id, u.username, u.display_name, u.headline, u.country, u.avatar_updated_at,
-  u.created_at AS member_since, u.paypal_status, u.paypal_merchant_id,
+  u.created_at AS member_since, u.paypal_status, u.paypal_merchant_id, u.arc_wallet,
   (SELECT COUNT(*) FROM projects o JOIN proposals op ON op.project_id = o.id
    WHERE o.service_id = s.id AND op.status = 'accepted')::int AS order_count,
   (SELECT url FROM service_samples x WHERE x.service_id = s.id ORDER BY x.sort_order, x.id LIMIT 1) AS cover_url
 `;
 
-const toService = (r) => ({
-  id: r.id,
-  title: r.title,
-  workType: r.work_type,
-  platforms: r.platforms,
-  videoLength: r.video_length,
-  description: r.description,
-  pricePerVideo: Number(r.price_per_video),
-  deliveryDays: r.delivery_days,
-  revisions: r.revisions,
-  maxVideos: r.max_videos,
-  status: r.status,
-  createdAt: r.created_at,
-  orderCount: r.order_count,
-  coverEmbedUrl: r.cover_url ? parseVideoUrl(r.cover_url)?.embedUrl ?? null : null,
-  // Clients can only order from freelancers PayPal can pay.
-  canOrder: r.status === "active" && r.paypal_status === "ready",
-  freelancer: {
-    id: r.freelancer_id,
-    username: r.username,
-    displayName: r.display_name,
-    headline: r.headline ?? "",
-    country: r.country ? COUNTRIES.find((c) => c.value === r.country)?.label ?? r.country : null,
-    avatarUrl: avatarUrlOf({ id: r.freelancer_id, avatar_updated_at: r.avatar_updated_at }),
-    memberSince: r.member_since,
-    // The PayPal button on the service page pays this merchant (not secret).
-    paypalMerchantId: r.paypal_status === "ready" ? r.paypal_merchant_id : null,
-  },
-});
+const toService = (r) => {
+  // How the freelancer can be paid: PayPal, USDC on Arc (when set up here), or both.
+  const paypalReady = r.paypal_status === "ready";
+  const arcReady = Boolean(r.arc_wallet) && arcEnabled();
+  return {
+    id: r.id,
+    title: r.title,
+    workType: r.work_type,
+    platforms: r.platforms,
+    videoLength: r.video_length,
+    description: r.description,
+    pricePerVideo: Number(r.price_per_video),
+    deliveryDays: r.delivery_days,
+    revisions: r.revisions,
+    maxVideos: r.max_videos,
+    status: r.status,
+    createdAt: r.created_at,
+    orderCount: r.order_count,
+    coverEmbedUrl: r.cover_url ? parseVideoUrl(r.cover_url)?.embedUrl ?? null : null,
+    // Clients can only order from freelancers who can be paid.
+    canOrder: r.status === "active" && (paypalReady || arcReady),
+    arcReady,
+    freelancer: {
+      id: r.freelancer_id,
+      username: r.username,
+      displayName: r.display_name,
+      headline: r.headline ?? "",
+      country: r.country ? COUNTRIES.find((c) => c.value === r.country)?.label ?? r.country : null,
+      avatarUrl: avatarUrlOf({ id: r.freelancer_id, avatar_updated_at: r.avatar_updated_at }),
+      memberSince: r.member_since,
+      // The PayPal button on the service page pays this merchant (not secret).
+      paypalMerchantId: paypalReady ? r.paypal_merchant_id : null,
+    },
+  };
+};
 
 export const SERVICE_SORTS = {
   newest: "s.created_at DESC",
@@ -293,7 +300,7 @@ export async function createServiceOrder(serviceId, viewer, body) {
   if (!data) throw new OrderError("Service not found.", 404);
   const s = data.service;
   if (s.status !== "active") throw new OrderError("This service is paused.");
-  if (!s.canOrder) throw new OrderError("This freelancer hasn't connected PayPal yet, so they can't take orders.");
+  if (!s.canOrder) throw new OrderError("This freelancer hasn't connected PayPal or an Arc wallet yet, so they can't take orders.");
 
   const videoCount = Number(body?.videoCount);
   const brief = typeof body?.brief === "string" ? body.brief.trim() : "";

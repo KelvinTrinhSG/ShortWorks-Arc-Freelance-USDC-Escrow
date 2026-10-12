@@ -121,9 +121,11 @@ async function getHireContext(proposalId) {
 }
 
 // Why the client can't hire this proposal right now, or null. Shared by the page and the API.
-export function hireBlocker({ status, deliveryDate, paypalStatus }, today = todayUtc()) {
+// `method`: "paypal" (default) needs the freelancer's PayPal; "arc" needs their verified Arc wallet.
+export function hireBlocker({ status, deliveryDate, paypalStatus, arcWallet, method = "paypal" }, today = todayUtc()) {
   if (status !== "pending") return "This proposal was already answered.";
-  if (paypalStatus !== "ready") return "The freelancer hasn't connected PayPal yet, so they can't be paid.";
+  if (method === "paypal" && paypalStatus !== "ready") return "The freelancer hasn't connected PayPal yet, so they can't be paid.";
+  if (method === "arc" && !arcWallet) return "The freelancer hasn't added an Arc wallet yet, so they can't be paid in USDC.";
   if (deliveryDate < today) return "The delivery date has passed. Ask the freelancer to update their proposal.";
   if (deliveryDate > addDays(today, MAX_DELIVERY_DAYS)) {
     return `Delivery must be within ${MAX_DELIVERY_DAYS} days of hiring. Ask the freelancer to update the date.`;
@@ -140,6 +142,9 @@ export async function startCheckout(proposalId, viewer) {
   if (blocker) throw new PaymentError(blocker);
   if (["authorized", "capturing", "captured", "voiding"].includes(h.payment_status)) {
     throw new PaymentError("This freelancer is already paid for.");
+  }
+  if (await hasLivePayment({ proposalId: h.id })) {
+    throw new PaymentError("This freelancer is already paid for with USDC on Arc.");
   }
 
   const amount = Math.round(Number(h.price_per_video) * h.video_count * 100) / 100;
@@ -329,23 +334,31 @@ const SCOPE = `($1::int IS NULL OR pr.project_id = $1) AND ($2::int IS NULL OR p
 const scopeArgs = ({ projectId, proposalId, userId }) => [projectId ?? null, proposalId ?? null, userId ?? null];
 
 // Payments that keep a project, proposal or account from being deleted: money held or taken
-// (refunded payments too: their history is kept).
+// (refunded PayPal payments too: their history is kept), with PayPal or USDC on Arc.
 export async function hasLivePayment(scope) {
   const { rows } = await pool.query(
     `SELECT 1 FROM job_payments jp JOIN proposals pr ON pr.id = jp.proposal_id
      WHERE jp.status IN ('authorized', 'capturing', 'voiding', 'captured', 'partially_refunded', 'refunded') AND ${SCOPE}
+     UNION ALL
+     SELECT 1 FROM job_arc_payments ja JOIN proposals pr ON pr.id = ja.proposal_id
+     WHERE ja.status IN ('funded', 'releasing', 'released', 'refunding') AND ${SCOPE}
      LIMIT 1`,
     scopeArgs(scope),
   );
   return rows.length > 0;
 }
 
-// Leftover rows of payments that never held money (abandoned, voided, failed), so the
-// proposal, project or account can be deleted.
+// Leftover rows of payments that never held money (abandoned, voided, failed, refunded
+// on Arc), so the proposal, project or account can be deleted.
 export async function clearDeadPayments(scope) {
   await pool.query(
     `DELETE FROM job_payments jp USING proposals pr
      WHERE pr.id = jp.proposal_id AND jp.status IN ('created', 'voided', 'expired', 'failed') AND ${SCOPE}`,
+    scopeArgs(scope),
+  );
+  await pool.query(
+    `DELETE FROM job_arc_payments ja USING proposals pr
+     WHERE pr.id = ja.proposal_id AND ja.status IN ('signed', 'refunded') AND ${SCOPE}`,
     scopeArgs(scope),
   );
 }

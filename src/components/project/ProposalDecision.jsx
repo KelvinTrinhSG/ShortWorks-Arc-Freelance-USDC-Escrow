@@ -2,11 +2,12 @@
 import { confirmDialog } from "@/store/confirmStore";
 import Link from "next/link";
 import HireAndPay from "./HireAndPay";
+import HireWithArc from "./HireWithArc";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-// Client's Hire & pay / Decline buttons on a proposal; Undo puts it back to pending
-// (and releases the PayPal hold of a hire).
+// Client's Hire & pay (PayPal, or USDC on Arc) / Decline buttons on a proposal; Undo puts it
+// back to pending (and releases the PayPal hold or refunds the Arc escrow).
 export default function ProposalDecision({ proposal }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
@@ -36,8 +37,9 @@ export default function ProposalDecision({ proposal }) {
       <div className="d-flex flex-wrap gap-2 align-items-start">
         {proposal.status === "pending" ? (
           <>
-            {/* Hiring = PayPal holds the money first (docs/payments.md). */}
-            <HireAndPay proposal={proposal} />
+            {/* Hiring = the money is held first: by PayPal (docs/payments.md) or in the Arc escrow (docs/arc-payments.md). */}
+            <HireAndPay proposal={proposal} label={proposal.hire.arc ? `Hire & pay $${proposal.hire.amount} with PayPal` : undefined} />
+            {proposal.hire.arc && <HireWithArc proposal={proposal} label={`Hire & pay ${proposal.hire.amount} USDC on Arc`} />}
             <button type="button" className="btn btn-sm btn-outline-danger" disabled={busy} onClick={() => decide("declined")}>
               Decline
             </button>
@@ -63,7 +65,7 @@ export default function ProposalDecision({ proposal }) {
                 if (proposal.status === "accepted") {
                   const ok = await confirmDialog({
                     title: "Undo this hire?",
-                    message: `The payment PayPal is holding for ${proposal.freelancer.displayName} is released, so you're not charged. The proposal goes back to waiting.`,
+                    message: `The payment held for ${proposal.freelancer.displayName} is released (PayPal) or sent back to your wallet (USDC on Arc), so you're not charged. The proposal goes back to waiting.`,
                     confirmLabel: "Undo hire",
                     danger: true,
                   });

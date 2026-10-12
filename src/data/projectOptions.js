@@ -56,6 +56,9 @@ export const MAX_DELIVERY_DAYS = 25;
 export const AUTO_APPROVE_DAYS = 3;
 // ShortWorks decides a dispute within this many hours (every day counts).
 export const DISPUTE_DECISION_HOURS = 48;
+// Arc escrow (docs/arc-payments.md §5): this many days after delivery + review, the client can take
+// the USDC back on-chain without ShortWorks (unless a dispute is open). A safety net only.
+export const ARC_RECLAIM_BUFFER_DAYS = 14;
 
 // The platform fee comes out of the freelancer's side, so does PayPal's fee.
 export const PLATFORM_FEE_PERCENT = 10;

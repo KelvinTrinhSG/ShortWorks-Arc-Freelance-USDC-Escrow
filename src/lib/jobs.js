@@ -10,6 +10,15 @@ import {
   WORK_TYPES,
 } from "@/data/projectOptions";
 import { COUNTRIES, PLATFORMS } from "@/data/talentOptions";
+import {
+  arcRefund,
+  arcRelease,
+  arcSetFrozen,
+  confirmClientRelease,
+  getArcPayment,
+  hasLiveArcPayment,
+  reconcileArcPayments,
+} from "@/lib/arcPayments";
 import pool from "@/lib/db";
 import { notifyJobEvent, notifyProposalDecision } from "@/lib/notifications";
 import { PaymentError, capturePayment, getJobPayment, releasePayment } from "@/lib/payments";
@@ -184,6 +193,21 @@ async function getJobContext(id) {
 const roleOf = (ctx, viewer) =>
   viewer?.id === ctx.client_id ? "client" : viewer?.id === ctx.freelancer_id ? "freelancer" : null;
 
+// ---- The job's money: PayPal or USDC on Arc ---------------------------------------
+
+// Pays the freelancer from whatever holds the money.
+const takeJobPayment = async (id) => ((await hasLiveArcPayment(id)) ? arcRelease(id) : capturePayment(id));
+// Gives the money back to the client (no-op when nothing is held).
+const returnJobPayment = async (id) => ((await hasLiveArcPayment(id)) ? arcRefund(id) : releasePayment(id));
+
+// The payment to show on the job: the one holding or that took the money, else the latest attempt.
+async function getPayment(id) {
+  const [arc, paypal] = await Promise.all([getArcPayment(id), getJobPayment(id)]);
+  if (arc && ["funded", "releasing", "released", "refunding"].includes(arc.status)) return arc;
+  if (paypal && !["created", "voided", "expired", "failed"].includes(paypal.status)) return paypal;
+  return arc ?? paypal;
+}
+
 // /jobs/{id}: the project, the accepted proposal, the freelancer and the activity log.
 // Only the client who hired and the hired freelancer may see it; null for everyone else.
 export async function getJob(id, viewer) {
@@ -213,8 +237,10 @@ export async function getJob(id, viewer) {
   const r = pr[0];
   const lastDispute = events.findLast((e) => e.type === "dispute_opened");
   const lastSubmitted = events.findLast((e) => e.type === "submitted");
-  const payment = await getJobPayment(ctx.id);
+  const payment = await getPayment(ctx.id);
   const hours = (iso, h) => new Date(new Date(iso).getTime() + h * 3600000);
+  // An Arc hold doesn't run out during a dispute (the escrow is frozen), so it doesn't cut the decision time short.
+  const holdEndsAt = payment?.method !== "arc" && payment?.expiresAt ? new Date(payment.expiresAt) : Infinity;
 
   return {
     role,
@@ -225,7 +251,7 @@ export async function getJob(id, viewer) {
       // or before the held payment expires if that comes first.
       disputeDecideBy:
         ctx.job_status === "disputed" && lastDispute
-          ? new Date(Math.min(hours(lastDispute.created_at, DISPUTE_DECISION_HOURS), payment?.expiresAt ? new Date(payment.expiresAt) : Infinity))
+          ? new Date(Math.min(hours(lastDispute.created_at, DISPUTE_DECISION_HOURS), holdEndsAt))
           : null,
       // When a submitted job approves itself if the client doesn't answer.
       autoApproveAt:
@@ -350,14 +376,21 @@ export async function runJobAction(id, viewer, body) {
   if (error) return { error, code: 400 };
 
   const to = typeof action.to === "function" ? action.to(ctx) : action.to;
-  if (body.action === "approve") {
-    // Take the money first; the job only completes once the freelancer is paid.
-    try {
-      await capturePayment(ctx.id);
-    } catch (err) {
-      if (err instanceof PaymentError) return { error: err.message, code: err.code };
-      throw err;
+  const isArc = await hasLiveArcPayment(ctx.id);
+  const disputeChange = body.action === "dispute" || body.action === "withdraw_dispute";
+  try {
+    if (body.action === "approve") {
+      // Take the money first; the job only completes once the freelancer is paid.
+      // On Arc the client normally releases from their own wallet and sends the transaction hash.
+      if (isArc && body.txHash) await confirmClientRelease(ctx.id, body.txHash);
+      else await takeJobPayment(ctx.id);
+    } else if (isArc && disputeChange) {
+      // A dispute freezes the escrow so the client can't take the money back meanwhile.
+      await arcSetFrozen(ctx.id, body.action === "dispute");
     }
+  } catch (err) {
+    if (err instanceof PaymentError) return { error: err.message, code: err.code };
+    throw err;
   }
   const ok = await applyTransition(ctx, {
     from: ctx.job_status,
@@ -368,7 +401,11 @@ export async function runJobAction(id, viewer, body) {
     // Money already moved: the job completes even if something else changed meanwhile.
     force: body.action === "approve",
   });
-  if (!ok) return { error: "The job has moved on since you opened this page. Refresh and try again.", code: 409 };
+  if (!ok) {
+    // Undo the freeze (or unfreeze) the job no longer needs.
+    if (isArc && disputeChange) await arcSetFrozen(ctx.id, body.action !== "dispute").catch(() => {});
+    return { error: "The job has moved on since you opened this page. Refresh and try again.", code: 409 };
+  }
 
   // Tell the other side.
   const recipient = role === "client" ? ctx.freelancer_id : ctx.client_id;
@@ -427,7 +464,7 @@ export async function autoApproveDueJobs() {
   for (const { id } of rows) {
     const ctx = await getJobContext(id);
     try {
-      await capturePayment(id);
+      await takeJobPayment(id);
       await applyTransition(ctx, { from: "submitted", to: "completed", event: "auto_approved", actorId: null, force: true });
       await notifyJobEvent(ctx, ctx.freelancer_id, null, "auto_approved");
       await notifyJobEvent(ctx, ctx.client_id, null, "auto_approved");
@@ -450,8 +487,8 @@ export async function resolveDispute(id, adminId, decision, note) {
   if (!text || text.length > JOB_NOTE_MAX) return { error: "Explain the decision to both sides.", code: 400 };
 
   try {
-    if (decision === "pay") await capturePayment(ctx.id);
-    else await releasePayment(ctx.id);
+    if (decision === "pay") await takeJobPayment(ctx.id);
+    else await returnJobPayment(ctx.id);
   } catch (err) {
     if (err instanceof PaymentError) return { error: err.message, code: err.code };
     throw err;
@@ -475,14 +512,17 @@ export async function resolveDispute(id, adminId, decision, note) {
 export async function getOpenDisputes() {
   const { rows } = await pool.query(
     `SELECT pr.id, p.title, c.display_name AS client_name, f.display_name AS freelancer_name,
-            jp.amount, jp.expires_at, jp.status AS payment_status,
+            COALESCE(ja.amount, jp.amount) AS amount, jp.expires_at,
+            COALESCE(ja.status, jp.status) AS payment_status, (ja.id IS NOT NULL) AS is_arc,
             e.created_at AS opened_at, e.reason, e.note, a.display_name AS opened_by,
-            LEAST(e.created_at + make_interval(hours => $1), COALESCE(jp.expires_at, 'infinity')) AS decide_by
+            LEAST(e.created_at + make_interval(hours => $1), COALESCE(CASE WHEN ja.id IS NULL THEN jp.expires_at END, 'infinity')) AS decide_by
      FROM proposals pr
      JOIN projects p ON p.id = pr.project_id
      JOIN users c ON c.id = p.client_id
      JOIN users f ON f.id = pr.freelancer_id
      LEFT JOIN job_payments jp ON jp.proposal_id = pr.id
+     -- An Arc escrow holding the money (frozen during the dispute, so no deadline from it).
+     LEFT JOIN job_arc_payments ja ON ja.proposal_id = pr.id AND ja.status IN ('funded', 'releasing', 'refunding')
      JOIN LATERAL (SELECT * FROM job_events x WHERE x.proposal_id = pr.id AND x.type = 'dispute_opened'
                    ORDER BY x.created_at DESC, x.id DESC LIMIT 1) e ON TRUE
      LEFT JOIN users a ON a.id = e.actor_id
@@ -496,6 +536,7 @@ export async function getOpenDisputes() {
     clientName: r.client_name,
     freelancerName: r.freelancer_name,
     amount: Number(r.amount ?? 0),
+    currency: r.is_arc ? "USDC" : "USD",
     paymentStatus: r.payment_status,
     expiresAt: r.expires_at,
     openedAt: r.opened_at,
@@ -506,9 +547,10 @@ export async function getOpenDisputes() {
   }));
 }
 
-// PayPal let the held money go without ShortWorks asking (the hold expired, or it was
-// voided on PayPal): nobody can be paid for this job any more, so it is cancelled and
-// both sides are told. `event` is "payment_expired" or "payment_voided".
+// The held money went away without ShortWorks asking (the PayPal hold expired or was voided
+// on PayPal, or the Arc escrow gave the USDC back): nobody can be paid for this job any more,
+// so it is cancelled and both sides are told. `event` is "payment_expired", "payment_voided"
+// or "payment_refunded".
 // Returns true when the job was cancelled.
 export async function cancelJobForLostPayment(id, event) {
   const ctx = await getJobContext(id);
@@ -518,6 +560,25 @@ export async function cancelJobForLostPayment(id, event) {
   await notifyJobEvent(ctx, ctx.freelancer_id, null, event);
   await notifyJobEvent(ctx, ctx.client_id, null, event);
   return true;
+}
+
+// Daily (cron): lines Arc payments up with the chain, then moves the jobs whose money moved
+// outside ShortWorks. Released on-chain by the client = approved; given back (the client
+// reclaimed after expiry, or the freelancer refunded) = cancelled.
+export async function syncArcJobs() {
+  const outcomes = await reconcileArcPayments();
+  for (const o of outcomes) {
+    const ctx = await getJobContext(o.proposalId);
+    if (!ctx || ["completed", "cancelled"].includes(ctx.job_status)) continue;
+    if (o.outcome === "released") {
+      const ok = await applyTransition(ctx, { from: ctx.job_status, to: "completed", event: "approved", actorId: ctx.client_id, force: true });
+      if (ok) await notifyJobEvent(ctx, ctx.freelancer_id, ctx.client_id, "approved");
+      o.job = ok ? "completed" : ctx.job_status;
+    } else if (o.outcome === "refunded") {
+      o.job = (await cancelJobForLostPayment(ctx.id, "payment_refunded")) ? "cancelled" : ctx.job_status;
+    }
+  }
+  return outcomes;
 }
 
 // The client undoes a hire, only before any work was handed in. The proposal goes back
@@ -535,7 +596,7 @@ export async function undoHire(proposalId, status) {
   );
   if (!rows[0]) return { error: "Work on this job has already started, so the hire can't be undone.", code: 409 };
   try {
-    await releasePayment(proposalId);
+    await returnJobPayment(proposalId);
   } catch (err) {
     await pool.query("UPDATE proposals SET status = 'accepted', accepted_at = $2 WHERE id = $1", [proposalId, rows[0].accepted_at]);
     if (err instanceof PaymentError) return { error: err.message, code: err.code };

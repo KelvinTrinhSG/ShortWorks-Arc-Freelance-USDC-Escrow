@@ -1,6 +1,6 @@
-import { ARC, isWalletAddress } from "@/data/arc";
+import { getArc, isWalletAddress } from "@/data/arc";
 
-async function rpc(method, params) {
+async function rpc(ARC, method, params) {
   const res = await fetch(ARC.rpcUrl, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -21,9 +21,12 @@ function formatUnits(value, decimals) {
   return `${BigInt(whole).toLocaleString("en-US")}.${frac}`;
 }
 
-// The USDC balance of a wallet on Arc: GET /api/arc/balance?address=0x…
+// The USDC balance of a wallet on Arc: GET /api/arc/balance?address=0x…&network=testnet|mainnet
+// (no network = the default from NEXT_PUBLIC_ARC_NETWORK).
 export async function GET(request) {
-  const address = new URL(request.url).searchParams.get("address") ?? "";
+  const params = new URL(request.url).searchParams;
+  const address = params.get("address") ?? "";
+  const ARC = getArc(params.get("network"));
   if (!isWalletAddress(address)) {
     return Response.json({ error: "That isn't a valid wallet address (0x followed by 40 characters)." }, { status: 400 });
   }
@@ -31,9 +34,9 @@ export async function GET(request) {
     // balanceOf(address)
     const data = "0x70a08231" + address.slice(2).toLowerCase().padStart(64, "0");
     const [raw, chainId, block] = await Promise.all([
-      rpc("eth_call", [{ to: ARC.usdc, data }, "latest"]),
-      rpc("eth_chainId", []),
-      rpc("eth_blockNumber", []),
+      rpc(ARC, "eth_call", [{ to: ARC.usdc, data }, "latest"]),
+      rpc(ARC, "eth_chainId", []),
+      rpc(ARC, "eth_blockNumber", []),
     ]);
     if (Number(chainId) !== ARC.chainId) throw new Error(`Unexpected chain ID ${Number(chainId)}.`);
     const balance = BigInt(raw === "0x" ? 0 : raw);
@@ -41,10 +44,11 @@ export async function GET(request) {
       address,
       balance: formatUnits(balance, ARC.usdcDecimals),
       currency: ARC.currency,
+      network: ARC.key,
       chainId: ARC.chainId,
       blockNumber: Number(block),
     });
   } catch (err) {
-    return Response.json({ error: `Couldn't reach the Arc network: ${err.message}` }, { status: 502 });
+    return Response.json({ error: `Couldn't reach ${ARC.name}: ${err.message}` }, { status: 502 });
   }
 }

@@ -51,7 +51,7 @@ function Row({ label, children }) {
 }
 
 const money2 = (n) => `$${Number(n).toFixed(2)}`;
-const SYSTEM_EVENTS = new Set(["auto_approved", "dispute_resolved", "payment_voided", "payment_expired"]);
+const SYSTEM_EVENTS = new Set(["auto_approved", "dispute_resolved", "payment_voided", "payment_expired", "payment_refunded"]);
 
 // The job's PayPal payment (lib/payments.js): held, paid with the fee breakdown, or released.
 function PaymentCard({ payment, job, isClient, videoCount }) {
@@ -116,6 +116,58 @@ function PaymentCard({ payment, job, isClient, videoCount }) {
   );
 }
 
+const shortHex = (a) => `${a.slice(0, 6)}…${a.slice(-4)}`;
+const usdc = (n) => `${Number(n).toLocaleString("en-US", { maximumFractionDigits: 6 })} USDC`;
+
+// The job's USDC payment held in the escrow contract on Arc (lib/arcPayments.js).
+function ArcPaymentCard({ payment: a, job, isClient, videoCount }) {
+  const link = (path, text) => (
+    <a href={`${a.explorerUrl}/${path}`} target="_blank" rel="noreferrer" className="text-thm">
+      {text} ↗
+    </a>
+  );
+  const status =
+    a.status === "released" ? <span className="text-success">Paid ✓</span>
+    : a.status === "refunded" ? "Returned to the client"
+    : a.status === "releasing" ? "Paying…"
+    : a.status === "refunding" ? "Returning to the client…"
+    : job.status === "disputed" ? <span className="text-danger">Held in escrow · on hold (dispute)</span>
+    : "Held in escrow";
+
+  return (
+    <div className="bgc-white bdrs12 p30 mb30 default-box-shadow1">
+      <h5 className="mb15 d-flex align-items-center gap-2">
+        <img src="/images/icon/arc-logo.png" alt="" width={20} height={20} /> Payment · USDC on {a.network}
+      </h5>
+      <p className="text mb-0 fz14">{isClient ? "You pay" : "Client pays"}</p>
+      <h3 className="mb5">{usdc(a.amount)}</h3>
+      <p className="text fz14 mb15">
+        {job.pricePerVideo} USDC per video × {videoCount}
+      </p>
+      <Row label="Status">{status}</Row>
+      <Row label="Platform fee">−{usdc(a.platformFee)}</Row>
+      <Row label={a.status === "released" ? (isClient ? "Freelancer received" : "You received") : isClient ? "Freelancer receives" : "You receive"}>
+        <span className={a.status === "released" ? "text-success" : ""}>{usdc(a.netToFreelancer)}</span>
+      </Row>
+      {a.status === "funded" && job.status !== "disputed" && (
+        <Row label="Client can reclaim after">{formatDateTime(a.expiresAt)}</Row>
+      )}
+      <Row label="Escrow">{link(`address/${a.escrow}`, `${shortHex(a.escrow)} · job #${a.escrowJobId}`)}</Row>
+      {a.fundTx && <Row label="Paid in">{link(`tx/${a.fundTx}`, shortHex(a.fundTx))}</Row>}
+      {a.settleTx && <Row label={a.status === "refunded" ? "Returned in" : "Paid out in"}>{link(`tx/${a.settleTx}`, shortHex(a.settleTx))}</Row>}
+      <p className="text fz13 mt15 mb-0">
+        {a.status === "released"
+          ? `Paid out by the escrow contract${a.settledByClient ? " when the client approved from their wallet" : ""}: the freelancer's wallet and the platform fee, in one transaction.`
+          : a.status === "refunded"
+            ? "The escrow contract sent all the USDC back to the client's wallet."
+            : isClient
+              ? "Your USDC is held by the escrow contract, not by ShortWorks. It can only go to the freelancer, back to you, or the platform fee."
+              : "The client's USDC is held by the escrow contract and goes straight to your wallet when the work is approved."}
+      </p>
+    </div>
+  );
+}
+
 const EVENT_TEXT = {
   submitted: "submitted the videos",
   revision_requested: "asked for changes",
@@ -126,6 +178,7 @@ const EVENT_TEXT = {
   dispute_resolved: "decided the dispute",
   payment_voided: "cancelled the job: PayPal released the held payment, so the work can no longer be paid",
   payment_expired: "cancelled the job: PayPal's hold on the payment expired, so the work can no longer be paid",
+  payment_refunded: "cancelled the job: the USDC held on Arc went back to the client, so the work can no longer be paid",
 };
 
 // Hired -> In progress -> Submitted -> Completed. A dispute is shown on the step it froze.
@@ -258,6 +311,19 @@ export default async function JobPage({ params }) {
                 freelancerName={f.displayName}
                 autoApproveAt={job.autoApproveAt && formatDateTime(job.autoApproveAt)}
                 disputeOpenedByMe={job.disputeOpenedByMe}
+                paymentMethod={payment?.method ?? "paypal"}
+                arc={
+                  payment?.method === "arc" && payment.status === "funded"
+                    ? {
+                        escrow: payment.escrow,
+                        escrowJobId: payment.escrowJobId,
+                        clientWallet: payment.clientWallet,
+                        chainId: payment.chainId,
+                        amount: payment.amount,
+                        platformFee: payment.platformFee,
+                      }
+                    : null
+                }
               />
               {job.status === "disputed" && lastDispute && (
                 <div className="bdr1 bdrs8 p20 mb30" style={{ borderColor: "#f3c4c4", backgroundColor: "#fdf5f5" }}>
@@ -418,7 +484,9 @@ export default async function JobPage({ params }) {
                     <li className="py-2 bdrb1 fz14">
                       <span className="text">{formatDay(job.acceptedAt)}</span> ·{" "}
                       {isClient ? "You" : p.client.displayName}{" "}
-                      {isOrder ? "ordered the service and paid with PayPal" : `hired ${isClient ? f.displayName : "you"}`}
+                      {isOrder
+                        ? `ordered the service and paid ${payment?.method === "arc" ? "in USDC on Arc" : "with PayPal"}`
+                        : `hired ${isClient ? f.displayName : "you"}`}
                     </li>
                   )}
                   {events.map((e) => (
@@ -448,7 +516,11 @@ export default async function JobPage({ params }) {
                 <Progress status={job.status} statusBeforeDispute={job.statusBeforeDispute} />
               </div>
 
-              <PaymentCard payment={payment} job={job} isClient={isClient} videoCount={p.videoCount} />
+              {payment?.method === "arc" ? (
+                <ArcPaymentCard payment={payment} job={job} isClient={isClient} videoCount={p.videoCount} />
+              ) : (
+                <PaymentCard payment={payment} job={job} isClient={isClient} videoCount={p.videoCount} />
+              )}
 
 
               <div className="bgc-white bdrs12 p30 mb30 default-box-shadow1">

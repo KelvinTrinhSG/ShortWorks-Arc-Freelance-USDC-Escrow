@@ -34,6 +34,7 @@
     "react-tooltip": "^5.28.1",
     "server-only": "^0.0.1",
     "swiper": "^11.2.7",
+    "viem": "^2.57.4",
     "wowjs": "^1.1.3",
     "zustand": "^5.0.5"
   },

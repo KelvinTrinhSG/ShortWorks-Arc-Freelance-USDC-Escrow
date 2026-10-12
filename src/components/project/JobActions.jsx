@@ -1,11 +1,19 @@
 "use client";
+import { arcByChainId } from "@/data/arc";
+import ESCROW_ABI from "@/data/arcEscrowAbi.json";
 import { DISPUTE_REASONS, JOB_NOTE_MAX } from "@/data/projectOptions";
+import { connectWallet, getEthereum, sendTransaction, switchToArc, waitForTransaction, walletErrorMessage } from "@/lib/metamask";
 import { confirmDialog } from "@/store/confirmStore";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { encodeFunctionData } from "viem";
+
+const short = (a) => `${a.slice(0, 6)}…${a.slice(-4)}`;
 
 // The "next step" box on /jobs/{id}: what the viewer can do now, by role and status.
 // Every action goes to POST /api/jobs/{id}; the page re-renders with the new status.
+// `arc`: the job's USDC escrow on Arc ({ escrow, escrowJobId, clientWallet, chainId, amount,
+// platformFee }), when it was paid that way and the money is still held.
 export default function JobActions({
   jobId,
   role,
@@ -15,7 +23,10 @@ export default function JobActions({
   freelancerName,
   autoApproveAt,
   disputeOpenedByMe,
+  paymentMethod,
+  arc,
 }) {
+  const paidTo = paymentMethod === "arc" ? "Arc wallet" : "PayPal account";
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -42,6 +53,30 @@ export default function JobActions({
     } catch (err) {
       setError(err.message);
     } finally {
+      setBusy(false);
+    }
+  };
+
+  // Arc: the client releases the escrow from the wallet that paid, then the server checks the transaction.
+  const approveOnArc = async () => {
+    setBusy(true);
+    setError("");
+    try {
+      const eth = getEthereum();
+      const from = await connectWallet(eth);
+      if (from.toLowerCase() !== arc.clientWallet.toLowerCase()) {
+        throw new Error(`Switch MetaMask to the wallet you paid from (${short(arc.clientWallet)}) and try again.`);
+      }
+      await switchToArc(eth, arcByChainId(arc.chainId));
+      const hash = await sendTransaction(eth, {
+        from,
+        to: arc.escrow,
+        data: encodeFunctionData({ abi: ESCROW_ABI, functionName: "release", args: [BigInt(arc.escrowJobId)] }),
+      });
+      await waitForTransaction(eth, hash);
+      await run("approve", { txHash: hash });
+    } catch (err) {
+      setError(walletErrorMessage(err));
       setBusy(false);
     }
   };
@@ -139,7 +174,15 @@ export default function JobActions({
           <h5 className="mb5">Review the delivery</h5>
           <p className="text fz14 mb15">
             Check the delivered videos above. Approving completes the job and pays{" "}
-            <strong>${total}</strong> to {freelancerName} through PayPal.
+            {arc ? (
+              <>
+                <strong>{arc.amount} USDC</strong> from the escrow to {freelancerName} (you confirm it in MetaMask).
+              </>
+            ) : (
+              <>
+                <strong>${total}</strong> to {freelancerName} through PayPal.
+              </>
+            )}
             {autoApproveAt && (
               <>
                 {" "}
@@ -155,10 +198,12 @@ export default function JobActions({
               onClick={async () => {
                 const ok = await confirmDialog({
                   title: "Approve the work?",
-                  message: `$${total} will be paid to ${freelancerName} from the payment PayPal is holding. This completes the job; you can't request changes afterwards.`,
+                  message: arc
+                    ? `The escrow pays ${Math.round((arc.amount - arc.platformFee) * 100) / 100} USDC to ${freelancerName} and ${arc.platformFee} USDC platform fee. MetaMask asks you to confirm. This completes the job; you can't request changes afterwards.`
+                    : `$${total} will be paid to ${freelancerName} from the payment PayPal is holding. This completes the job; you can't request changes afterwards.`,
                   confirmLabel: "Approve & Complete",
                 });
-                if (ok) run("approve");
+                if (ok) (arc ? approveOnArc() : run("approve"));
               }}
             >
               Approve & Complete
@@ -167,6 +212,26 @@ export default function JobActions({
               Request changes
             </button>
           </div>
+          {arc && (
+            <p className="fz13 text mt10 mb-0">
+              Can&apos;t use the wallet you paid from?{" "}
+              <button
+                type="button"
+                className="btn btn-link p-0 fz13 align-baseline text-thm"
+                disabled={busy}
+                onClick={async () => {
+                  const ok = await confirmDialog({
+                    title: "Approve without your wallet?",
+                    message: `ShortWorks releases the escrow for you: ${freelancerName} is paid from the USDC held on Arc. This completes the job.`,
+                    confirmLabel: "Approve & Complete",
+                  });
+                  if (ok) run("approve");
+                }}
+              >
+                Approve and let ShortWorks release it
+              </button>
+            </p>
+          )}
         </>
       );
   } else if (status === "submitted") {
@@ -174,8 +239,7 @@ export default function JobActions({
       <>
         <h5 className="mb5">🎉 Nice work, your videos are in!</h5>
         <p className="text fz14 mb-0">
-          Now waiting for the client&apos;s review. They either approve (you&apos;re paid to your PayPal
-          account) or ask for changes. You&apos;ll get a notification either way.
+          Now waiting for the client&apos;s review. They either approve (you&apos;re paid to your {paidTo}) or ask for changes. You&apos;ll get a notification either way.
           {autoApproveAt && <> No answer by {autoApproveAt}? It&apos;s approved and paid automatically.</>}
         </p>
       </>
@@ -185,7 +249,9 @@ export default function JobActions({
       <>
         <h5 className="mb5 text-success">🎉 Job completed</h5>
         <p className="text fz14 mb-0">
-          {role === "client" ? "The work is approved and the freelancer is paid. Thanks for hiring on ShortWorks!" : "The work is approved and the payment went to your PayPal account. Great job!"}
+          {role === "client"
+            ? "The work is approved and the freelancer is paid. Thanks for hiring on ShortWorks!"
+            : `The work is approved and the payment went to your ${paidTo}. Great job!`}
         </p>
       </>
     );
@@ -194,8 +260,7 @@ export default function JobActions({
       <>
         <h5 className="mb5">Job cancelled</h5>
         <p className="text fz14 mb-0">
-          ShortWorks decided the dispute for the client: the held payment was released and nobody
-          was charged. See the decision in the activity below.
+          The held payment went back to the client, so nobody was charged. See why in the activity below.
         </p>
       </>
     );

@@ -13,6 +13,7 @@ import {
   WORK_TYPES,
 } from "@/data/projectOptions";
 import { COUNTRIES, PLATFORMS } from "@/data/talentOptions";
+import { arcEnabled } from "@/lib/arc";
 import pool from "@/lib/db";
 import { notifyProposalDecision, notifyProposalReceived } from "@/lib/notifications";
 import { hireBlocker } from "@/lib/payments";
@@ -265,7 +266,7 @@ export async function getProject(id, viewer) {
     SELECT pr.id, pr.price_per_video, to_char(pr.delivery_date, 'YYYY-MM-DD') AS delivery_date,
            pr.cover_letter, pr.sample_url, pr.status, pr.created_at, pr.accepted_at,
            u.id AS freelancer_id, u.username, u.display_name, u.headline, u.country, u.avatar_updated_at,
-           u.paypal_status, u.paypal_merchant_id
+           u.paypal_status, u.paypal_merchant_id, u.arc_wallet
     FROM proposals pr JOIN users u ON u.id = pr.freelancer_id
     WHERE pr.project_id = $1`;
   const toProposal = (r) => ({
@@ -291,13 +292,18 @@ export async function getProject(id, viewer) {
   let myProposal = null;
   if (isOwner) {
     const res = await pool.query(`${proposalQuery} ORDER BY pr.created_at`, [id]);
-    // What the owner needs for Hire & pay: the PayPal button pays this merchant.
+    // What the owner needs for Hire & pay: the PayPal button pays this merchant; `arc` is
+    // there when paying in USDC on Arc is set up (with why it can't be used, if so).
+    const arcOn = arcEnabled();
     proposals = res.rows.map((r) => ({
       ...toProposal(r),
       hire: {
         amount: money(Number(r.price_per_video) * project.videoCount),
         merchantId: r.paypal_status === "ready" ? r.paypal_merchant_id : null,
         blocker: hireBlocker({ status: r.status, deliveryDate: r.delivery_date, paypalStatus: r.paypal_status }),
+        arc: arcOn
+          ? { blocker: hireBlocker({ status: r.status, deliveryDate: r.delivery_date, arcWallet: r.arc_wallet, method: "arc" }) }
+          : null,
       },
     }));
   } else if (viewer?.accountType === "freelancer") {

@@ -1,5 +1,5 @@
 import pool from "@/lib/db";
-import { autoApproveDueJobs, cancelJobForLostPayment } from "@/lib/jobs";
+import { autoApproveDueJobs, cancelJobForLostPayment, syncArcJobs } from "@/lib/jobs";
 import { notifyPaymentExpiring } from "@/lib/notifications";
 import { refreshAuthorization } from "@/lib/payments";
 
@@ -7,6 +7,8 @@ import { refreshAuthorization } from "@/lib/payments";
 // 1. approve submitted jobs the client left unanswered for 3 days (and pay the freelancer)
 // 2. warn about held payments that expire within 3 days; record the ones that expired
 //    and cancel their jobs (nobody can be paid for them any more)
+// 3. Arc: line payments up with the chain (hires paid in a closed tab, releases / refunds made
+//    outside ShortWorks), warn about escrows close to expiry. Runs first, so step 1 sees it.
 // Vercel sends "Authorization: Bearer $CRON_SECRET".
 export async function GET(request) {
   const secret = process.env.CRON_SECRET;
@@ -14,6 +16,7 @@ export async function GET(request) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const arc = await syncArcJobs().catch((err) => [{ outcome: "error", error: err.message }]);
   const approved = await autoApproveDueJobs();
 
   const { rows } = await pool.query(
@@ -35,5 +38,5 @@ export async function GET(request) {
     }
   }
 
-  return Response.json({ approved, expiring });
+  return Response.json({ approved, expiring, arc });
 }
