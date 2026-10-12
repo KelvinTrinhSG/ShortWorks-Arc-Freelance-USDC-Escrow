@@ -10,6 +10,7 @@ import {
   createPartnerReferral,
   findMerchantIdByTrackingId,
   getAuthorization,
+  getCapture,
   getMerchantIntegration,
   voidAuthorization,
 } from "@/lib/paypal";
@@ -143,6 +144,11 @@ export async function startCheckout(proposalId, viewer) {
 
   const amount = Math.round(Number(h.price_per_video) * h.video_count * 100) / 100;
   const platformFee = platformFeeFor(amount);
+  // Same id for the same checkout (proposal, amount, freelancer, within the hour), so a
+  // double click or a second tab gets the same order back from PayPal instead of a new
+  // one that makes the first tab fail. After a failed or released attempt, a new order.
+  const retryOf = ["voided", "expired", "failed"].includes(h.payment_status) ? h.order_id : "first";
+  const requestId = ["sw-order", h.id, Math.round(amount * 100), h.paypal_merchant_id, Math.floor(Date.now() / 3600000), retryOf].join("-");
   let order;
   try {
     order = await createOrder({
@@ -151,6 +157,7 @@ export async function startCheckout(proposalId, viewer) {
       currency: CURRENCY,
       referenceId: `job-${h.id}`,
       description: `ShortWorks: ${h.title} (${h.video_count} videos, ${h.freelancer_name})`,
+      requestId,
     });
   } catch (err) {
     throw fromPayPal(err, "start the payment");
@@ -321,11 +328,12 @@ const SCOPE = `($1::int IS NULL OR pr.project_id = $1) AND ($2::int IS NULL OR p
   AND ($3::int IS NULL OR pr.freelancer_id = $3 OR pr.project_id IN (SELECT id FROM projects WHERE client_id = $3))`;
 const scopeArgs = ({ projectId, proposalId, userId }) => [projectId ?? null, proposalId ?? null, userId ?? null];
 
-// Payments that keep a project, proposal or account from being deleted: money held or taken.
+// Payments that keep a project, proposal or account from being deleted: money held or taken
+// (refunded payments too: their history is kept).
 export async function hasLivePayment(scope) {
   const { rows } = await pool.query(
     `SELECT 1 FROM job_payments jp JOIN proposals pr ON pr.id = jp.proposal_id
-     WHERE jp.status IN ('authorized', 'capturing', 'voiding', 'captured') AND ${SCOPE}
+     WHERE jp.status IN ('authorized', 'capturing', 'voiding', 'captured', 'partially_refunded', 'refunded') AND ${SCOPE}
      LIMIT 1`,
     scopeArgs(scope),
   );
@@ -346,16 +354,39 @@ export async function clearDeadPayments(scope) {
 
 // Keeps our rows in line with what happened on PayPal's side. Our own calls already
 // update them; this catches the rest (expiry, voids or refunds made in PayPal...).
+// Returns the proposal id when a hold was voided that ShortWorks didn't release itself:
+// the caller cancels that job (lib/jobs.js cancelJobForLostPayment).
 export async function applyWebhookEvent(event) {
   const r = event.resource ?? {};
   const authId = r.supplementary_data?.related_ids?.authorization_id;
   switch (event.event_type) {
-    case "PAYMENT.AUTHORIZATION.VOIDED":
-      await pool.query(
-        "UPDATE job_payments SET status = 'voided', updated_at = NOW() WHERE authorization_id = $1 AND status IN ('authorized', 'voiding')",
+    case "PAYMENT.AUTHORIZATION.VOIDED": {
+      // 'voiding' = our own release in progress; 'authorized' = voided by someone else.
+      const { rows } = await pool.query(
+        `UPDATE job_payments jp SET status = 'voided', updated_at = NOW()
+         FROM (SELECT id, status FROM job_payments WHERE authorization_id = $1) old
+         WHERE jp.id = old.id AND jp.status IN ('authorized', 'voiding')
+         RETURNING jp.proposal_id, old.status AS old_status`,
         [r.id],
       );
+      return rows[0]?.old_status === "authorized" ? rows[0].proposal_id : null;
+    }
+    case "PAYMENT.CAPTURE.REFUNDED": {
+      // The resource is the refund; its "up" link is the capture. The capture's own status
+      // says whether it is now fully or partly refunded (several refunds add up).
+      const captureId = r.links?.find((l) => l.rel === "up")?.href?.split("/").pop();
+      const { rows } = await pool.query(
+        "SELECT id, seller_merchant_id FROM job_payments WHERE capture_id = $1",
+        [captureId ?? null],
+      );
+      if (!rows[0]) break;
+      const capture = await getCapture(captureId, rows[0].seller_merchant_id);
+      const status = { REFUNDED: "refunded", PARTIALLY_REFUNDED: "partially_refunded" }[capture.status];
+      if (status) {
+        await pool.query("UPDATE job_payments SET status = $2, updated_at = NOW() WHERE id = $1", [rows[0].id, status]);
+      }
       break;
+    }
     case "PAYMENT.CAPTURE.COMPLETED":
       if (authId) {
         await pool.query(
@@ -383,4 +414,5 @@ export async function applyWebhookEvent(event) {
     default:
       break;
   }
+  return null;
 }

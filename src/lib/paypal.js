@@ -187,6 +187,10 @@ export const voidAuthorization = (authorizationId, sellerMerchantId) =>
 export const getAuthorization = (authorizationId, sellerMerchantId) =>
   paypalFetch(`/v2/payments/authorizations/${encodeURIComponent(authorizationId)}`, { sellerMerchantId });
 
+// { id, status: COMPLETED | PARTIALLY_REFUNDED | REFUNDED | ..., amount }
+export const getCapture = (captureId, sellerMerchantId) =>
+  paypalFetch(`/v2/payments/captures/${encodeURIComponent(captureId)}`, { sellerMerchantId });
+
 // ---- Webhooks -----------------------------------------------------------------
 
 // Asks PayPal whether a webhook call really came from PayPal.

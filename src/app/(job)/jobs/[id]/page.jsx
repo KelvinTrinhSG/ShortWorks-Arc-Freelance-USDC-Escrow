@@ -51,7 +51,7 @@ function Row({ label, children }) {
 }
 
 const money2 = (n) => `$${Number(n).toFixed(2)}`;
-const SYSTEM_EVENTS = new Set(["auto_approved", "dispute_resolved"]);
+const SYSTEM_EVENTS = new Set(["auto_approved", "dispute_resolved", "payment_voided", "payment_expired"]);
 
 // The job's PayPal payment (lib/payments.js): held, paid with the fee breakdown, or released.
 function PaymentCard({ payment, job, isClient, videoCount }) {
@@ -59,6 +59,8 @@ function PaymentCard({ payment, job, isClient, videoCount }) {
   const s = payment?.status;
   const status =
     s === "captured" ? <span className="text-success">Paid ✓</span>
+    : s === "refunded" ? <span className="text-danger">Refunded to the client</span>
+    : s === "partially_refunded" ? <span className="text-danger">Paid, partly refunded to the client</span>
     : s === "capturing" ? "Paying…"
     : s === "voided" ? "Released, nobody was charged"
     : s === "expired" ? <span className="text-danger">Hold expired</span>
@@ -81,7 +83,7 @@ function PaymentCard({ payment, job, isClient, videoCount }) {
       {s === "authorized" && payment.expiresAt && (
         <Row label="Held until">{formatDateTime(payment.expiresAt)}</Row>
       )}
-      {s === "captured" ? (
+      {["captured", "refunded", "partially_refunded"].includes(s) ? (
         <>
           <Row label="PayPal fee">−{money2(payment.paypalFee ?? 0)}</Row>
           <Row label={`Platform fee`}>−{money2(payment.platformFee)}</Row>
@@ -104,9 +106,11 @@ function PaymentCard({ payment, job, isClient, videoCount }) {
             : "The client's money is held by PayPal and goes straight to your PayPal account when the work is approved."
           : s === "captured"
             ? "Paid through PayPal, straight to the freelancer's account."
-            : s === "voided"
-              ? "The hold was released and the client was not charged."
-              : "PayPal fee is an estimate until the payment is taken."}
+            : s === "refunded" || s === "partially_refunded"
+              ? "The payment was taken, then refunded through PayPal (outside ShortWorks)."
+              : s === "voided" || s === "expired"
+                ? "The hold was released and the client was not charged."
+                : "PayPal fee is an estimate until the payment is taken."}
       </p>
     </div>
   );
@@ -120,6 +124,8 @@ const EVENT_TEXT = {
   dispute_withdrawn: "withdrew the dispute",
   auto_approved: "approved the work automatically (no answer for 3 days)",
   dispute_resolved: "decided the dispute",
+  payment_voided: "cancelled the job: PayPal released the held payment, so the work can no longer be paid",
+  payment_expired: "cancelled the job: PayPal's hold on the payment expired, so the work can no longer be paid",
 };
 
 // Hired -> In progress -> Submitted -> Completed. A dispute is shown on the step it froze.

@@ -22,6 +22,12 @@ Quyết định khi triển khai:
 - Đã xoá 2 job test cũ (proposal 3 và 22) vì không có thanh toán.
 - Project / tài khoản đã có tiền giữ hoặc đã trả **không xoá được** (409), chỉ Close.
 
+Sửa sau khi rà soát (2026-10-12):
+- **Khoản giữ mất ngoài ShortWorks → job bị huỷ.** Webhook `PAYMENT.AUTHORIZATION.VOIDED` mà ShortWorks không tự void, hoặc cron thấy authorization `EXPIRED` / `VOIDED` / `DENIED`: `cancelJobForLostPayment()` (`lib/jobs.js`) chuyển job sang `cancelled`, ghi sự kiện `payment_voided` / `payment_expired` và báo cả hai bên. Trước đây job vẫn chạy và chỉ lỗi lúc Approve.
+- **Undo hire:** `undoHire()` đổi proposal về `pending` / `declined` trước (cùng câu lệnh với điều kiện "chưa giao bài"), rồi mới void; void lỗi thì trả lại `accepted`.
+- **Tạo order có `PayPal-Request-Id`:** cố định theo proposal + số tiền + freelancer + giờ hiện tại (lần thử sau một lần thất bại / đã void thì id mới). Bấm 2 lần hoặc mở 2 tab nhận cùng một order.
+- **Refund:** webhook `PAYMENT.CAPTURE.REFUNDED` hỏi lại capture trên PayPal và lưu `refunded` / `partially_refunded`. Không cần migration (cột `status` là VARCHAR). Webhook sandbox đã đăng ký sẵn event này (kiểm tra 2026-10-12).
+
 ---
 
 # Đề xuất ban đầu

@@ -11,7 +11,7 @@ import {
 } from "@/data/projectOptions";
 import { COUNTRIES, PLATFORMS } from "@/data/talentOptions";
 import pool from "@/lib/db";
-import { notifyJobEvent } from "@/lib/notifications";
+import { notifyJobEvent, notifyProposalDecision } from "@/lib/notifications";
 import { PaymentError, capturePayment, getJobPayment, releasePayment } from "@/lib/payments";
 import { avatarUrlOf } from "@/lib/profile";
 import { getProject } from "@/lib/projects";
@@ -506,13 +506,41 @@ export async function getOpenDisputes() {
   }));
 }
 
-// The client may only undo an acceptance before any work was handed in.
-export async function canUndoAcceptance(proposalId) {
+// PayPal let the held money go without ShortWorks asking (the hold expired, or it was
+// voided on PayPal): nobody can be paid for this job any more, so it is cancelled and
+// both sides are told. `event` is "payment_expired" or "payment_voided".
+// Returns true when the job was cancelled.
+export async function cancelJobForLostPayment(id, event) {
+  const ctx = await getJobContext(id);
+  if (!ctx || ["completed", "cancelled"].includes(ctx.job_status)) return false;
+  const ok = await applyTransition(ctx, { from: ctx.job_status, to: "cancelled", event, actorId: null });
+  if (!ok) return false;
+  await notifyJobEvent(ctx, ctx.freelancer_id, null, event);
+  await notifyJobEvent(ctx, ctx.client_id, null, event);
+  return true;
+}
+
+// The client undoes a hire, only before any work was handed in. The proposal goes back
+// to `status` (pending / declined) first, in the same statement as the check, so no work
+// can be handed in while PayPal releases the hold; if releasing fails, the hire is restored.
+// Returns {} on success or { error, code }.
+export async function undoHire(proposalId, status) {
   const { rows } = await pool.query(
-    `SELECT job_status = 'in_progress'
-            AND NOT EXISTS (SELECT 1 FROM job_events e WHERE e.proposal_id = pr.id) AS ok
-     FROM proposals pr WHERE pr.id = $1`,
-    [proposalId],
+    `UPDATE proposals pr SET status = $2::varchar, accepted_at = NULL
+     FROM (SELECT accepted_at FROM proposals WHERE id = $1) old
+     WHERE pr.id = $1 AND pr.status = 'accepted' AND pr.job_status = 'in_progress'
+       AND NOT EXISTS (SELECT 1 FROM job_events e WHERE e.proposal_id = pr.id)
+     RETURNING old.accepted_at`,
+    [proposalId, status],
   );
-  return Boolean(rows[0]?.ok);
+  if (!rows[0]) return { error: "Work on this job has already started, so the hire can't be undone.", code: 409 };
+  try {
+    await releasePayment(proposalId);
+  } catch (err) {
+    await pool.query("UPDATE proposals SET status = 'accepted', accepted_at = $2 WHERE id = $1", [proposalId, rows[0].accepted_at]);
+    if (err instanceof PaymentError) return { error: err.message, code: err.code };
+    throw err;
+  }
+  await notifyProposalDecision(proposalId, status);
+  return {};
 }

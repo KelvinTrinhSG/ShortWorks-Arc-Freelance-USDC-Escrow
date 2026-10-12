@@ -5,8 +5,8 @@ import {
   updateProposal,
   validateProposal,
 } from "@/lib/projects";
-import { canUndoAcceptance } from "@/lib/jobs";
-import { PaymentError, clearDeadPayments, releasePayment } from "@/lib/payments";
+import { undoHire } from "@/lib/jobs";
+import { clearDeadPayments } from "@/lib/payments";
 import { getViewer } from "@/lib/viewer";
 
 const error = (message, status) => Response.json({ error: message }, { status });
@@ -37,17 +37,10 @@ export async function PATCH(request, { params }) {
       return error("Use Hire & pay to hire this freelancer.", 400);
     }
     if (proposal.status === "accepted" && body.status !== "accepted") {
-      // Once work was handed in (or disputed), the job can't be undone from here.
-      if (!(await canUndoAcceptance(proposal.id))) {
-        return error("Work on this job has already started, so the hire can't be undone.", 409);
-      }
       // Undoing a hire releases the held money; nobody is charged.
-      try {
-        await releasePayment(proposal.id);
-      } catch (err) {
-        if (err instanceof PaymentError) return error(err.message, err.code);
-        throw err;
-      }
+      const { error: message, code } = await undoHire(proposal.id, body.status);
+      if (message) return error(message, code);
+      return Response.json({ ok: true, status: body.status });
     }
     await setProposalStatus(proposal.id, body.status);
     return Response.json({ ok: true, status: body.status });
