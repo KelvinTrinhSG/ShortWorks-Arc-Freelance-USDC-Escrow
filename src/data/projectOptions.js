@@ -62,7 +62,8 @@ export const DISPUTE_DECISION_HOURS = 48;
 export const ARC_RECLAIM_BUFFER_DAYS = 14;
 
 // The platform fee comes out of the freelancer's side, so does PayPal's fee.
-export const PLATFORM_FEE_PERCENT = 10;
+// Fixed when a job is hired (job_payments.platform_fee, Arc Terms): changing it only affects new hires.
+export const PLATFORM_FEE_PERCENT = 5;
 // Only for the "You receive ≈" estimate: the real PayPal fee is known after capture.
 // Sandbox charged $0.64 on $10; re-check against PayPal's live rates (docs/payments.md §11).
 const PAYPAL_FEE_ESTIMATE = { percent: 3.49, fixed: 0.29 };

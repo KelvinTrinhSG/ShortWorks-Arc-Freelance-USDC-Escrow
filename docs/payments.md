@@ -18,7 +18,7 @@ Quyết định khi triển khai:
 - Dùng lại app **Platform Partner App** của demo (partner `59SRQD4T47KY4`). Credential chép vào `.env.local` của ShortWorks (không commit).
 - Webhook sandbox `2J565532KN297751G` trỏ tới `https://pay-pal-short-work-project.vercel.app/api/paypal/webhook`, tạo bằng API.
 - `ADMIN_EMAILS`: email của tài khoản kelvinClient (giá trị thật trong `.env.local` và trên Vercel).
-- Phí sàn 10%, 25 ngày, 48 giờ duyệt (`AUTO_APPROVE_HOURS`), 48 giờ xử khiếu nại và công thức ước tính phí PayPal (3.49% + $0.29, khớp $0.64 cho $10 trên Sandbox) là **hằng số trong `src/data/projectOptions.js`**, không phải biến môi trường, vì form proposal (chạy trên trình duyệt) cũng cần.
+- Phí sàn 5% (`PLATFORM_FEE_PERCENT`, trước 2026-10-12 là 10%; phí chốt lúc thuê nên job cũ giữ 10%), 25 ngày, 48 giờ duyệt (`AUTO_APPROVE_HOURS`), 48 giờ xử khiếu nại và công thức ước tính phí PayPal (3.49% + $0.29, khớp $0.64 cho $10 trên Sandbox) là **hằng số trong `src/data/projectOptions.js`**, không phải biến môi trường, vì form proposal (chạy trên trình duyệt) cũng cần.
 - Đã xoá 2 job test cũ (proposal 3 và 22) vì không có thanh toán.
 - Project / tài khoản đã có tiền giữ hoặc đã trả **không xoá được** (409), chỉ Close.
 
@@ -56,7 +56,7 @@ ShortWorks không bao giờ cầm tiền của người khác. Tiền đi thẳn
 | **Capture có `platform_fees` (chia tiền thật), kịch bản F** | ✅ **Đã chạy ngày 2026-10-07** (xem bảng dưới) | `data/contracts.json` trong thư mục local, cùng `GET /v2/payments/captures/{id}` |
 | Void (kịch bản G) và chặn sai luồng (kịch bản H) | ❓ Không có dấu vết trong `data/`: chưa có hợp đồng v2 nào bị void | — |
 
-Kết quả kịch bản F, kiểm tra lại với PayPal Sandbox ngày 2026-10-11 bằng `GET /v2/payments/captures/32827723UX8248025`:
+Kết quả kịch bản F, kiểm tra lại với PayPal Sandbox ngày 2026-10-11 bằng `GET /v2/payments/captures/32827723UX8248025` (chạy khi phí sàn còn 10%; với 5% hiện nay, $10 → phí sàn $0.50, freelancer nhận ≈ $8.86):
 
 | | Số tiền | Ai nhận |
 |---|---|---|
@@ -239,7 +239,7 @@ Thay đổi so với demo:
 | Trang | Thay đổi |
 |---|---|
 | **My Profile** (freelancer) | Thay ô "PayPal email" bằng thẻ **Connect PayPal**: chưa kết nối → nút mở popup; `ready` → "Ready to get paid · merchant …"; `blocked` → lý do (chưa xác nhận email…) và nút "Check again" |
-| **Gửi proposal** | Freelancer chưa kết nối vẫn gửi được, nhưng có nhắc: "Connect PayPal so the client can hire you". Ngay dưới ô giá hiện bảng **ước tính** cập nhật theo giá đang nhập (Q1): "Client pays $10.00 · Platform fee (10%) −$1.00 · PayPal fee ≈ −$0.64 · **You receive ≈ $8.36**". Ô chọn ngày giao giới hạn tối đa hôm nay + 25 ngày (Q2) |
+| **Gửi proposal** | Freelancer chưa kết nối vẫn gửi được, nhưng có nhắc: "Connect PayPal so the client can hire you". Ngay dưới ô giá hiện bảng **ước tính** cập nhật theo giá đang nhập (Q1): "Client pays $10.00 · Platform fee (5%) −$0.50 · PayPal fee ≈ −$0.64 · **You receive ≈ $8.86**". Ô chọn ngày giao giới hạn tối đa hôm nay + 25 ngày (Q2) |
 | **Proposals** (người thuê, trang dự án) | Nút **Accept** thành **Hire & pay $X**, mở hộp có nút PayPal (SDK tải theo `merchant-id` của freelancer; đổi freelancer thì tải lại SDK như demo). Freelancer chưa kết nối thì nút bị khoá kèm lời giải thích |
 | **Job — khối Payment** | `authorized`: "**$X held by PayPal** · until {ngày}". `captured`: bảng **Gross / PayPal fee / Platform fee / You receive**. `voided`: "Released, nobody was charged". Bỏ dòng "Payment through PayPal is coming soon." |
 | **Approve & Complete** | Hộp xác nhận (đã dùng `confirmDialog`) ghi rõ "$X will be paid to {freelancer}" |
@@ -280,7 +280,7 @@ CRON_SECRET=                       # Vercel Cron gửi kèm, để chỉ cron g�
 |---|---|---|
 | P1 | Freelancer Connect PayPal | `ready`; người thuê thấy nút Hire & pay được bật |
 | P2 | Hire & pay $X | Personal bị **giữ** $X (chưa trừ); job In progress; Payment "held" |
-| P3 | Submit → Approve & Complete | Freelancer nhận X − phí sàn − phí PayPal; ShortWorks nhận phí sàn; Personal bị trừ $X. Với $10: $8.36 / $1.00 / $0.64 như demo. Khối Payment hiện đủ 4 con số |
+| P3 | Submit → Approve & Complete | Freelancer nhận X − phí sàn − phí PayPal; ShortWorks nhận phí sàn; Personal bị trừ $X. Với $10: $8.86 / $0.50 / $0.64 (demo chạy lúc phí 10%: $8.36 / $1.00 / $0.64). Khối Payment hiện đủ 4 con số |
 | P4 | Hire → Undo trước khi giao bài | Void; không ai bị trừ tiền |
 | P5 | Bấm Approve 2 lần / 2 tab | Chỉ 1 lần capture (409 cho lần sau) |
 | P6 | Sửa `amount` trong request | Bị bỏ qua, backend dùng giá proposal |
@@ -289,7 +289,7 @@ CRON_SECRET=                       # Vercel Cron gửi kèm, để chỉ cron g�
 | P9 | Webhook giả (sai chữ ký) | Bị từ chối |
 | P10 | Proposal có ngày giao hôm nay + 26 ngày | Không gửi được; proposal cũ vượt 25 ngày thì nút Hire & pay bị khoá |
 | P11 | Submit rồi để yên 3 ngày (giả lập bằng cách lùi `created_at` của sự kiện `submitted`, rồi chạy cron bằng tay) | Tự Approve, capture, cả hai bên nhận thông báo; job đang Disputed thì không bị tự Approve |
-| P12 | Gõ giá $10 trong form proposal | Hiện "You receive ≈ $8.36"; sau capture, khối Payment hiện số chính xác |
+| P12 | Gõ giá $10 trong form proposal | Hiện "You receive ≈ $8.86"; sau capture, khối Payment hiện số chính xác |
 
 ---
 
@@ -313,7 +313,7 @@ CRON_SECRET=                       # Vercel Cron gửi kèm, để chỉ cron g�
 
 | # | Câu hỏi | Quyết định | Áp dụng ở |
 |---|---|---|---|
-| Q1 | Ai chịu phí sàn 10%? | **Trừ vào phần freelancer.** Người thuê trả đúng giá trong proposal. Freelancer chịu phí sàn 10% và phí PayPal ($10 → nhận $8.36 trong demo). Form proposal hiện "You receive ≈ …" ngay khi nhập giá. Phí PayPal chỉ biết chính xác sau capture, nên lúc đó ghi là "khoảng" | §7 (Gửi proposal, Payment), §12 |
+| Q1 | Ai chịu phí sàn 5%? | **Trừ vào phần freelancer.** Người thuê trả đúng giá trong proposal. Freelancer chịu phí sàn 5% (trước 2026-10-12 là 10%) và phí PayPal ($10 → nhận ≈ $8.86). Form proposal hiện "You receive ≈ …" ngay khi nhập giá. Phí PayPal chỉ biết chính xác sau capture, nên lúc đó ghi là "khoảng" | §7 (Gửi proposal, Payment), §12 |
 | Q2 | Giới hạn thời gian | **Ngày giao tối đa 25 ngày** cho bản đầu. Delayed disbursement để bản sau | §3, §9 P10 |
 | Q3 | Tự Approve khi người thuê im lặng | **48 giờ** kể từ lần giao gần nhất (trước đây 3 ngày). Không áp dụng khi đang khiếu nại | §3, §9 P11 |
 | Q4 | Ai xử lý khiếu nại | **Admin là đội ShortWorks**, theo điều khoản viết ở `/terms` | §7 (Admin, `/terms`), §12 |
@@ -337,7 +337,7 @@ youReceive ≈ amount − round(amount × PLATFORM_FEE_PERCENT / 100, 2) − pay
 
 Đây là dàn ý để viết điều khoản, **chưa phải văn bản pháp lý**. Nên nhờ người có chuyên môn xem lại trước khi lên Live.
 
-1. **Phí:** người thuê trả đúng giá đã thoả thuận trong proposal. ShortWorks thu phí sàn 10%, trừ vào khoản freelancer nhận. Phí xử lý của PayPal cũng trừ vào khoản freelancer nhận.
+1. **Phí:** người thuê trả đúng giá đã thoả thuận trong proposal. ShortWorks thu phí sàn 5%, trừ vào khoản freelancer nhận. Phí xử lý của PayPal cũng trừ vào khoản freelancer nhận.
 2. **Giữ tiền:** khi thuê, PayPal giữ (authorize) toàn bộ số tiền trên tài khoản người thuê. Tiền chỉ bị thu khi công việc được duyệt, và được giải phóng nếu huỷ trước khi freelancer giao bài.
 3. **Thời hạn:** ngày giao tối đa 25 ngày kể từ khi thuê. Người thuê có 48 giờ để duyệt hoặc yêu cầu sửa sau mỗi lần giao. Quá hạn đó, công việc được tự động duyệt và thanh toán.
 4. **Yêu cầu sửa:** người thuê ghi rõ cần sửa gì. Yêu cầu phải nằm trong phạm vi brief ban đầu.

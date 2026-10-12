@@ -1,5 +1,5 @@
 "use client";
-import { VIDEO_LENGTHS, WORK_TYPES, estimateEarnings } from "@/data/projectOptions";
+import { PLATFORM_FEE_PERCENT, VIDEO_LENGTHS, WORK_TYPES, estimateEarnings } from "@/data/projectOptions";
 import {
   DELIVERY_DAYS,
   MAX_ORDER_VIDEOS,
@@ -199,7 +199,7 @@ export default function ServiceForm({ serviceId, initial }) {
               {earnings.amount > 0 && (
                 <p className="fz13 text mt5 mb0">
                   You receive ≈ <strong className="dark-color">${earnings.net.toFixed(2)}</strong> per video after the
-                  10% platform fee and PayPal&apos;s fee (for a 1-video order).
+                  {PLATFORM_FEE_PERCENT}% platform fee and PayPal&apos;s fee (for a 1-video order).
                 </p>
               )}
               <FieldError message={errorFor("pricePerVideo")} />

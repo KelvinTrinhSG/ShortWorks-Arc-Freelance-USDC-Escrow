@@ -61,7 +61,7 @@ struct Job {
     address client;      // ví người thuê (người gửi USDC)
     address freelancer;  // ví nhận tiền, chốt lúc fund
     uint128 amount;      // tổng USDC (6 số lẻ), = giá × số video
-    uint128 fee;         // phí sàn, chốt lúc fund (10% hiện nay)
+    uint128 fee;         // phí sàn, chốt lúc fund (5% hiện nay)
     uint64  expiresAt;   // mốc an toàn: sau mốc này người thuê tự lấy lại được (§5)
     bool    frozen;      // đang khiếu nại: dừng đồng hồ expiresAt
     Status  status;
@@ -200,9 +200,9 @@ Khiếu nại: OPERATOR setFrozen(true). Admin quyết: release (freelancer) ho�
 | | Job $100 trả bằng PayPal | Job $100 trả bằng Arc |
 |---|---|---|
 | Người thuê trả | $100 | 100 USDC + gas (rất nhỏ) |
-| Phí sàn 10% | −$10 | −10 USDC (`fee` trong Terms) |
+| Phí sàn 5% | −$5 | −5 USDC (`fee` trong Terms) |
 | Phí cổng thanh toán | ≈ −$3.78 (PayPal) | 0 |
-| **Freelancer nhận** | **≈ $86.22** | **90 USDC** |
+| **Freelancer nhận** | **≈ $91.22** | **95 USDC** |
 
 Form proposal hiện "You receive ≈" cho cả hai cách trả.
 
@@ -330,7 +330,7 @@ Rồi đặt `ARC_ESCROW_ADDRESS` (và `ARC_ESCROW_DEPLOY_BLOCK`) trong `.env.lo
 | `/pay-with-arc` | Nút chuyển Testnet / Mainnet (nhãn "Test USDC, no real value" / "Real USDC"; MetaMask tự chuyển mạng theo). Ví đã lưu hiện sẵn khi mở trang. Connect MetaMask hoặc nhập tay thì lưu ví vào tài khoản; **Change wallet**, **Remove** (§4) |
 | Proposals (người thuê) | Hai nút: **Hire & pay with PayPal** và **Hire & pay … USDC on Arc**. Nút Arc khoá khi freelancer chưa lưu ví. Đặt dịch vụ (`/services/{id}`) cũng có hai cách trả |
 | Hộp Hire with Arc | Kết nối MetaMask → chuyển sang Arc → kiểm tra số dư USDC đủ (job + gas) → ký permit → gửi giao dịch → "Holding the payment…" |
-| Job: khối Payment | "100 USDC held in escrow" + link explorer tới contract và tx; sau `release`: "Paid 90 USDC to the freelancer · 10 USDC platform fee" |
+| Job: khối Payment | "100 USDC held in escrow" + link explorer tới contract và tx; sau `release`: "Paid 95 USDC to the freelancer · 5 USDC platform fee" |
 | Approve & Complete | Job trả bằng Arc: MetaMask mở để gọi `release` |
 | `/terms` | Thêm mục thanh toán bằng USDC trên Arc: escrow, phí, `reclaim` sau `expiresAt`, gas |
 
