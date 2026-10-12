@@ -1,6 +1,6 @@
 # Thanh toán Job bằng USDC trên Arc
 
-> **Trạng thái (2026-10-12): đã triển khai, chạy trên Arc Testnet.** Đi kèm với thanh toán PayPal ([payments.md](payments.md)), không thay thế. Người thuê chọn một trong hai khi bấm Hire. Chưa audit contract, chưa lên mainnet (§11).
+> **Trạng thái (2026-10-12): đã triển khai. Testnet: `0xDCbD230Ee76458993cf2624c94530681e79BbC63` (block 66756024). Mainnet: `0xe69C9077b3F12939EFCd673171A4489f0f1370da` (block 25527141).** Đi kèm với thanh toán PayPal ([payments.md](payments.md)), không thay thế. Người thuê chọn một trong hai khi bấm Hire. **Contract chưa audit** (§11).
 >
 > | Phần | File |
 > |---|---|
@@ -286,6 +286,19 @@ ARC_OPERATOR_PRIVATE_KEY=   # gửi release / refund / setFrozen, cần nạp US
 
 Thiếu `ARC_ESCROW_ADDRESS` hoặc một trong hai khoá thì app **tự ẩn** mọi nút Arc (`arcEnabled()`), PayPal chạy như cũ. Khoá ADMIN / deployer **không** nằm trong app: nó ở `contracts/.env` (testnet), và trên mainnet phải là multisig hoặc ví phần cứng (B4).
 
+### Testnet và mainnet cùng lúc
+
+| | Máy dev (`.env.local`) | Vercel Production (`.env.mainnet.local` là bản ghi) |
+|---|---|---|
+| `NEXT_PUBLIC_ARC_NETWORK` | `testnet` | `mainnet` |
+| Escrow | `0xDCbD…bC63` | `0xe69C…70da` |
+| Signer | khoá testnet | khoá **riêng** cho mainnet (`0xD6Bf…Fca70`) |
+| Operator / admin / treasury | ví testnet (`contracts/.env`) | ví gas `0xA24d…2E00` (`contracts/.env.mainnet`) |
+
+**Hai mạng dùng chung một database.** Mỗi khoản thanh toán lưu `chain_id`, và mỗi server **chỉ xử lý khoản thuộc mạng của mình** (`onThisNetwork` trong `arcPayments.js`). Cron chỉ đối chiếu các khoản cùng mạng; release / refund / freeze / approve trên một job của mạng kia trả lỗi "Manage it on the ShortWorks site that runs on that network". Thiếu chốt chặn này thì server mainnet sẽ đọc job testnet bằng RPC mainnet, thấy "không tồn tại" và gửi nhầm thông báo.
+
+**Lưu ý ví mainnet:** khoá của ví gas `0xA24d…2E00` đã được gửi qua chat lúc thiết lập. Ví này vừa là ADMIN vừa là OPERATOR. Nên sớm: `grantRole(DEFAULT_ADMIN_ROLE, <ví an toàn>)` rồi `renounceRole(DEFAULT_ADMIN_ROLE, 0xA24d…)`; đổi `treasury` sang ví nhận phí riêng; chỉ để trong ví gas lượng USDC đủ trả gas.
+
 ### Deploy contract
 
 ```bash
@@ -341,7 +354,7 @@ Rồi đặt `ARC_ESCROW_ADDRESS` (và `ARC_ESCROW_DEPLOY_BLOCK`) trong `.env.lo
 ## 11. Tiến độ
 
 1. ✅ `ShortWorksEscrow` + 30 unit test Foundry (A1–A3, A6–A8 ở mức contract).
-2. ✅ Deploy lên **Arc Testnet**. Smoke test trên chain thật bằng chính `src/lib/arc.js`: fundWithPermit, approve + fund, setFrozen, release, refund, Terms bị sửa thì revert.
+2. ✅ Deploy lên **Arc Testnet** và **Arc Mainnet** (smoke test mainnet: fund 0.01 USDC bằng permit, freeze, refund; hết 0.0068 USDC gas). Smoke test trên chain thật bằng chính `src/lib/arc.js`: fundWithPermit, approve + fund, setFrozen, release, refund, Terms bị sửa thì revert.
 3. ✅ Lưu ví trên `/pay-with-arc` (connect MetaMask hoặc nhập tay, §4) + migration `012`.
 4. ✅ Hire & pay with Arc: Terms, permit (dự phòng approve + fund), xác minh receipt.
 5. ✅ Approve (bằng ví hoặc nhờ server), Undo, tự Approve, khiếu nại (freeze), cron đối chiếu.

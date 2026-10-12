@@ -85,6 +85,16 @@ async function getHireContext(proposalId) {
 const getRow = async (proposalId) =>
   (await pool.query("SELECT * FROM job_arc_payments WHERE proposal_id = $1", [proposalId])).rows[0] ?? null;
 
+// The database is shared by servers on different networks (e.g. local on testnet, Vercel on
+// mainnet). A server only touches payments made on its own network: its RPC and keys can't
+// read or move the others.
+const onThisNetwork = (row) => Number(row?.chain_id) === ARC.chainId;
+function requireThisNetwork(row) {
+  if (row && !onThisNetwork(row)) {
+    throw new PaymentError(`This job was paid on ${arcByChainId(row.chain_id).name}. Manage it on the ShortWorks site that runs on that network.`, 409);
+  }
+}
+
 // The terms as the contract sees them (bigints).
 const termsOf = (row) => ({
   jobId: BigInt(row.escrow_job_id),
@@ -191,6 +201,7 @@ export async function completeArcCheckout(proposalId, txHash, viewer) {
   if (h.client_id !== viewer.id) throw new PaymentError("Only the project owner can hire.", 403);
   if (!isTxHash(txHash)) throw new PaymentError("That isn't a transaction hash.", 400);
   const row = await getRow(h.id);
+  requireThisNetwork(row);
   if (row?.status === "funded" && h.status === "accepted") return true; // already done (retry)
   if (row?.status !== "signed") throw new PaymentError("This payment is no longer valid. Please start again.");
 
@@ -267,7 +278,7 @@ async function confirmFunding(row, txHash) {
 // Returns true when it was funded.
 export async function syncSignedPayment(proposalId) {
   const row = await getRow(proposalId);
-  if (row?.status !== "signed") return false;
+  if (row?.status !== "signed" || !onThisNetwork(row)) return false;
   const job = await readEscrowJob(row.escrow_address, row.escrow_job_id);
   if (job.status === "none") return false;
   if (job.status === "funded") await confirmFunding(row, null).catch(() => {});
@@ -296,9 +307,11 @@ async function markSettled(id, status, txHash, by) {
 async function settleAsOperator(proposalId, kind) {
   const busy = kind === "release" ? "releasing" : "refunding";
   const done = kind === "release" ? "released" : "refunded";
+  requireThisNetwork(await getRow(proposalId));
   const { rows } = await pool.query(
-    `UPDATE job_arc_payments SET status = $2, updated_at = NOW() WHERE proposal_id = $1 AND status = 'funded' RETURNING *`,
-    [proposalId, busy],
+    `UPDATE job_arc_payments SET status = $2, updated_at = NOW()
+     WHERE proposal_id = $1 AND status = 'funded' AND chain_id = $3 RETURNING *`,
+    [proposalId, busy, ARC.chainId],
   );
   const p = rows[0];
   if (!p) return null;
@@ -335,6 +348,7 @@ export async function arcRefund(proposalId) {
 export async function confirmClientRelease(proposalId, txHash) {
   if (!isTxHash(txHash)) throw new PaymentError("That isn't a transaction hash.", 400);
   const row = await getRow(proposalId);
+  requireThisNetwork(row);
   if (!row || !["funded", "released"].includes(row.status)) throw new PaymentError("There's no held USDC for this job. Refresh and try again.");
   let receipt;
   try {
@@ -353,6 +367,7 @@ export async function confirmClientRelease(proposalId, txHash) {
 export async function arcSetFrozen(proposalId, frozen) {
   const row = await getRow(proposalId);
   if (row?.status !== "funded") return;
+  requireThisNetwork(row);
   try {
     await sendAsOperator(row.escrow_address, "setFrozen", [BigInt(row.escrow_job_id), frozen]);
   } catch (err) {
@@ -393,12 +408,15 @@ export async function getArcPayment(proposalId) {
 // Lines the database up with the chain: hires paid in a tab that closed, releases and refunds
 // made outside ShortWorks (client released, freelancer refunded, client reclaimed after expiry),
 // operator calls that crashed half way. Warns about held payments close to expiry.
+// Only payments on this server's network (see onThisNetwork).
 // Returns { outcomes: [{ proposalId, outcome }], ... } for lib/jobs.js to move the jobs.
 export async function reconcileArcPayments() {
   const { rows } = await pool.query(
     `SELECT * FROM job_arc_payments
-     WHERE status IN ('funded', 'releasing', 'refunding')
-        OR (status = 'signed' AND signature_deadline > NOW() - INTERVAL '2 days')`,
+     WHERE chain_id = $1
+       AND (status IN ('funded', 'releasing', 'refunding')
+            OR (status = 'signed' AND signature_deadline > NOW() - INTERVAL '2 days'))`,
+    [ARC.chainId],
   );
   const outcomes = [];
   for (const row of rows) {
