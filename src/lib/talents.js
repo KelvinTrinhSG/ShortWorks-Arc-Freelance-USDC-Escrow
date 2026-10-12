@@ -13,8 +13,8 @@ import { avatarUrlOf, toVideo } from "@/lib/profile";
 
 export const PAGE_SIZE = 12;
 
-// True when all 10 required items are filled in. Every account is listed;
-// complete profiles are just ranked first under "Recommended".
+// True when all 10 required items are filled in. Only complete profiles of accounts that
+// aren't hidden (db/013_hidden_accounts.sql) are listed; incomplete ones still have their page.
 // Keep in sync with requiredChecks() in components/dashboard/profile/TalentProfile.jsx.
 const COMPLETE = `(
   u.avatar_updated_at IS NOT NULL
@@ -102,7 +102,7 @@ export function parseFilters(params) {
 }
 
 export async function searchTalents(f) {
-  const where = ["u.account_type = 'freelancer'"];
+  const where = ["u.account_type = 'freelancer'", "NOT u.hidden", COMPLETE];
   const values = [];
   // Every "?" in `sql` becomes the same numbered parameter holding `value`.
   const add = (sql, value) => {

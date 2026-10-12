@@ -62,7 +62,8 @@ export function parseEmployerFilters(params) {
 }
 
 export async function searchEmployers(f) {
-  const where = ["u.account_type = 'client'"];
+  // Hidden accounts (test data, db/013_hidden_accounts.sql) are never listed.
+  const where = ["u.account_type = 'client'", "NOT u.hidden"];
   const args = [];
   const add = (sql, value) => {
     args.push(value);

@@ -207,6 +207,7 @@ export async function searchProjects(f, freelancerId = null) {
     "p.status = 'open'",
     "p.deadline >= CURRENT_DATE",
     "NOT EXISTS (SELECT 1 FROM proposals pr WHERE pr.project_id = p.id AND pr.status = 'accepted')",
+    "NOT c.hidden", // posted by a hidden (test) account
   ];
   const args = [];
   const add = (sql, value) => {

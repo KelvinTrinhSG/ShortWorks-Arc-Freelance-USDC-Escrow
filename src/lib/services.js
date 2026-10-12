@@ -204,7 +204,7 @@ export function parseServiceFilters(params) {
 
 // Active services for /services, newest first by default.
 export async function searchServices(f) {
-  const where = ["s.status = 'active'"];
+  const where = ["s.status = 'active'", "NOT u.hidden"]; // offered by a hidden (test) account
   const args = [];
   const add = (sql, value) => {
     args.push(value);
