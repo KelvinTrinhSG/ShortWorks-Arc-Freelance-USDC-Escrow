@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="532" height="300" viewBox="0 0 532 300" fill="none">
+  <!-- /employers: a brand's storefront, and a "hired" card -->
+  <defs>
+    <filter id="sh" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="8" stdDeviation="9" flood-color="#1f2937" flood-opacity=".12"/>
+    </filter>
+  </defs>
+  <ellipse cx="266" cy="166" rx="228" ry="120" fill="#fff" opacity=".55"/>
+  <path d="M60 60l3 7 7 3-7 3-3 7-3-7-7-3 7-3z" fill="#FBC55A"/>
+  <path d="M478 246l2.5 6 6 2.5-6 2.5-2.5 6-2.5-6-6-2.5 6-2.5z" fill="#5BBB7B"/>
+  <circle cx="470" cy="40" r="5" fill="#F29A76"/>
+  <circle cx="52" cy="196" r="4" fill="#6C8CF5"/>
+
+  <!-- storefront -->
+  <g filter="url(#sh)">
+    <rect x="96" y="96" width="220" height="176" rx="12" fill="#fff"/>
+  </g>
+  <!-- sign -->
+  <rect x="150" y="56" width="112" height="34" rx="10" fill="#5BBB7B"/>
+  <rect x="170" y="66" width="72" height="6" rx="3" fill="#fff"/>
+  <rect x="182" y="77" width="48" height="5" rx="2.5" fill="#fff" opacity=".8"/>
+  <!-- awning -->
+  <path d="M90 100h29v26a14.5 14.5 0 0 1-29 0z" fill="#F29A76"/>
+  <path d="M119 100h29v26a14.5 14.5 0 0 1-29 0z" fill="#FAD3C2"/>
+  <path d="M148 100h29v26a14.5 14.5 0 0 1-29 0z" fill="#F29A76"/>
+  <path d="M177 100h29v26a14.5 14.5 0 0 1-29 0z" fill="#FAD3C2"/>
+  <path d="M206 100h29v26a14.5 14.5 0 0 1-29 0z" fill="#F29A76"/>
+  <path d="M235 100h29v26a14.5 14.5 0 0 1-29 0z" fill="#FAD3C2"/>
+  <path d="M264 100h29v26a14.5 14.5 0 0 1-29 0z" fill="#F29A76"/>
+  <path d="M293 100h29v26a14.5 14.5 0 0 1-29 0z" fill="#FAD3C2"/>
+  <!-- window with products -->
+  <rect x="116" y="158" width="104" height="72" rx="8" fill="#E6F4EB"/>
+  <rect x="134" y="182" width="16" height="38" rx="5" fill="#5BBB7B"/>
+  <rect x="138" y="174" width="8" height="10" rx="2" fill="#3F9A5E"/>
+  <rect x="160" y="190" width="22" height="30" rx="6" fill="#FBC55A"/>
+  <rect x="192" y="186" width="14" height="34" rx="5" fill="#6C8CF5"/>
+  <!-- door -->
+  <rect x="236" y="158" width="60" height="114" rx="8" fill="#222"/>
+  <circle cx="284" cy="218" r="4" fill="#FBC55A"/>
+  <rect x="246" y="168" width="40" height="36" rx="5" fill="#444"/>
+
+  <!-- hired card -->
+  <g filter="url(#sh)">
+    <rect x="338" y="64" width="150" height="162" rx="16" fill="#fff"/>
+  </g>
+  <circle cx="413" cy="104" r="26" fill="#DDE5FD"/>
+  <circle cx="413" cy="98" r="10" fill="#6C8CF5"/>
+  <path d="M394 122c3-11 10-15 19-15s16 4 19 15z" fill="#6C8CF5"/>
+  <rect x="372" y="142" width="82" height="9" rx="4.5" fill="#222" opacity=".85"/>
+  <rect x="384" y="157" width="58" height="6" rx="3" fill="#C9D1CC"/>
+  <rect x="362" y="180" width="102" height="30" rx="15" fill="#5BBB7B"/>
+  <path d="M400 195l6 6 12-12" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- briefcase -->
+  <g filter="url(#sh)">
+    <rect x="34" y="214" width="62" height="46" rx="9" fill="#FBC55A"/>
+  </g>
+  <path d="M53 214v-7a5 5 0 0 1 5-5h14a5 5 0 0 1 5 5v7" stroke="#222" stroke-width="4"/>
+  <rect x="34" y="232" width="62" height="5" fill="#E5A93A"/>
+</svg>

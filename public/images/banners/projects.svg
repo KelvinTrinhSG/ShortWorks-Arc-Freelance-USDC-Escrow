@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="532" height="300" viewBox="0 0 532 300" fill="none">
+  <!-- /projects: a brief on a clipboard with checklist and video slots, deadline and budget -->
+  <defs>
+    <filter id="sh" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="8" stdDeviation="9" flood-color="#1f2937" flood-opacity=".12"/>
+    </filter>
+  </defs>
+  <ellipse cx="266" cy="166" rx="226" ry="120" fill="#fff" opacity=".55"/>
+  <path d="M452 48l3 7 7 3-7 3-3 7-3-7-7-3 7-3z" fill="#5BBB7B"/>
+  <path d="M78 244l2.5 6 6 2.5-6 2.5-2.5 6-2.5-6-6-2.5 6-2.5z" fill="#FBC55A"/>
+  <circle cx="474" cy="230" r="5" fill="#6C8CF5"/>
+  <circle cx="60" cy="72" r="4" fill="#F29A76"/>
+
+  <!-- clipboard -->
+  <g filter="url(#sh)">
+    <rect x="166" y="32" width="200" height="246" rx="18" fill="#fff"/>
+  </g>
+  <rect x="226" y="20" width="80" height="28" rx="9" fill="#222"/>
+  <rect x="252" y="27" width="28" height="7" rx="3.5" fill="#555"/>
+  <rect x="190" y="64" width="112" height="10" rx="5" fill="#222" opacity=".85"/>
+  <rect x="190" y="82" width="72" height="7" rx="3.5" fill="#C9D1CC"/>
+
+  <!-- checklist -->
+  <g>
+    <rect x="190" y="104" width="18" height="18" rx="5" fill="#5BBB7B"/>
+    <path d="M194 113l4 4 7-8" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="218" y="109" width="118" height="8" rx="4" fill="#E2E8E4"/>
+    <rect x="190" y="132" width="18" height="18" rx="5" fill="#5BBB7B"/>
+    <path d="M194 141l4 4 7-8" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="218" y="137" width="96" height="8" rx="4" fill="#E2E8E4"/>
+    <rect x="190" y="160" width="18" height="18" rx="5" fill="none" stroke="#C9D1CC" stroke-width="2.5"/>
+    <rect x="218" y="165" width="108" height="8" rx="4" fill="#E2E8E4"/>
+  </g>
+
+  <!-- video slots -->
+  <rect x="190" y="194" width="42" height="64" rx="8" fill="#F29A76"/>
+  <path d="M206 218l12 8-12 8z" fill="#fff"/>
+  <rect x="245" y="194" width="42" height="64" rx="8" fill="#6C8CF5"/>
+  <path d="M261 218l12 8-12 8z" fill="#fff"/>
+  <rect x="300" y="194" width="42" height="64" rx="8" fill="#FBC55A"/>
+  <path d="M316 218l12 8-12 8z" fill="#fff"/>
+
+  <!-- deadline calendar -->
+  <g filter="url(#sh)">
+    <rect x="56" y="104" width="92" height="92" rx="16" fill="#fff"/>
+  </g>
+  <path d="M56 120a16 16 0 0 1 16-16h60a16 16 0 0 1 16 16v10H56z" fill="#F29A76"/>
+  <rect x="78" y="96" width="7" height="18" rx="3.5" fill="#222"/>
+  <rect x="119" y="96" width="7" height="18" rx="3.5" fill="#222"/>
+  <g fill="#E2E8E4">
+    <rect x="72" y="142" width="14" height="12" rx="3"/>
+    <rect x="95" y="142" width="14" height="12" rx="3"/>
+    <rect x="118" y="142" width="14" height="12" rx="3"/>
+    <rect x="72" y="164" width="14" height="12" rx="3"/>
+    <rect x="118" y="164" width="14" height="12" rx="3"/>
+  </g>
+  <rect x="95" y="164" width="14" height="12" rx="3" fill="#5BBB7B"/>
+
+  <!-- budget coin -->
+  <g filter="url(#sh)">
+    <circle cx="430" cy="128" r="38" fill="#FBC55A"/>
+  </g>
+  <circle cx="430" cy="128" r="28" fill="none" stroke="#fff" stroke-width="3" opacity=".8"/>
+  <text x="430" y="139" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="700" fill="#fff">$</text>
+</svg>

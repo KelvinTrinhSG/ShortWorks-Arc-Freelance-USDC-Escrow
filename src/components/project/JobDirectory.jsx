@@ -124,7 +124,7 @@ export default function JobDirectory({ initialQuery = "", accountType = null, to
       {/* Banner + search, same look as the Services banner (Breadcumb9). */}
       <section className="breadcumb-section pt-0">
         <div className="cta-service-v1 cta-banner mx-auto maxw1700 pt120 pb120 bdrs16 position-relative overflow-hidden d-flex align-items-center mx20-lg px30-lg">
-          <BannerDecor />
+          <BannerDecor art="jobs" />
           <div className="container position-relative zi1">
             <div className="row wow fadeInUp">
               <div className="col-xl-7">

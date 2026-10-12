@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="532" height="300" viewBox="0 0 532 300" fill="none">
+  <!-- /jobs: a job card with its video and progress (hired, in progress, submitted, completed) -->
+  <defs>
+    <filter id="sh" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="8" stdDeviation="9" flood-color="#1f2937" flood-opacity=".12"/>
+    </filter>
+    <linearGradient id="thumb" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F7B38F"/>
+      <stop offset="1" stop-color="#F28C6B"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="266" cy="164" rx="228" ry="122" fill="#fff" opacity=".55"/>
+  <path d="M64 52l3 7 7 3-7 3-3 7-3-7-7-3 7-3z" fill="#5BBB7B"/>
+  <path d="M480 238l2.5 6 6 2.5-6 2.5-2.5 6-2.5-6-6-2.5 6-2.5z" fill="#FBC55A"/>
+  <circle cx="44" cy="150" r="5" fill="#6C8CF5"/>
+  <circle cx="492" cy="152" r="4" fill="#F29A76"/>
+
+  <!-- job card -->
+  <g filter="url(#sh)">
+    <rect x="102" y="34" width="318" height="232" rx="20" fill="#fff"/>
+  </g>
+  <!-- video thumbnail -->
+  <rect x="126" y="58" width="74" height="118" rx="12" fill="url(#thumb)"/>
+  <circle cx="163" cy="117" r="16" fill="#fff"/>
+  <path d="M158 109l13 8-13 8z" fill="#F28C6B"/>
+  <!-- title and details -->
+  <rect x="220" y="66" width="150" height="11" rx="5.5" fill="#222" opacity=".85"/>
+  <rect x="220" y="86" width="104" height="8" rx="4" fill="#C9D1CC"/>
+  <rect x="220" y="112" width="58" height="22" rx="11" fill="#E6F4EB"/>
+  <rect x="232" y="120" width="34" height="6" rx="3" fill="#5BBB7B"/>
+  <rect x="286" y="112" width="70" height="22" rx="11" fill="#FEF3D7"/>
+  <rect x="298" y="120" width="46" height="6" rx="3" fill="#E5A93A"/>
+  <rect x="220" y="148" width="132" height="7" rx="3.5" fill="#E2E8E4"/>
+  <rect x="220" y="162" width="96" height="7" rx="3.5" fill="#E2E8E4"/>
+
+  <!-- progress: hired, in progress, submitted done; completed next -->
+  <rect x="150" y="218" width="222" height="5" rx="2.5" fill="#E2E8E4"/>
+  <rect x="150" y="218" width="148" height="5" rx="2.5" fill="#5BBB7B"/>
+  <g>
+    <circle cx="150" cy="220.5" r="15" fill="#5BBB7B"/>
+    <path d="M143.5 220.5l4.5 4.5 8-8.5" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="224" cy="220.5" r="15" fill="#5BBB7B"/>
+    <path d="M217.5 220.5l4.5 4.5 8-8.5" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="298" cy="220.5" r="15" fill="#5BBB7B"/>
+    <path d="M291.5 220.5l4.5 4.5 8-8.5" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="372" cy="220.5" r="15" fill="#fff" stroke="#C9D1CC" stroke-width="3"/>
+    <circle cx="372" cy="220.5" r="5" fill="#C9D1CC"/>
+  </g>
+
+  <!-- approved badge -->
+  <g filter="url(#sh)">
+    <circle cx="436" cy="60" r="32" fill="#5BBB7B"/>
+  </g>
+  <path d="M422 60l9 9 18-18" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- payment coin -->
+  <g filter="url(#sh)">
+    <circle cx="84" cy="226" r="30" fill="#FBC55A"/>
+  </g>
+  <circle cx="84" cy="226" r="21" fill="none" stroke="#fff" stroke-width="3" opacity=".8"/>
+  <text x="84" y="235" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" fill="#fff">$</text>
+</svg>
