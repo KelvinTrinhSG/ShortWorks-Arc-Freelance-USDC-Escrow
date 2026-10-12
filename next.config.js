@@ -24,9 +24,24 @@ const RENAMED = [
     ["/proposal", "/my-proposals"],
 ];
 
+// The site moved from the old Vercel name to shortworks.vercel.app (2026-10). Every page on the
+// old name goes to the same path on the new one, except the PayPal webhook: PayPal doesn't follow
+// redirects, so it keeps working until its URL is changed in the PayPal dashboard.
+// Not permanent, so browsers don't cache it if the site moves again (e.g. to a bought domain).
+const OLD_HOST = "pay-pal-short-work-project.vercel.app";
+const SITE = "https://shortworks.vercel.app";
+
 const nextConfig = {
     async redirects() {
-        return RENAMED.map(([source, destination]) => ({ source, destination, permanent: true }));
+        return [
+            {
+                source: "/:path((?!api/paypal/webhook$).*)",
+                has: [{ type: "host", value: OLD_HOST }],
+                destination: `${SITE}/:path`,
+                permanent: false,
+            },
+            ...RENAMED.map(([source, destination]) => ({ source, destination, permanent: true })),
+        ];
     },
 };
 

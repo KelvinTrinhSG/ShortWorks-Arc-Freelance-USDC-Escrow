@@ -293,11 +293,12 @@ Thiếu `ARC_ESCROW_ADDRESS` hoặc một trong hai khoá thì app **tự ẩn**
 | `NEXT_PUBLIC_ARC_NETWORK` | `testnet` | `mainnet` |
 | Escrow | `0xDCbD…bC63` | `0xe69C…70da` |
 | Signer | khoá testnet | khoá **riêng** cho mainnet (`0xD6Bf…Fca70`) |
-| Operator / admin / treasury | ví testnet (`contracts/.env`) | ví gas `0xA24d…2E00` (`contracts/.env.mainnet`) |
+| Operator (trả gas) | ví testnet (`contracts/.env`) | ví gas `0xA24d…2E00` (`contracts/.env.mainnet`) |
+| Admin + treasury (nhận phí) | ví testnet | `0xAe909F999CE1334eD02d40f0Afb883A967B03DEA` |
 
 **Hai mạng dùng chung một database.** Mỗi khoản thanh toán lưu `chain_id`, và mỗi server **chỉ xử lý khoản thuộc mạng của mình** (`onThisNetwork` trong `arcPayments.js`). Cron chỉ đối chiếu các khoản cùng mạng; release / refund / freeze / approve trên một job của mạng kia trả lỗi "Manage it on the ShortWorks site that runs on that network". Thiếu chốt chặn này thì server mainnet sẽ đọc job testnet bằng RPC mainnet, thấy "không tồn tại" và gửi nhầm thông báo.
 
-**Lưu ý ví mainnet:** khoá của ví gas `0xA24d…2E00` đã được gửi qua chat lúc thiết lập. Ví này vừa là ADMIN vừa là OPERATOR. Nên sớm: `grantRole(DEFAULT_ADMIN_ROLE, <ví an toàn>)` rồi `renounceRole(DEFAULT_ADMIN_ROLE, 0xA24d…)`; đổi `treasury` sang ví nhận phí riêng; chỉ để trong ví gas lượng USDC đủ trả gas.
+**Ví mainnet (2026-10-12):** khoá của ví gas `0xA24d…2E00` đã được gửi qua chat lúc thiết lập, nên quyền ADMIN và `treasury` đã chuyển sang `0xAe90…3DEA` (`grantRole`, `setTreasury`, rồi ví gas `renounceRole`). Ví gas giờ **chỉ là OPERATOR**: lộ khoá thì kẻ xấu chỉ release / refund sớm được (tiền vẫn chỉ tới client / freelancer / treasury), không pause, không đổi signer hay treasury. Chỉ để trong ví gas lượng USDC đủ trả gas. Muốn thay ví gas: admin `grantRole(OPERATOR_ROLE, <ví mới>)`, `revokeRole(OPERATOR_ROLE, 0xA24d…)`, đổi `ARC_OPERATOR_PRIVATE_KEY` trên Vercel.
 
 ### Deploy contract
 
