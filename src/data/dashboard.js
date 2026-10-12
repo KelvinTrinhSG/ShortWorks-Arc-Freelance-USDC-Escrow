@@ -17,6 +17,13 @@ export const dasboardNavigation = [
     path: "/paypal",
   },
   {
+    id: 18,
+    group: "account",
+    name: "Pay With Arc",
+    img: "/images/icon/arc-logo.png", // an image instead of an icon-font class
+    path: "/pay-with-arc",
+  },
+  {
     id: 15,
     group: "account",
     name: "Logout",

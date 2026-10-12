@@ -30,7 +30,11 @@ export default function DashboardNavigation() {
                     key={item.id}
                   >
                     <Link href={item.path} onClick={item.name === "Logout" ? logout : undefined}>
-                      <i className={`${item.icon} mr10`} />
+                      {item.img ? (
+                        <img src={item.img} alt="" width={18} height={18} className="mr10" />
+                      ) : (
+                        <i className={`${item.icon} mr10`} />
+                      )}
                       {item.name}
                     </Link>
                   </li>

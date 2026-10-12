@@ -23,7 +23,11 @@ export default function DashboardSidebar() {
                     onClick={item.name === "Logout" ? logout : undefined}
                     className={`items-center ${path === item.path ? "-is-active" : ""}`}
                   >
-                    <i className={`${item.icon} mr15`} />
+                    {item.img ? (
+                      <img src={item.img} alt="" width={18} height={18} className="mr15" />
+                    ) : (
+                      <i className={`${item.icon} mr15`} />
+                    )}
                     {item.name}
                   </Link>
                 </div>

@@ -32,6 +32,7 @@ export const config = {
     "/message/:path*",
     "/my-profile/:path*",
     "/payouts/:path*",
+    "/pay-with-arc",
     "/paypal", // not /paypal-connected: that page only closes the PayPal popup
     "/reviews/:path*",
     "/saved/:path*",
