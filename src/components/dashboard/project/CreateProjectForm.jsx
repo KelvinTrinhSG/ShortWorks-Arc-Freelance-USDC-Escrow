@@ -2,9 +2,8 @@
 import {
   BRIEF_MAX,
   MAX_REFERENCES,
-  MAX_VIDEO_COUNT,
-  MIN_VIDEO_COUNT,
   PROJECT_TITLE_MAX,
+  PROJECT_VIDEO_COUNT,
   VIDEO_LENGTHS,
   WORK_TYPES,
 } from "@/data/projectOptions";
@@ -22,7 +21,7 @@ const initialProject = {
   title: "",
   platforms: [],
   workType: undefined,
-  videoCount: "",
+  videoCount: String(PROJECT_VIDEO_COUNT), // fixed: a project is one video
   videoLength: undefined,
   brief: "",
   deadline: "",
@@ -37,19 +36,15 @@ const toDateInput = (d) =>
 // Field -> error message, or nothing when the project is ready to publish.
 function validate(p, minDeadline) {
   const errors = {};
-  const count = Number(p.videoCount);
   const budget = Number(p.budgetPerVideo);
   if (!p.title.trim()) errors.title = "Give your project a title.";
   if (!p.platforms.length) errors.platforms = "Pick at least one platform.";
   if (!p.workType) errors.workType = "Pick the type of work.";
-  if (!Number.isInteger(count) || count < MIN_VIDEO_COUNT || count > MAX_VIDEO_COUNT) {
-    errors.videoCount = `Enter ${MIN_VIDEO_COUNT}–${MAX_VIDEO_COUNT} videos.`;
-  }
   if (!p.videoLength) errors.videoLength = "Pick the video length.";
   if (!p.brief.trim()) errors.brief = "Describe what you need.";
   if (!p.deadline) errors.deadline = "Pick a deadline.";
   else if (p.deadline < minDeadline) errors.deadline = "The deadline must be tomorrow or later.";
-  if (!(budget > 0)) errors.budgetPerVideo = "Enter a budget per video.";
+  if (!(budget > 0)) errors.budgetPerVideo = "Enter a budget for the video.";
   return errors;
 }
 
@@ -206,33 +201,20 @@ export default function CreateProjectForm({ projectId, initial }) {
               </div>
               <div className="col-sm-6">
                 <div className="mb20">
-                  <Label required>Videos × length</Label>
-                  <div className="d-flex align-items-start gap-2">
-                    <input
-                      type="number"
-                      className="form-control"
-                      style={{ maxWidth: 110 }}
-                      min={MIN_VIDEO_COUNT}
-                      max={MAX_VIDEO_COUNT}
-                      step={1}
-                      aria-label="Number of videos"
-                      value={project.videoCount}
-                      onChange={setFromInput("videoCount")}
-                    />
-                    <span className="fz17 dark-color" style={{ lineHeight: "55px" }}>
-                      ×
-                    </span>
-                    <div className="flex-grow-1 no-label-select">
-                      <Select
-                        label=""
-                        options={VIDEO_LENGTHS}
-                        value={project.videoLength}
-                        onChange={set("videoLength")}
-                        placeholder="Length"
-                      />
-                    </div>
-                  </div>
-                  <FieldError message={errorFor("videoCount") || errorFor("videoLength")} />
+                  <Select
+                    label="Video length"
+                    required
+                    options={VIDEO_LENGTHS}
+                    value={project.videoLength}
+                    onChange={set("videoLength")}
+                    placeholder="Length"
+                  />
+                  <p className="fz13 text-muted mt5 mb0">
+                    {count > PROJECT_VIDEO_COUNT
+                      ? `This project was posted for ${count} videos and keeps that number.`
+                      : "One project = one video. Need more? Post one project per video."}
+                  </p>
+                  <FieldError message={errorFor("videoLength")} />
                 </div>
               </div>
             </div>
@@ -279,7 +261,7 @@ export default function CreateProjectForm({ projectId, initial }) {
             <div className="col-sm-6">
               <div className="mb20">
                 <Label required hint="(USD)">
-                  Budget per video
+                  {count > PROJECT_VIDEO_COUNT ? "Budget per video" : "Budget"}
                 </Label>
                 <input
                   type="number"
@@ -289,7 +271,7 @@ export default function CreateProjectForm({ projectId, initial }) {
                   value={project.budgetPerVideo}
                   onChange={setFromInput("budgetPerVideo")}
                 />
-                {total > 0 && (
+                {total > 0 && count > PROJECT_VIDEO_COUNT && (
                   <p className="fz14 text-thm mt5 mb0">
                     Total: ${total} for {count} {count === 1 ? "video" : "videos"}
                   </p>

@@ -48,7 +48,7 @@ export async function PATCH(request, { params }) {
     return Response.json({ ok: true, status: body.status });
   }
 
-  const { data, error } = validateProject(body);
+  const { data, error } = validateProject(body, project.video_count);
   if (error) return Response.json({ error }, { status: 400 });
   await updateProject(project.id, data);
   return Response.json({ id: project.id });

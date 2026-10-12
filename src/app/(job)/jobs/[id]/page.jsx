@@ -5,7 +5,7 @@ import JobActions from "@/components/project/JobActions";
 import { JobStatusBadge, jobStage } from "@/components/project/JobCard";
 import { dueLabel, formatDate } from "@/components/project/ProjectCard";
 import VideoFrame from "@/components/project/VideoFrame";
-import { DISPUTE_REASONS, VIDEO_LENGTHS, WORK_TYPES, estimateEarnings } from "@/data/projectOptions";
+import { AUTO_APPROVE_HOURS, DISPUTE_REASONS, VIDEO_LENGTHS, WORK_TYPES, estimateEarnings } from "@/data/projectOptions";
 import { COUNTRIES, PLATFORMS, labelOf } from "@/data/talentOptions";
 import { getJob } from "@/lib/jobs";
 import { getViewer } from "@/lib/viewer";
@@ -174,7 +174,7 @@ const EVENT_TEXT = {
   approved: "approved the work",
   dispute_opened: "opened a dispute",
   dispute_withdrawn: "withdrew the dispute",
-  auto_approved: "approved the work automatically (no answer for 3 days)",
+  auto_approved: `approved the work automatically (no answer for ${AUTO_APPROVE_HOURS} hours)`,
   dispute_resolved: "decided the dispute",
   payment_voided: "cancelled the job: PayPal released the held payment, so the work can no longer be paid",
   payment_expired: "cancelled the job: PayPal's hold on the payment expired, so the work can no longer be paid",
@@ -310,6 +310,7 @@ export default async function JobPage({ params }) {
                 total={job.total}
                 freelancerName={f.displayName}
                 autoApproveAt={job.autoApproveAt && formatDateTime(job.autoApproveAt)}
+                canClaim={job.canClaim}
                 disputeOpenedByMe={job.disputeOpenedByMe}
                 paymentMethod={payment?.method ?? "paypal"}
                 arc={

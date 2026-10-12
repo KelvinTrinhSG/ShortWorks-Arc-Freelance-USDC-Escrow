@@ -93,7 +93,7 @@ Thay cho form cũ của template (Your hourly price · Estimated Hours · Cover 
   - **Budget:** /video và tổng.
   - **Deadline.**
   - **Proposals:** tổng số (bấm vào mở trang chi tiết), kèm số "new" là chưa xử lý và số "accepted".
-  - **Actions:** Edit · Close/Reopen · Delete.
+  - **Actions:** Edit · Duplicate · Close/Reopen · Delete. **Duplicate** mở `/projects/new?from={id}` với form điền sẵn từ dự án đó (1 video; hạn chót đã qua thì để trống). Chỉ chủ dự án dùng được; đơn đặt từ Service không có nút này.
 - Delete hỏi xác nhận trước, và báo rõ sẽ xoá bao nhiêu proposal.
 - Tài khoản freelancer mở trang này thì thấy thông báo kèm link sang `/projects`.
 
@@ -106,7 +106,7 @@ Thay cho form cũ của template (Your hourly price · Estimated Hours · Cover 
 ## Quản lý ngay trên trang chi tiết
 
 - **Chủ dự án:**
-  - Dưới tiêu đề có Edit · Close/Reopen · Delete. Xoá xong chuyển về trang danh sách dự án `/projects`.
+  - Dưới tiêu đề có Edit · Duplicate · Close/Reopen · Delete. Xoá xong chuyển về trang danh sách dự án `/projects`.
   - Mỗi proposal có **Accept** · **Decline**. Sau khi chọn hiện "You accepted/declined this proposal" kèm nút **Undo**.
   - Có thể chấp nhận nhiều proposal, vì dự án nhiều video có thể chia cho nhiều freelancer.
 - **Freelancer:**
@@ -116,7 +116,7 @@ Thay cho form cũ của template (Your hourly price · Estimated Hours · Cover 
 
 | Component | Vai trò |
 |---|---|
-| `components/project/ProjectOwnerActions.jsx` | Edit · Close/Reopen · Delete (dùng ở bảng quản lý và trang chi tiết) |
+| `components/project/ProjectOwnerActions.jsx` | Edit · Duplicate · Close/Reopen · Delete (dùng ở bảng quản lý và trang chi tiết) |
 | `components/project/ProposalCard.jsx` | Thẻ proposal (dùng chung cho cả server và client) |
 | `components/project/ProposalDecision.jsx` | Accept · Decline · Undo |
 | `components/project/MyProposal.jsx` | Proposal của freelancer kèm Edit · Withdraw |

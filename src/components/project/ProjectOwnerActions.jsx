@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-// Edit / Close or Reopen / Delete for the client who owns a project.
+// Edit / Duplicate / Close or Reopen / Delete for the client who owns a project.
 // Used in the Manage Projects table and on the project page.
 export default function ProjectOwnerActions({ project, afterDelete, size = "sm" }) {
   const router = useRouter();
@@ -61,6 +61,11 @@ export default function ProjectOwnerActions({ project, afterDelete, size = "sm" 
         <Link href={`/projects/${project.id}/edit`} className={`${btn} btn-outline-dark`}>
           Edit
         </Link>
+        {!project.serviceId && (
+          <Link href={`/projects/new?from=${project.id}`} className={`${btn} btn-outline-dark`}>
+            Duplicate
+          </Link>
+        )}
         <button type="button" className={`${btn} btn-outline-secondary`} onClick={toggleStatus} disabled={busy}>
           {project.status === "open" ? "Close" : "Reopen"}
         </button>

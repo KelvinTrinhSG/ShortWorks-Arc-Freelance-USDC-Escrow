@@ -4,7 +4,8 @@ import { notifyPaymentExpiring } from "@/lib/notifications";
 import { refreshAuthorization } from "@/lib/payments";
 
 // Once a day (vercel.json; Hobby plan runs it once a day at an imprecise time):
-// 1. approve submitted jobs the client left unanswered for 3 days (and pay the freelancer)
+// 1. approve submitted jobs the client left unanswered for 48 hours (and pay the freelancer);
+//    the freelancer can also claim it from the job page as soon as the 48 hours are over
 // 2. warn about held payments that expire within 3 days; record the ones that expired
 //    and cancel their jobs (nobody can be paid for them any more)
 // 3. Arc: line payments up with the chain (hires paid in a closed tab, releases / refunds made

@@ -50,10 +50,11 @@ export const JOB_NOTE_MAX = 1000;
 // ---- Payments (docs/payments.md §11) -------------------------------------------
 
 // Delivery at most this many days after hiring: a PayPal authorization lasts 29 days,
-// which leaves room for the 3-day review and auto-approval.
+// which leaves room for the 48-hour review and auto-approval.
 export const MAX_DELIVERY_DAYS = 25;
-// A submitted job is approved automatically after this many days without an answer.
-export const AUTO_APPROVE_DAYS = 3;
+// A submitted job is approved automatically after this many hours without an answer.
+// The cron runs once a day, so in practice it happens at the first run after that.
+export const AUTO_APPROVE_HOURS = 48;
 // ShortWorks decides a dispute within this many hours (every day counts).
 export const DISPUTE_DECISION_HOURS = 48;
 // Arc escrow (docs/arc-payments.md §5): this many days after delivery + review, the client can take
@@ -78,8 +79,9 @@ export function estimateEarnings(amount) {
 
 export const PROJECT_TITLE_MAX = 70;
 export const BRIEF_MAX = 1000;
-export const MIN_VIDEO_COUNT = 1;
-export const MAX_VIDEO_COUNT = 50;
+// A posted project is exactly one video, so the freelancer is paid as soon as it's approved.
+// Projects posted before this rule (and service orders) may have more; they keep their count.
+export const PROJECT_VIDEO_COUNT = 1;
 export const MAX_REFERENCES = 3;
 
 export const COVER_LETTER_MAX = 1500;

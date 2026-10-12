@@ -1,10 +1,12 @@
-import { runJobAction } from "@/lib/jobs";
+import { claimAutoApproval, runJobAction } from "@/lib/jobs";
 import { getViewer } from "@/lib/viewer";
 
 // One step on a job, by the hired freelancer or the client (docs/jobs.md):
 // { action: "submit", links: [...], note }      freelancer, in_progress -> submitted
 // { action: "revision", note }                  client, submitted -> in_progress
 // { action: "approve", note? }                  client, submitted -> completed
+// { action: "claim" }                           freelancer, submitted -> completed once the
+//                                               client's review time is over (auto-approval)
 // { action: "dispute", reason, note }           either, in_progress | submitted -> disputed
 // { action: "withdraw_dispute" }                whoever opened it, back to where it was
 export async function POST(request, { params }) {
@@ -12,7 +14,7 @@ export async function POST(request, { params }) {
   if (!viewer) return Response.json({ error: "Please log in again." }, { status: 401 });
   const { id } = await params;
   const body = (await request.json().catch(() => null)) ?? {};
-  const result = await runJobAction(id, viewer, body);
+  const result = body.action === "claim" ? await claimAutoApproval(id, viewer) : await runJobAction(id, viewer, body);
   if (result.error) return Response.json({ error: result.error }, { status: result.code });
   return Response.json({ ok: true, status: result.status });
 }

@@ -108,7 +108,7 @@ Giống bài học PayPal "số tiền và phí do backend quyết định" (pay
 | Role | Giữ bởi | Được làm |
 |---|---|---|
 | `ADMIN` | Multisig / ví phần cứng | Pause, đổi treasury, signer, cấp / thu role. **Không** rút được tiền của job |
-| `OPERATOR` | Ví server của ShortWorks (khoá trong biến môi trường) | `release` khi tự Approve sau 3 ngày hoặc xử khiếu nại cho freelancer; `refund` khi Undo hire hoặc xử khiếu nại cho người thuê; `setFrozen` |
+| `OPERATOR` | Ví server của ShortWorks (khoá trong biến môi trường) | `release` khi tự Approve sau 48 giờ hoặc xử khiếu nại cho freelancer; `refund` khi Undo hire hoặc xử khiếu nại cho người thuê; `setFrozen` |
 | `signer` | Khoá riêng của server (khác OPERATOR) | Chỉ ký `Terms`. Không gửi giao dịch |
 | `treasury` | Ví nhận phí sàn | Chỉ nhận tiền |
 
@@ -147,7 +147,7 @@ Proposal pending
    │  Người thuê Request changes → IN PROGRESS          OPERATOR refund → [Refunded]
    ▼
 Người thuê "Approve & Complete" → release từ ví người thuê
-   (hoặc OPERATOR release sau 3 ngày im lặng)
+   (hoặc OPERATOR release sau 48 giờ im lặng)
    ▼
 [Released] Freelancer nhận amount − fee · treasury nhận fee
 Job: COMPLETED
@@ -161,7 +161,7 @@ Khiếu nại: OPERATOR setFrozen(true). Admin quyết: release (freelancer) ho�
 | Undo hire (chưa giao bài) | `refund` | ShortWorks (OPERATOR) |
 | Submit / Request changes | Không có | — |
 | Approve & Complete | `release` từ ví người thuê | Người thuê |
-| Tự Approve sau 3 ngày (cron) | `release` | ShortWorks |
+| Tự Approve sau 48 giờ (cron, hoặc freelancer bấm Claim payment) | `release` | ShortWorks |
 | Mở / rút khiếu nại | `setFrozen` | ShortWorks |
 | Admin xử khiếu nại | `release` hoặc `refund` | ShortWorks |
 | Quá `expiresAt`, không khiếu nại | `reclaim` | Người thuê |
@@ -189,8 +189,8 @@ Khiếu nại: OPERATOR setFrozen(true). Admin quyết: release (freelancer) ho�
 ## 5. Thời hạn
 
 - Arc không có giới hạn 29 ngày như authorization của PayPal, nên về mặt kỹ thuật **có thể bỏ giới hạn 25 ngày** cho job trả bằng Arc. Bản đầu nên giữ chung 25 ngày cho cả hai cách trả, để luật trên `/terms` đơn giản.
-- `expiresAt` = ngày giao + 3 ngày duyệt + 14 ngày dự phòng. Đây là **lưới an toàn khi ShortWorks ngừng hoạt động**: người thuê vẫn tự lấy lại tiền bằng `reclaim`, không phụ thuộc server.
-- Cron hằng ngày cảnh báo job sắp tới `expiresAt` mà chưa xong, giống cảnh báo hết hạn của PayPal. Server luôn tự Approve (3 ngày) **trước** `expiresAt`, nên freelancer đã giao bài sẽ được trả trước khi người thuê có thể `reclaim`.
+- `expiresAt` = ngày giao + 48 giờ duyệt + 14 ngày dự phòng. Đây là **lưới an toàn khi ShortWorks ngừng hoạt động**: người thuê vẫn tự lấy lại tiền bằng `reclaim`, không phụ thuộc server.
+- Cron hằng ngày cảnh báo job sắp tới `expiresAt` mà chưa xong, giống cảnh báo hết hạn của PayPal. Server luôn tự Approve (48 giờ) **trước** `expiresAt`, nên freelancer đã giao bài sẽ được trả trước khi người thuê có thể `reclaim`.
 - Khi khiếu nại, `setFrozen(true)` dừng `reclaim`; rút hoặc xử xong khiếu nại thì gỡ.
 
 ---
@@ -315,7 +315,7 @@ Rồi đặt `ARC_ESCROW_ADDRESS` (và `ARC_ESCROW_DEPLOY_BLOCK`) trong `.env.lo
 
 ### Những điểm bản triển khai bổ sung so với thiết kế
 
-- **Approve không cần ví (dự phòng cho B3):** người thuê mất ví đã trả thì vẫn bấm được "Approve and let ShortWorks release it". Khi đó server release bằng ví OPERATOR. Mức tin cậy giống tự Approve sau 3 ngày.
+- **Approve không cần ví (dự phòng cho B3):** người thuê mất ví đã trả thì vẫn bấm được "Approve and let ShortWorks release it". Khi đó server release bằng ví OPERATOR. Mức tin cậy giống tự Approve sau 48 giờ.
 - **Hai tab / bấm hai lần:** nếu Terms cũ còn hạn (≥ 5 phút) và cùng ví, cùng số tiền, server trả lại **đúng Terms cũ**, kèm cùng chữ ký (ký EIP-712 là tất định). Vì vậy chỉ một giao dịch fund thành công.
 - **Đóng tab sau khi đã trả:** lần bấm Hire tiếp theo, hoặc cron hằng ngày, đọc `jobs(id)` trên chain. Thấy `Funded` thì hoàn tất việc thuê.
 - **Freelancer đổi giá trong lúc người thuê đang trả:** tiền đã vào escrow nhưng không khớp giá mới, nên operator `refund` ngay. Giống PayPal.

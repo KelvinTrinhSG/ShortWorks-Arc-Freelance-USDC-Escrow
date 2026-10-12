@@ -18,7 +18,7 @@ Quyết định khi triển khai:
 - Dùng lại app **Platform Partner App** của demo (partner `59SRQD4T47KY4`). Credential chép vào `.env.local` của ShortWorks (không commit).
 - Webhook sandbox `2J565532KN297751G` trỏ tới `https://pay-pal-short-work-project.vercel.app/api/paypal/webhook`, tạo bằng API.
 - `ADMIN_EMAILS`: email của tài khoản kelvinClient (giá trị thật trong `.env.local` và trên Vercel).
-- Phí sàn 10%, 25 ngày, 3 ngày, 48 giờ và công thức ước tính phí PayPal (3.49% + $0.29, khớp $0.64 cho $10 trên Sandbox) là **hằng số trong `src/data/projectOptions.js`**, không phải biến môi trường, vì form proposal (chạy trên trình duyệt) cũng cần.
+- Phí sàn 10%, 25 ngày, 48 giờ duyệt (`AUTO_APPROVE_HOURS`), 48 giờ xử khiếu nại và công thức ước tính phí PayPal (3.49% + $0.29, khớp $0.64 cho $10 trên Sandbox) là **hằng số trong `src/data/projectOptions.js`**, không phải biến môi trường, vì form proposal (chạy trên trình duyệt) cũng cần.
 - Đã xoá 2 job test cũ (proposal 3 và 22) vì không có thanh toán.
 - Project / tài khoản đã có tiền giữ hoặc đã trả **không xoá được** (409), chỉ Close.
 
@@ -135,7 +135,7 @@ Khiếu nại (DISPUTED): giữ nguyên khoản authorize. Admin quyết định
    - Khi người thuê bấm **Hire & pay**: kiểm tra lại ngày giao ≤ hôm nay + 25 ngày, vì proposal có thể đã nằm chờ nhiều ngày. Nếu vượt, nút bị khoá kèm lời nhắn "Ask the freelancer to update the delivery date". Proposal còn `pending` nên freelancer sửa được.
 2. Lưu `expiration_time` và hiện cho cả hai bên ("Payment held until Nov 8").
 3. Một tác vụ chạy hằng ngày (Vercel Cron) làm 2 việc:
-   - **Tự Approve sau 3 ngày:** job ở **Submitted** mà người thuê không Approve hay Request changes trong **3 ngày** kể từ lần giao gần nhất → tự Approve và capture, ghi sự kiện `auto_approved` vào `job_events`, báo cho cả hai bên. Job đang **Disputed** thì không tự Approve. Trang job hiện đếm ngược cho người thuê: "Auto-approves in 2 days".
+   - **Tự Approve sau 48 giờ:** job ở **Submitted** mà người thuê không Approve hay Request changes trong **48 giờ** kể từ lần giao gần nhất → tự Approve và capture (freelancer bấm **Claim payment** trên trang job ngay khi hết 48 giờ, hoặc cron hằng ngày làm thay), ghi sự kiện `auto_approved` vào `job_events`, báo cho cả hai bên. Job đang **Disputed** thì không tự Approve. Trang job hiện đếm ngược cho người thuê: "Auto-approves in 2 days".
    - Authorization còn ≤ 3 ngày là hết hạn mà job chưa xong (ví dụ đang khiếu nại) → báo cho admin và cả hai bên.
 
 **Bản sau, nếu cần job dài hơn 25 ngày:** chuyển sang **Delayed disbursement**.
@@ -315,7 +315,7 @@ CRON_SECRET=                       # Vercel Cron gửi kèm, để chỉ cron g�
 |---|---|---|---|
 | Q1 | Ai chịu phí sàn 10%? | **Trừ vào phần freelancer.** Người thuê trả đúng giá trong proposal. Freelancer chịu phí sàn 10% và phí PayPal ($10 → nhận $8.36 trong demo). Form proposal hiện "You receive ≈ …" ngay khi nhập giá. Phí PayPal chỉ biết chính xác sau capture, nên lúc đó ghi là "khoảng" | §7 (Gửi proposal, Payment), §12 |
 | Q2 | Giới hạn thời gian | **Ngày giao tối đa 25 ngày** cho bản đầu. Delayed disbursement để bản sau | §3, §9 P10 |
-| Q3 | Tự Approve khi người thuê im lặng | **3 ngày** kể từ lần giao gần nhất. Không áp dụng khi đang khiếu nại | §3, §9 P11 |
+| Q3 | Tự Approve khi người thuê im lặng | **48 giờ** kể từ lần giao gần nhất (trước đây 3 ngày). Không áp dụng khi đang khiếu nại | §3, §9 P11 |
 | Q4 | Ai xử lý khiếu nại | **Admin là đội ShortWorks**, theo điều khoản viết ở `/terms` | §7 (Admin, `/terms`), §12 |
 | Q6 | Thời hạn xử lý khiếu nại | **2 ngày (48 giờ)** kể từ khi mở, **tính cả cuối tuần và ngày lễ** (đội làm việc mọi ngày) | §12 |
 | Q7 | Chia một phần tiền khi khiếu nại? | **Không.** Trả hết cho một bên: capture toàn bộ hoặc void | §7 (Admin), §12 |
@@ -339,7 +339,7 @@ youReceive ≈ amount − round(amount × PLATFORM_FEE_PERCENT / 100, 2) − pay
 
 1. **Phí:** người thuê trả đúng giá đã thoả thuận trong proposal. ShortWorks thu phí sàn 10%, trừ vào khoản freelancer nhận. Phí xử lý của PayPal cũng trừ vào khoản freelancer nhận.
 2. **Giữ tiền:** khi thuê, PayPal giữ (authorize) toàn bộ số tiền trên tài khoản người thuê. Tiền chỉ bị thu khi công việc được duyệt, và được giải phóng nếu huỷ trước khi freelancer giao bài.
-3. **Thời hạn:** ngày giao tối đa 25 ngày kể từ khi thuê. Người thuê có 3 ngày để duyệt hoặc yêu cầu sửa sau mỗi lần giao. Quá hạn đó, công việc được tự động duyệt và thanh toán.
+3. **Thời hạn:** ngày giao tối đa 25 ngày kể từ khi thuê. Người thuê có 48 giờ để duyệt hoặc yêu cầu sửa sau mỗi lần giao. Quá hạn đó, công việc được tự động duyệt và thanh toán.
 4. **Yêu cầu sửa:** người thuê ghi rõ cần sửa gì. Yêu cầu phải nằm trong phạm vi brief ban đầu.
 5. **Khiếu nại:**
    - Ai mở được và khi nào: cả hai bên, khi job đang In progress hoặc Submitted.
@@ -355,7 +355,7 @@ youReceive ≈ amount − round(amount × PLATFORM_FEE_PERCENT / 100, 2) − pay
 Hệ quả cho phần làm:
 - Trang admin chỉ cần 2 nút **Pay freelancer** (capture toàn bộ) và **Release to client** (void), không cần ô nhập số tiền.
 - Mỗi khiếu nại có **hạn xử lý** = lúc mở + **48 giờ**. Không cần lịch ngày nghỉ hay ngày lễ: tính bằng `created_at + interval '48 hours'` của sự kiện `dispute_opened`. Trang admin sắp xếp theo hạn này và tô đỏ khiếu nại đã quá hạn. Cả hai bên thấy "We'll decide by {ngày giờ}" trên trang job.
-- **Hết hạn authorization:** trường hợp xấu nhất là khiếu nại mở ở cuối thời gian duyệt (giao ngày 25 + 3 ngày duyệt = ngày 28). Cộng thêm 48 giờ là ngày 30, vẫn có thể vượt ngày 29. Nếu authorization hết hạn trước khi admin quyết, tiền tự được giải phóng (người thuê thắng mặc định). Vì vậy, khi authorization còn **< 48 giờ**, hạn xử lý khiếu nại lấy theo hạn của authorization, cái nào sớm hơn thì dùng cái đó. Trang admin đưa những khiếu nại này lên đầu và ghi rõ "Payment hold expires {ngày giờ}".
+- **Hết hạn authorization:** trường hợp xấu nhất là khiếu nại mở ở cuối thời gian duyệt (giao ngày 25 + 2 ngày duyệt = ngày 27). Cộng thêm 48 giờ là ngày 29, sát hạn ngày 29. Nếu authorization hết hạn trước khi admin quyết, tiền tự được giải phóng (người thuê thắng mặc định). Vì vậy, khi authorization còn **< 48 giờ**, hạn xử lý khiếu nại lấy theo hạn của authorization, cái nào sớm hơn thì dùng cái đó. Trang admin đưa những khiếu nại này lên đầu và ghi rõ "Payment hold expires {ngày giờ}".
 
 ## Tài liệu tham khảo
 

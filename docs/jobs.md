@@ -14,7 +14,7 @@ Hired → IN PROGRESS ──Submit──▶ SUBMITTED ──Approve & Complete�
 | Trạng thái | Ý nghĩa | Ai làm gì |
 |---|---|---|
 | **In progress** | Freelancer đang làm. Quá ngày giao thì hiện nhãn **Overdue** (không lưu riêng). | Freelancer: **Submit** link video (1 link/video, tối đa bằng số video) + ghi chú |
-| **Submitted** | Đã giao, chờ người thuê duyệt | Người thuê: **Approve & Complete**, hoặc **Request changes** (bắt buộc ghi rõ cần sửa gì) → quay lại In progress |
+| **Submitted** | Đã giao, chờ người thuê duyệt | Người thuê: **Approve & Complete**, hoặc **Request changes** (bắt buộc ghi rõ cần sửa gì) → quay lại In progress. Người thuê im lặng **48 giờ** kể từ lần giao gần nhất → freelancer bấm được **Claim payment** (tự Approve và trả tiền ngay); không bấm thì cron hằng ngày làm thay |
 | **Completed** | Người thuê đã duyệt. Số tiền thành "Due to the freelancer". | — |
 | **Disputed** | Một bên mở khiếu nại (chọn lý do + mô tả). Job tạm dừng. | Chỉ bên mở khiếu nại được **Withdraw**; job quay lại trạng thái trước khi khiếu nại |
 
@@ -72,7 +72,7 @@ Chỉ **người thuê** và **freelancer được thuê** mở được; ngư�
 | Method | Endpoint | Việc làm |
 |---|---|---|
 | `GET` | `/api/jobs` | Danh sách job của người đang đăng nhập, kèm bộ lọc |
-| `POST` | `/api/jobs/{id}` | `{ action: "submit", links, note }` · `{ action: "revision", note }` · `{ action: "approve" }` · `{ action: "dispute", reason, note }` · `{ action: "withdraw_dispute" }` |
+| `POST` | `/api/jobs/{id}` | `{ action: "submit", links, note }` · `{ action: "revision", note }` · `{ action: "approve" }` · `{ action: "claim" }` (freelancer, sau 48 giờ) · `{ action: "dispute", reason, note }` · `{ action: "withdraw_dispute" }` |
 
 ## File
 

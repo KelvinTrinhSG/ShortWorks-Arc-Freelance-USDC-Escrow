@@ -1,6 +1,6 @@
 "use client";
 import {
-  AUTO_APPROVE_DAYS,
+  AUTO_APPROVE_HOURS,
   DISPUTE_DECISION_HOURS,
   MAX_DELIVERY_DAYS,
   PLATFORM_FEE_PERCENT,
@@ -18,7 +18,7 @@ import { Navigation, Pagination } from "swiper/modules";
 const FACTS = [
   { value: "$0", label: "charged when you hire: PayPal only holds the money" },
   { value: `${DISPUTE_DECISION_HOURS}h`, label: "for ShortWorks to decide a dispute, every day of the week" },
-  { value: `${AUTO_APPROVE_DAYS} days`, label: "to review each delivery before it's approved automatically" },
+  { value: `${AUTO_APPROVE_HOURS}h`, label: "to review each delivery before it's approved automatically" },
 ];
 
 const SLIDES = [
@@ -31,7 +31,7 @@ const SLIDES = [
   },
   {
     title: "For freelancers",
-    text: `Get paid straight into your own PayPal account. If the client goes quiet, the job is approved after ${AUTO_APPROVE_DAYS} days.`,
+    text: `Get paid straight into your own PayPal account. If the client goes quiet, the job is approved after ${AUTO_APPROVE_HOURS} hours.`,
     icon: "flaticon-dollar",
     who: "Connect PayPal once",
     detail: `${PLATFORM_FEE_PERCENT}% platform fee, nothing else`,
@@ -70,7 +70,7 @@ export default function WhyShortWorks() {
             </div>
             <div className="row">
               {FACTS.map((f) => (
-                <div key={f.value} className="col-sm-6 col-lg-4">
+                <div key={f.label} className="col-sm-6 col-lg-4">
                   <div className="funfact_one">
                     <div className="details">
                       <h2 className="mb10">{f.value}</h2>

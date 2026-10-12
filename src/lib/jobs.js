@@ -1,6 +1,6 @@
 import "server-only";
 import {
-  AUTO_APPROVE_DAYS,
+  AUTO_APPROVE_HOURS,
   DISPUTE_DECISION_HOURS,
   DISPUTE_REASONS,
   JOB_NOTE_MAX,
@@ -237,6 +237,10 @@ export async function getJob(id, viewer) {
   const r = pr[0];
   const lastDispute = events.findLast((e) => e.type === "dispute_opened");
   const lastSubmitted = events.findLast((e) => e.type === "submitted");
+  const autoApproveAt =
+    ctx.job_status === "submitted" && lastSubmitted
+      ? new Date(new Date(lastSubmitted.created_at).getTime() + AUTO_APPROVE_HOURS * 3600000)
+      : null;
   const payment = await getPayment(ctx.id);
   const hours = (iso, h) => new Date(new Date(iso).getTime() + h * 3600000);
   // An Arc hold doesn't run out during a dispute (the escrow is frozen), so it doesn't cut the decision time short.
@@ -253,9 +257,10 @@ export async function getJob(id, viewer) {
         ctx.job_status === "disputed" && lastDispute
           ? new Date(Math.min(hours(lastDispute.created_at, DISPUTE_DECISION_HOURS), holdEndsAt))
           : null,
-      // When a submitted job approves itself if the client doesn't answer.
-      autoApproveAt:
-        ctx.job_status === "submitted" && lastSubmitted ? hours(lastSubmitted.created_at, AUTO_APPROVE_DAYS * 24) : null,
+      // When a submitted job approves itself if the client doesn't answer. From then on the
+      // freelancer can also claim the payment from the job page instead of waiting for the cron.
+      autoApproveAt,
+      canClaim: role === "freelancer" && autoApproveAt !== null && autoApproveAt <= new Date(),
       id: ctx.id,
       status: ctx.job_status,
       statusBeforeDispute: ctx.status_before_dispute,
@@ -449,31 +454,57 @@ async function applyTransition(ctx, { from, to, event, actorId, note, links, rea
 
 // ---- ShortWorks' own steps (cron, admin) --------------------------------------
 
-// Submitted jobs the client left unanswered for AUTO_APPROVE_DAYS since the last delivery:
-// approve them (and pay the freelancer). Disputed jobs are never in 'submitted'.
+// Submitted jobs the client left unanswered for AUTO_APPROVE_HOURS since the last delivery.
+// Disputed jobs are never in 'submitted'.
+const DUE_FOR_AUTO_APPROVAL = `pr.status = 'accepted' AND pr.job_status = 'submitted'
+  AND (SELECT MAX(e.created_at) FROM job_events e WHERE e.proposal_id = pr.id AND e.type = 'submitted')
+      < NOW() - make_interval(hours => $1)`;
+
+// Pays the freelancer and completes the job, as if the client had approved it.
+async function autoApprove(id) {
+  const ctx = await getJobContext(id);
+  await takeJobPayment(id);
+  await applyTransition(ctx, { from: "submitted", to: "completed", event: "auto_approved", actorId: null, force: true });
+  await notifyJobEvent(ctx, ctx.freelancer_id, null, "auto_approved");
+  await notifyJobEvent(ctx, ctx.client_id, null, "auto_approved");
+}
+
+// Approves every job that is due (and pays the freelancer).
 // Returns what happened to each, for the cron log.
 export async function autoApproveDueJobs() {
-  const { rows } = await pool.query(
-    `SELECT pr.id FROM proposals pr
-     WHERE pr.status = 'accepted' AND pr.job_status = 'submitted'
-       AND (SELECT MAX(e.created_at) FROM job_events e WHERE e.proposal_id = pr.id AND e.type = 'submitted')
-           < NOW() - make_interval(days => $1)`,
-    [AUTO_APPROVE_DAYS],
-  );
+  const { rows } = await pool.query(`SELECT pr.id FROM proposals pr WHERE ${DUE_FOR_AUTO_APPROVAL}`, [AUTO_APPROVE_HOURS]);
   const results = [];
   for (const { id } of rows) {
-    const ctx = await getJobContext(id);
     try {
-      await takeJobPayment(id);
-      await applyTransition(ctx, { from: "submitted", to: "completed", event: "auto_approved", actorId: null, force: true });
-      await notifyJobEvent(ctx, ctx.freelancer_id, null, "auto_approved");
-      await notifyJobEvent(ctx, ctx.client_id, null, "auto_approved");
+      await autoApprove(id);
       results.push({ id, ok: true });
     } catch (err) {
       results.push({ id, ok: false, error: err.message });
     }
   }
   return results;
+}
+
+// The freelancer claims the payment of a job that is due for auto-approval, without waiting
+// for the daily cron. Returns { status } or { error, code }.
+export async function claimAutoApproval(id, viewer) {
+  const ctx = await getJobContext(id);
+  if (!ctx) return { error: "Job not found.", code: 404 };
+  if (roleOf(ctx, viewer) !== "freelancer") return { error: "Only the freelancer can do this.", code: 403 };
+  const { rows } = await pool.query(`SELECT pr.id FROM proposals pr WHERE pr.id = $2 AND ${DUE_FOR_AUTO_APPROVAL}`, [
+    AUTO_APPROVE_HOURS,
+    ctx.id,
+  ]);
+  if (!rows.length) {
+    return { error: "The client still has time to review this delivery. Refresh and try again.", code: 409 };
+  }
+  try {
+    await autoApprove(ctx.id);
+  } catch (err) {
+    if (err instanceof PaymentError) return { error: err.message, code: err.code };
+    throw err;
+  }
+  return { status: "completed" };
 }
 
 // An admin settles a dispute: pay the freelancer everything, or release everything

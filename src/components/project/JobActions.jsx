@@ -22,6 +22,7 @@ export default function JobActions({
   total,
   freelancerName,
   autoApproveAt,
+  canClaim,
   disputeOpenedByMe,
   paymentMethod,
   arc,
@@ -234,13 +235,26 @@ export default function JobActions({
           )}
         </>
       );
+  } else if (status === "submitted" && canClaim) {
+    main = (
+      <>
+        <h5 className="mb5">The review time is over</h5>
+        <p className="text fz14 mb15">
+          The client didn&apos;t approve or ask for changes by {autoApproveAt}, so the work counts as
+          approved. Claim your payment now: it goes to your {paidTo}.
+        </p>
+        <button type="button" className="ud-btn btn-thm" disabled={busy} onClick={() => run("claim")}>
+          Claim payment <i className="fal fa-arrow-right-long" />
+        </button>
+      </>
+    );
   } else if (status === "submitted") {
     main = (
       <>
         <h5 className="mb5">🎉 Nice work, your videos are in!</h5>
         <p className="text fz14 mb-0">
           Now waiting for the client&apos;s review. They either approve (you&apos;re paid to your {paidTo}) or ask for changes. You&apos;ll get a notification either way.
-          {autoApproveAt && <> No answer by {autoApproveAt}? It&apos;s approved and paid automatically.</>}
+          {autoApproveAt && <> No answer by {autoApproveAt}? It counts as approved, and you can claim your payment here.</>}
         </p>
       </>
     );

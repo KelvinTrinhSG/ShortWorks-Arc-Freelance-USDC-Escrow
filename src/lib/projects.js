@@ -4,11 +4,10 @@ import {
   COVER_LETTER_MAX,
   MAX_DELIVERY_DAYS,
   MAX_REFERENCES,
-  MAX_VIDEO_COUNT,
-  MIN_VIDEO_COUNT,
   MY_STATUSES,
   PROJECTS_PAGE_SIZE,
   PROJECT_TITLE_MAX,
+  PROJECT_VIDEO_COUNT,
   VIDEO_LENGTHS,
   WORK_TYPES,
 } from "@/data/projectOptions";
@@ -29,19 +28,20 @@ const money = (n) => Math.round(n * 100) / 100;
 
 // ---- Validation -------------------------------------------------------------
 
-// Returns { data } or { error } for POST /api/projects.
-export function validateProject(body) {
+// Returns { data } or { error } for POST /api/projects. A project is one video; when editing,
+// `currentVideoCount` lets a project posted before that rule keep its count.
+export function validateProject(body, currentVideoCount = PROJECT_VIDEO_COUNT) {
   const b = body ?? {};
   const title = typeof b.title === "string" ? b.title.trim() : "";
   const brief = typeof b.brief === "string" ? b.brief.trim() : "";
-  const count = Number(b.videoCount);
+  const count = b.videoCount === undefined ? PROJECT_VIDEO_COUNT : Number(b.videoCount);
   const budget = Number(b.budgetPerVideo);
   const platforms = Array.isArray(b.platforms) ? [...new Set(b.platforms)] : [];
 
   if (!title || title.length > PROJECT_TITLE_MAX) return { error: `Title is required (max ${PROJECT_TITLE_MAX} characters).` };
   if (!platforms.length || platforms.some((p) => !values(PLATFORMS).includes(p))) return { error: "Pick at least one valid platform." };
   if (!values(WORK_TYPES).includes(b.workType)) return { error: "Pick the type of work." };
-  if (!Number.isInteger(count) || count < MIN_VIDEO_COUNT || count > MAX_VIDEO_COUNT) return { error: `Number of videos must be ${MIN_VIDEO_COUNT}–${MAX_VIDEO_COUNT}.` };
+  if (count !== PROJECT_VIDEO_COUNT && count !== currentVideoCount) return { error: "A project is one video. Post another project for each extra video." };
   if (!values(VIDEO_LENGTHS).includes(b.videoLength)) return { error: "Pick the video length." };
   if (!brief || brief.length > BRIEF_MAX) return { error: `Brief is required (max ${BRIEF_MAX} characters).` };
   if (!isDate(b.deadline) || b.deadline <= todayUtc()) return { error: "The deadline must be a date after today." };
@@ -79,6 +79,22 @@ export function validateProposal(body, project) {
     sampleUrl = b.sampleUrl.trim();
   }
   return { data: { pricePerVideo: money(price), deliveryDate: b.deliveryDate, coverLetter, sampleUrl } };
+}
+
+// A project (from getProject) in the shape of the Create Project form state: to edit it, or,
+// with `copy`, to post it again (one video; a deadline already past is left for the client to pick).
+export function projectFormState(p, { copy = false } = {}) {
+  return {
+    title: p.title,
+    platforms: p.platforms,
+    workType: p.workType,
+    videoCount: String(copy ? PROJECT_VIDEO_COUNT : p.videoCount),
+    videoLength: p.videoLength,
+    brief: p.brief,
+    deadline: copy && p.deadline <= todayUtc() ? "" : p.deadline,
+    budgetPerVideo: String(p.budgetPerVideo),
+    references: p.references,
+  };
 }
 
 // ---- Writes -----------------------------------------------------------------
@@ -352,7 +368,7 @@ export async function getOwnedProjects(clientId) {
 export async function getProjectOwner(id) {
   if (!/^\d+$/.test(String(id))) return null;
   const { rows } = await pool.query(
-    "SELECT id, client_id, status, to_char(deadline, 'YYYY-MM-DD') AS deadline FROM projects WHERE id = $1",
+    "SELECT id, client_id, status, video_count, to_char(deadline, 'YYYY-MM-DD') AS deadline FROM projects WHERE id = $1",
     [id],
   );
   return rows[0] ?? null;

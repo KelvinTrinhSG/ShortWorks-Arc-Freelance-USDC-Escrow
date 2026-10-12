@@ -1,6 +1,6 @@
 import "server-only";
 import { ARC, arcByChainId, isWalletAddress } from "@/data/arc";
-import { ARC_RECLAIM_BUFFER_DAYS, AUTO_APPROVE_DAYS, platformFeeFor } from "@/data/projectOptions";
+import { ARC_RECLAIM_BUFFER_DAYS, AUTO_APPROVE_HOURS, platformFeeFor } from "@/data/projectOptions";
 import {
   chainMessage,
   escrowAddress,
@@ -175,7 +175,9 @@ export async function startArcCheckout(proposalId, viewer, wallet) {
   }
   if (!escrowJobId) throw new PaymentError("Couldn't prepare the payment. Please try again.", 503);
 
-  const expiresAt = new Date(Date.parse(`${h.delivery_date}T23:59:59Z`) + (AUTO_APPROVE_DAYS + ARC_RECLAIM_BUFFER_DAYS) * DAY);
+  const expiresAt = new Date(
+    Date.parse(`${h.delivery_date}T23:59:59Z`) + AUTO_APPROVE_HOURS * 3_600_000 + ARC_RECLAIM_BUFFER_DAYS * DAY,
+  );
   const signatureDeadline = new Date(Date.now() + SIGNATURE_MINUTES * 60_000);
   const { rows } = await pool.query(
     `INSERT INTO job_arc_payments (proposal_id, chain_id, escrow_address, escrow_job_id, client_wallet, freelancer_wallet,

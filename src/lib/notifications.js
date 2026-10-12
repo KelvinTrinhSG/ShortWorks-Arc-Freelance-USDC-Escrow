@@ -1,4 +1,5 @@
 import "server-only";
+import { AUTO_APPROVE_HOURS } from "@/data/projectOptions";
 import pool from "@/lib/db";
 import { avatarUrlOf } from "@/lib/profile";
 
@@ -103,7 +104,7 @@ const MESSAGES = {
   job_dispute_opened: (r) => ({ text: `opened a dispute on "${r.title}"`, href: jobHref(r) }),
   job_dispute_withdrawn: (r) => ({ text: `withdrew the dispute on "${r.title}"`, href: jobHref(r) }),
   // Sent by ShortWorks itself (no actor).
-  job_auto_approved: (r) => ({ text: `approved "${r.title}" automatically after 3 days, and the freelancer was paid`, href: jobHref(r) }),
+  job_auto_approved: (r) => ({ text: `approved "${r.title}" automatically after ${AUTO_APPROVE_HOURS} hours, and the freelancer was paid`, href: jobHref(r) }),
   job_dispute_resolved: (r) => ({ text: `decided the dispute on "${r.title}"`, href: jobHref(r) }),
   job_payment_voided: (r) => ({ text: `cancelled "${r.title}": PayPal released the held payment`, href: jobHref(r) }),
   job_payment_expired: (r) => ({ text: `cancelled "${r.title}": the payment hold expired`, href: jobHref(r) }),

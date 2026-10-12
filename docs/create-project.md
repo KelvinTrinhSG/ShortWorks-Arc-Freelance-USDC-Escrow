@@ -9,10 +9,10 @@ Form 8 trường, đủ để freelancer đọc là hiểu ngay **scope · time 
 | 1 | Project title | ✅ | text, tối đa 70 ký tự | Scope |
 | 2 | Platforms | ✅ | chọn nhiều: TikTok · Instagram Reels · YouTube Shorts · Facebook Reels | Scope |
 | 3 | Type of work | ✅ | chọn 1: Video editing · UGC filming · Motion graphics | Scope |
-| 4 | Videos × length | ✅ | số video (1–50) × độ dài (≤15s · 15–30s · 30–60s · 60–90s · 1,5–3 phút) | Scope |
+| 4 | Video length | ✅ | độ dài (≤15s · 15–30s · 30–60s · 60–90s · 1,5–3 phút). **1 dự án = 1 video** (`PROJECT_VIDEO_COUNT`), không còn ô nhập số video, để freelancer giao xong 1 video là được trả tiền cho video đó. Dự án đăng trước quy định này (và đơn đặt từ Service) giữ nguyên số video cũ khi sửa | Scope |
 | 5 | Brief | ✅ | tối đa 1000 ký tự. Dưới ô có gợi ý cần ghi gì: sản phẩm, mục tiêu, thông điệp, ai cung cấp footage, phụ đề/nhạc/lồng tiếng, ngôn ngữ, link tài liệu | Scope + Quality |
 | 6 | Deadline | ✅ | chọn ngày, từ ngày mai trở đi | Time |
-| 7 | Budget per video | ✅ | số (USD). Tổng tiền tự tính ngay bên dưới, ví dụ "Total: $200 for 5 videos" | Cost |
+| 7 | Budget | ✅ | số (USD) cho 1 video. Dự án cũ nhiều video hiện "Budget per video" kèm dòng tổng tiền | Cost |
 | 8 | Reference videos | — | 0–3 link TikTok/Reels/Shorts/Facebook, xem trước dạng khung dọc 9:16 | Quality |
 
 ## Giao diện

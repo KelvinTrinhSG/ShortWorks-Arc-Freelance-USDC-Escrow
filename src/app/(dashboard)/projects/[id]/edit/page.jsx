@@ -2,7 +2,7 @@ import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import DashboardNavigation from "@/components/dashboard/header/DashboardNavigation";
 import CreateProjectForm from "@/components/dashboard/project/CreateProjectForm";
 import MobileNavigation2 from "@/components/header/MobileNavigation2";
-import { getProject } from "@/lib/projects";
+import { getProject, projectFormState } from "@/lib/projects";
 import { getViewer } from "@/lib/viewer";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -18,19 +18,7 @@ export default async function page({ params }) {
   // Only the client who posted it may edit; everyone else gets a 404.
   if (!data?.isOwner) notFound();
   const p = data.project;
-
-  // Same shape as the Create Project form state.
-  const initial = {
-    title: p.title,
-    platforms: p.platforms,
-    workType: p.workType,
-    videoCount: String(p.videoCount),
-    videoLength: p.videoLength,
-    brief: p.brief,
-    deadline: p.deadline,
-    budgetPerVideo: String(p.budgetPerVideo),
-    references: p.references,
-  };
+  const initial = projectFormState(p);
 
   return (
     <>

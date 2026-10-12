@@ -2,7 +2,7 @@ import Footer from "@/components/footer/Footer";
 import Header20 from "@/components/header/Header20";
 import {
   ARC_RECLAIM_BUFFER_DAYS,
-  AUTO_APPROVE_DAYS,
+  AUTO_APPROVE_HOURS,
   DISPUTE_DECISION_HOURS,
   MAX_DELIVERY_DAYS,
   PLATFORM_FEE_PERCENT,
@@ -46,7 +46,7 @@ const SECTIONS = [
       `When the work is approved, the contract pays the freelancer and the ${PLATFORM_FEE_PERCENT}% platform fee in one transaction. There is no payment processor fee: on a 100 USDC job the freelancer receives ${100 - PLATFORM_FEE_PERCENT} USDC.`,
       "Network fees on Arc are paid in USDC by whoever sends the transaction: the client when hiring and approving, ShortWorks for automatic approvals, undoing a hire and dispute decisions. They are very small but the client needs a little more USDC than the job price.",
       "If the client undoes the hire before any work is delivered, or a dispute is decided for the client, all the USDC goes back to the client's wallet.",
-      `As a safety net, if a job is still not settled ${AUTO_APPROVE_DAYS + ARC_RECLAIM_BUFFER_DAYS} days after the delivery date, the client can take the USDC back directly from the contract, without ShortWorks. This is paused while a dispute is open.`,
+      `As a safety net, if a job is still not settled ${Math.ceil(AUTO_APPROVE_HOURS / 24) + ARC_RECLAIM_BUFFER_DAYS} days after the delivery date, the client can take the USDC back directly from the contract, without ShortWorks. This is paused while a dispute is open.`,
       "Transactions on a blockchain can't be reversed. Check you're on the right network and wallet before confirming in your wallet. On the Arc testnet, USDC has no real value.",
     ],
   },
@@ -55,7 +55,7 @@ const SECTIONS = [
     title: "Delivery and review times",
     body: [
       `The delivery date can be at most ${MAX_DELIVERY_DAYS} days after hiring, because PayPal holds a payment for a limited time.`,
-      `After each delivery, the client has ${AUTO_APPROVE_DAYS} days to approve or request changes. Without an answer, the work is approved automatically and the freelancer is paid.`,
+      `After each delivery, the client has ${AUTO_APPROVE_HOURS} hours to approve or request changes. Without an answer, the work is approved automatically and the freelancer is paid: the freelancer can claim the payment from the job page right away, otherwise ShortWorks pays it within a day.`,
     ],
   },
   {
