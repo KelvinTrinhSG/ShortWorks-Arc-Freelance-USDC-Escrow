@@ -13,7 +13,7 @@ export default function PayoutForm() {
               <input
                 type="text"
                 className="form-control"
-                placeholder="creativelayers088@gmail.com"
+                placeholder="you@example.com"
               />
             </div>
           </div>
@@ -25,7 +25,7 @@ export default function PayoutForm() {
               <input
                 type="text"
                 className="form-control"
-                placeholder="creativelayers088@gmail.com"
+                placeholder="you@example.com"
               />
             </div>
           </div>
@@ -37,7 +37,7 @@ export default function PayoutForm() {
               <input
                 type="text"
                 className="form-control"
-                placeholder="creativelayers088@gmail.com"
+                placeholder="you@example.com"
               />
             </div>
           </div>
@@ -49,7 +49,7 @@ export default function PayoutForm() {
               <input
                 type="text"
                 className="form-control"
-                placeholder="creativelayers088@gmail.com"
+                placeholder="you@example.com"
               />
             </div>
           </div>
@@ -61,7 +61,7 @@ export default function PayoutForm() {
               <input
                 type="text"
                 className="form-control"
-                placeholder="creativelayers088@gmail.com"
+                placeholder="you@example.com"
               />
             </div>
           </div>
@@ -73,7 +73,7 @@ export default function PayoutForm() {
               <input
                 type="text"
                 className="form-control"
-                placeholder="creativelayers088@gmail.com"
+                placeholder="you@example.com"
               />
             </div>
           </div>

@@ -4,8 +4,8 @@ import Hero16 from "@/components/hero/Hero16";
 import Blog16 from "@/components/section/Blog16";
 import BrowserCategory16 from "@/components/section/BrowserCategory16";
 import CtaBanner16 from "@/components/section/CtaBanner16";
-import LearnFreeio16 from "@/components/section/LearnFreeio16";
-import LearnFreeio17 from "@/components/section/LearnFreeio17";
+import LearnPlatform16 from "@/components/section/LearnPlatform16";
+import LearnPlatform17 from "@/components/section/LearnPlatform17";
 import NeedSomething2 from "@/components/section/NeedSomething2";
 import OurCta16 from "@/components/section/OurCta16";
 import OurPartner1 from "@/components/section/OurPartner1";
@@ -25,10 +25,10 @@ export default function page() {
                 <BrowserCategory16 />
                 <NeedSomething2 />
                 <PopularService1 />
-                <LearnFreeio16 />
+                <LearnPlatform16 />
                 <CtaBanner16 />
                 <OurPartner1 />
-                <LearnFreeio17 />
+                <LearnPlatform17 />
                 <Blog16 />
                 <OurCta16 />
             </div>

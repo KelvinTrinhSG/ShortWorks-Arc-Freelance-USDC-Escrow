@@ -97,7 +97,7 @@ export const browserCategory = [
   },
 ];
 
-export const learnFreeio1 = [
+export const learnPlatform1 = [
   {
     id: 1,
     title: "Great Work",

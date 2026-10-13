@@ -12,7 +12,7 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { Navigation, Pagination } from "swiper/modules";
 
-// Home page section in place of the template's testimonials (LearnFreeio1): there are
+// Home page section in place of the template's testimonials (LearnPlatform1): there are
 // no real reviews yet, so it states how ShortWorks works instead. Numbers come from
 // data/projectOptions.js so they stay true if the rules change.
 const FACTS = [

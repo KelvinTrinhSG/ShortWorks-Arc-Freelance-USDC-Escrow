@@ -7,7 +7,7 @@ import BrowserCategory14 from "@/components/section/BrowserCategory14";
 import CtaBanner14 from "@/components/section/CtaBanner14";
 import CtaBanner142 from "@/components/section/CtaBanner142";
 import HighestRated14 from "@/components/section/HighestRated14";
-import LearnFreeio1 from "@/components/section/LearnFreeio1";
+import LearnPlatform1 from "@/components/section/LearnPlatform1";
 import OurPartner1 from "@/components/section/OurPartner1";
 import SkillArea1 from "@/components/section/SkillArea1";
 import TrendingService14 from "@/components/section/TrendingService14";
@@ -32,7 +32,7 @@ export default function page() {
                     <CtaBanner142 />
                     <HighestRated14 />
                     <About14 />
-                    <LearnFreeio1 />
+                    <LearnPlatform1 />
                     <SkillArea1 />
                 </div>
                 <Footer11 />

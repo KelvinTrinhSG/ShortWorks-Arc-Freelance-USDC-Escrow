@@ -1,15 +1,15 @@
 "use client";
-import LearnFreeioCard from "../card/LearnFreeioCard";
+import LearnPlatformCard from "../card/LearnPlatformCard";
 import { Swiper, SwiperSlide } from "@/components/swiper";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { Navigation, Pagination } from "swiper/modules";
-import { learnFreeio1 } from "@/data/project";
+import { learnPlatform1 } from "@/data/project";
 import CountUp from "react-countup";
 import { usePathname } from "next/navigation";
 
-export default function LearnFreeio1() {
+export default function LearnPlatform1() {
   const path = usePathname();
 
   return (
@@ -112,9 +112,9 @@ export default function LearnFreeio1() {
                     clickable: true,
                   }}
                 >
-                  {learnFreeio1.map((item, index) => (
+                  {learnPlatform1.map((item, index) => (
                     <SwiperSlide key={index}>
-                      <LearnFreeioCard data={item} />
+                      <LearnPlatformCard data={item} />
                     </SwiperSlide>
                   ))}
                 </Swiper>

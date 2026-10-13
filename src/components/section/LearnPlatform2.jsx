@@ -1,8 +1,8 @@
 "use client";
 import CountUp from "react-countup";
-import LearnFreeIoCard2 from "../card/LearnFreeIoCard2";
+import LearnPlatformCard2 from "../card/LearnPlatformCard2";
 
-export default function LearnFreeio2() {
+export default function LearnPlatform2() {
   return (
     <>
       <section className="hover-bgc-color pb90 pb30-md overflow-hidden">
@@ -22,7 +22,7 @@ export default function LearnFreeio2() {
               .fill(3)
               .map((_, i) => (
                 <div key={i} className="col-sm-6 col-lg-4">
-                  <LearnFreeIoCard2 />
+                  <LearnPlatformCard2 />
                 </div>
               ))}
           </div>

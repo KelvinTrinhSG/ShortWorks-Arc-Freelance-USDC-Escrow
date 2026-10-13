@@ -3,7 +3,7 @@ import Header21 from "@/components/header/Header21";
 import Hero9 from "@/components/hero/Hero9";
 import BrowserCategory2 from "@/components/section/BrowserCategory2";
 import HighestRated3 from "@/components/section/HighestRated3";
-import LearnFreeio1 from "@/components/section/LearnFreeio1";
+import LearnPlatform1 from "@/components/section/LearnPlatform1";
 import OurCta5 from "@/components/section/OurCta5";
 import OurFunFact3 from "@/components/section/OurFunFact3";
 import OurPartner1 from "@/components/section/OurPartner1";
@@ -28,7 +28,7 @@ export default function page() {
                 <HighestRated3 />
                 <OurFunFact3 />
                 <TrendingService5 />
-                <LearnFreeio1 />
+                <LearnPlatform1 />
                 <SkillArea1 />
                 <Footer8 />
             </div>

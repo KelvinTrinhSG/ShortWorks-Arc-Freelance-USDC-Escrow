@@ -1,13 +1,13 @@
 "use client";
-import LearnFreeioCard from "../card/LearnFreeioCard";
+import LearnPlatformCard from "../card/LearnPlatformCard";
 import { Swiper, SwiperSlide } from "@/components/swiper";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { Navigation, Pagination } from "swiper/modules";
-import { learnFreeio1 } from "@/data/project";
+import { learnPlatform1 } from "@/data/project";
 
-export default function LearnFreeio17() {
+export default function LearnPlatform17() {
   return (
     <section className="bgc-thm4 pb90 pb30-md overflow-hidden">
       <div className="container">
@@ -56,9 +56,9 @@ export default function LearnFreeio17() {
                   },
                 }}
               >
-                {learnFreeio1.map((item, index) => (
+                {learnPlatform1.map((item, index) => (
                   <SwiperSlide key={index}>
-                    <LearnFreeioCard data={item} />
+                    <LearnPlatformCard data={item} />
                   </SwiperSlide>
                 ))}
               </Swiper>

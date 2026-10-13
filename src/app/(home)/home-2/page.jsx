@@ -4,7 +4,7 @@ import Hero2 from "@/components/hero/Hero2";
 import BrowserCategory2 from "@/components/section/BrowserCategory2";
 import CtaBanner2 from "@/components/section/CtaBanner2";
 import HighestRated1 from "@/components/section/HighestRated1";
-import LearnFreeio1 from "@/components/section/LearnFreeio1";
+import LearnPlatform1 from "@/components/section/LearnPlatform1";
 import NeedSomething2 from "@/components/section/NeedSomething2";
 import OurPartner1 from "@/components/section/OurPartner1";
 import PopularService1 from "@/components/section/PopularService1";
@@ -25,7 +25,7 @@ export default function page() {
                 <OurPartner1 />
                 <BrowserCategory2 />
                 <HighestRated1 />
-                <LearnFreeio1 />
+                <LearnPlatform1 />
                 <Footer2 />
             </div>
         </>

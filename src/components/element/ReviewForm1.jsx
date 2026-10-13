@@ -39,7 +39,7 @@ export default function ReviewForm1() {
                 <input
                   type="email"
                   className="form-control"
-                  placeholder="creativelayers088"
+                  placeholder="you@example.com"
                 />
               </div>
             </div>

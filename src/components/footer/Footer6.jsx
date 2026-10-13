@@ -103,15 +103,7 @@ export default function Footer6() {
                         <div className="col-md-6">
                             <div className="text-center text-lg-start">
                                 <p className="copyright-text mb-0 text-white-light ff-heading">
-                                    © ShortWorks. 2023{" "}
-                                    <Link
-                                        href="https://themeforest.net/user/ib-themes/portfolio"
-                                        target="_blank"
-                                        style={{ color: "inherit" }}
-                                    >
-                                        ib-themes
-                                    </Link>
-                                    . All rights reserved.
+                                    © ShortWorks 2026. All rights reserved.
                                 </p>
                             </div>
                         </div>

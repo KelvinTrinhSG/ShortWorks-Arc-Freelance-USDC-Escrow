@@ -4,7 +4,7 @@ import Link from "next/link";
 import React from "react";
 import CountUp from "react-countup";
 
-export default function LearnFreeio16() {
+export default function LearnPlatform16() {
   return (
     <section className="hover-bgc-color pb90 pb30-md overflow-hidden  cta-home5-style">
       <Image

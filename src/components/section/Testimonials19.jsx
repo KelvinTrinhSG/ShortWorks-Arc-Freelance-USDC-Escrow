@@ -5,7 +5,7 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { Navigation, Pagination } from "swiper/modules";
 
-import { learnFreeio1 } from "@/data/project";
+import { learnPlatform1 } from "@/data/project";
 import Image from "next/image";
 
 export default function Testimonials19() {
@@ -56,7 +56,7 @@ export default function Testimonials19() {
                     },
                   }}
                 >
-                  {learnFreeio1.map((elm, index) => (
+                  {learnPlatform1.map((elm, index) => (
                     <SwiperSlide key={index}>
                       <div className="item">
                         <div className="testimonial-style1 at-home19 default-box-shadow1 position-relative mb60 bdrs12">

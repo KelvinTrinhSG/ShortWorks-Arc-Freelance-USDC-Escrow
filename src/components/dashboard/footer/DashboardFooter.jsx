@@ -9,8 +9,7 @@ export default function DashboardFooter() {
                         <div className="col-auto">
                             <div className="copyright-widget">
                                 <p className="mb-md-0">
-                                    © ShortWorks. 2023 CreativeLayers. All rights
-                                    reserved.
+                                    © ShortWorks 2026. All rights reserved.
                                 </p>
                             </div>
                         </div>
